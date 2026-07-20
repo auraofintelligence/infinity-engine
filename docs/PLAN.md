@@ -30,16 +30,16 @@ Every stage advances `status` in the note's frontmatter, so the vault itself is 
 ## Phases
 
 - **Phase 0 (this repo, done):** vault + ontology + ingest + ideation packets + claude-CLI loop + validate + dashboard + runner/job scaffolding + researched providers.yaml.
-- **Phase 1, comic pre-viz:** a ComfyUI workflow (Qwen-Image) driven by `panel_beats`, wrapped as a `panels` job the local runner can execute on the RTX 3060/production box for drafts. Character LoRA training for the recurring cast (one-off, ~US$1-5 per character on a rented A100).
+- **Phase 1, comic pre-viz:** a ComfyUI workflow (Qwen-Image) driven by `panel_beats`, wrapped as a `panels` job the local runner can execute on the production box for drafts. Character LoRA training for the recurring cast (one-off, ~A$2-7 per character on a rented A100).
 - **Phase 2, remote video:** worker image (ComfyUI + Wan 2.2 / HunyuanVideo 1.5) for Vast.ai interruptible 4090s; `keyframes → video` jobs via the remote_pod runner; per-job cost written back to the log. First full lyric video end to end.
 - **Phase 3, sound and mouths:** TTS (Qwen3-TTS) + lip-sync (LatentSync/InfiniteTalk) jobs; first micro-drama.
 - **Phase 4, assembly and publish:** beat-synced cutting (librosa + ffmpeg), platform renders (9:16, 1:1, 16:9), publish checklists per platform.
 
 Model refresh is a recurring chore, not a rebuild: re-run the research pass, edit `providers.yaml`, done.
 
-## Cost picture (2026-07-20)
+## Cost picture (2026-07-20, AUD at AUD/USD 0.70)
 
-- Draft video batch: Vast.ai interruptible 4090 ~US$0.30/hr; a 6 s draft clip costs a few cents of GPU time.
-- Premium runs: RunPod secure A100 80GB ~US$1.39/hr or H100 ~US$2.99/hr with a network volume so 30 GB of weights persists between sessions.
-- Zero-ops fallback: fal.ai per-output (hosted Wan ~US$0.05/s of video) when a hosted model beats self-hosting for a hero shot.
-- Whole-album maths: 100 songs × ~40 draft clips × 6 s ≈ 40 hrs of 4090 time ≈ US$12-15 per full draft sweep. The expensive tier only ever renders approved shots.
+- Draft video batch: Vast.ai interruptible 4090 ~A$0.45/hr; a 6 s draft clip costs a few cents of GPU time.
+- Premium runs: RunPod secure A100 80GB ~A$2.00/hr or H100 ~A$4.30/hr with a network volume so 30 GB of weights persists between sessions.
+- Zero-ops fallback: fal.ai per-output (hosted Wan ~A$0.07/s of video) when a hosted model beats self-hosting for a hero shot.
+- Whole-album maths: 103 songs × ~40 draft clips × 6 s ≈ 41 hrs of 4090 time ≈ A$18-22 per full draft sweep, about the price of two coffees and a ferry ticket. The expensive tier only ever renders approved shots.

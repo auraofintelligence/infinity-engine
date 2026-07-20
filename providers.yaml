@@ -1,6 +1,7 @@
 # Model and compute registry, researched 2026-07-20.
 # Swapping a model or host = editing this file, never workflow code.
-# Prices are USD and drift; re-verify before a big batch.
+# Prices in AUD, converted from provider USD rates at AUD/USD 0.70
+# (2026-07-20). Rates drift; re-verify before a big batch.
 # Licence notes matter because the music universe is commercial.
 
 runners:
@@ -18,12 +19,12 @@ runners:
     service: fal.ai
 
 # Where to rent the metal (2026-07-20 snapshot):
-#   draft batches:   Vast.ai interruptible RTX 4090 ~US$0.30/hr (per-second
+#   draft batches:   Vast.ai interruptible RTX 4090 ~A$0.45/hr (per-second
 #                    billing, docker-native, built for restartable batch)
-#   reliability up:  RunPod community 4090 US$0.34/hr, secure A100 80GB
-#                    ~US$1.39/hr, H100 ~US$2.99/hr; network volumes keep
+#   reliability up:  RunPod community 4090 ~A$0.50/hr, secure A100 80GB
+#                    ~A$2.00/hr, H100 ~A$4.30/hr; network volumes keep
 #                    model weights warm between runs; Sydney region exists
-#   zero-ops:        fal.ai per-output (Wan hosted ~US$0.05/s of video)
+#   zero-ops:        fal.ai per-output (Wan hosted ~A$0.07/s of video)
 #                    for premium clips without managing weights
 
 models:
@@ -40,7 +41,8 @@ models:
       why: best open quality with a clean commercial licence; huge LoRA ecosystem
     premium:
       name: LTX-2.3
-      licence: LTX-2 Community (free commercial under US$10M/yr revenue)
+      licence: LTX-2 Community (free commercial under US$10M/yr revenue,
+        their licence term is set in USD)
       vram_gb: 16-80
       why: native synced audio+video, native 4K and vertical 1080x1920
 
@@ -108,7 +110,7 @@ models:
         only usable here with a paid BFL licence
     character_lock: >
       Recurring cast: train a character LoRA on Qwen-Image or FLUX.1-dev,
-      roughly 30-60 min on one rented A100/4090 (about US$1-5 per character).
+      roughly 30-60 min on one rented A100/4090 (about A$2-7 per character).
 
   llm:
     draft:
