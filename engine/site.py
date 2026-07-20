@@ -220,6 +220,14 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
     path = out_dir / "pipeline.html"
     path.write_text(_page("How it works", pipeline_body), encoding="utf-8")
     written.append(path)
+
+    # Prune stale album pages: if an album drops out of the allowlist,
+    # its old page must not linger on the live site.
+    kept = {p.name for p in written if p.parent.name == "albums"}
+    for old in (out_dir / "albums").glob("*.html"):
+        if old.name not in kept:
+            old.unlink()
+
     return written
 
 

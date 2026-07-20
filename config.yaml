@@ -15,6 +15,15 @@ sources:
   # production machine when running there.
   local_lyrics: null
 
+# Only these albums flow into the engine, in this order. Leave empty or
+# remove to take every album in the catalogue. The universe repo carries
+# more albums than we want in the pipeline yet; this is the gate.
+albums:
+  - songs-of-straddie
+  - chronicles-of-the-forgotten
+  - starseed-code-from-aura-to-infinity
+  - a-protopian-gambit
+
 # Job artefacts (payloads in, results out).
 jobs_dir: jobs
 db_path: jobs/engine.db

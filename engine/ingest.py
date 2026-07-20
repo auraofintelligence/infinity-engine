@@ -70,11 +70,18 @@ def _merge(vault_dir: Path, slug: str, fresh_meta: dict, lyrics: str,
     return "created"
 
 
-def ingest_album_pack(pack_dir: Path, vault_dir: Path) -> dict:
+def ingest_album_pack(pack_dir: Path, vault_dir: Path,
+                      allow_albums: list[str] | None = None) -> dict:
+    """Ingest the album-pack repo. If allow_albums is given, only albums
+    whose slug is in that list flow into the vault; everything else in
+    the catalogue is skipped."""
     catalogue = json.loads(
         (pack_dir / "data" / "catalogue.json").read_text(encoding="utf-8"))
-    counts = {"created": 0, "updated": 0, "no_page": 0}
+    counts = {"created": 0, "updated": 0, "no_page": 0, "skipped_album": 0}
     for album in catalogue.get("albums", []):
+        if allow_albums and album.get("slug") not in allow_albums:
+            counts["skipped_album"] += 1
+            continue
         for track_no, slug in enumerate(album.get("tracks", []), start=1):
             page = pack_dir / "songs" / slug / "index.html"
             if not page.exists():

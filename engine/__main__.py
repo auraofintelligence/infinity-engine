@@ -31,7 +31,8 @@ def cmd_ingest(cfg, args):
     if pack:
         pack_dir = (cfg["_root"] / pack).resolve()
         if pack_dir.exists():
-            counts = ingest.ingest_album_pack(pack_dir, vault_dir)
+            counts = ingest.ingest_album_pack(
+                pack_dir, vault_dir, allow_albums=cfg.get("albums") or None)
             print(f"album-pack: {counts}")
             ran = True
         else:
@@ -130,8 +131,14 @@ def cmd_site(cfg, args):
     notes = vault.all_notes(resolve(cfg, "vault_dir"))
     if not notes:
         sys.exit("vault is empty; run: python -m engine ingest")
-    written = render_site(notes, load_catalogue(pack_dir),
-                          cfg["_root"] / "docs")
+    catalogue = load_catalogue(pack_dir)
+    allow = cfg.get("albums") or None
+    if allow:
+        # Keep only allowed albums, ordered as the allowlist lists them,
+        # so the site mirrors exactly what the pipeline covers.
+        by_slug = {a.get("slug"): a for a in catalogue.get("albums", [])}
+        catalogue["albums"] = [by_slug[s] for s in allow if s in by_slug]
+    written = render_site(notes, catalogue, cfg["_root"] / "docs")
     print(f"wrote {len(written)} pages under docs/")
 
 
