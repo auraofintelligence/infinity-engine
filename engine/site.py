@@ -141,10 +141,10 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             "</div></a>")
     index_body = (
         "<h1>Where every song sits</h1>"
-        "<p class='lead'>One hundred and three songs are moving from lyrics "
-        "towards film: lyric videos, comics, vertical micro-dramas and more. "
-        "This page tracks each song through the stages below and updates as "
-        "pieces complete.</p>"
+        f"<p class='lead'>{len(notes)} songs across {len(cards)} albums are "
+        "moving from lyrics towards film: lyric videos, comics, vertical "
+        "micro-dramas and more. This page tracks each song through the "
+        "stages below and updates as pieces complete.</p>"
         f"{_status_bar(total_counts, len(notes))}"
         f"<p class='muted'>{len(notes)} songs &middot; {summary}</p>"
         "<div class='legend'>" + "".join(
