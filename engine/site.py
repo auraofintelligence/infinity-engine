@@ -24,6 +24,7 @@ STATUS_BLURB = {
 }
 
 UNIVERSE_BASE = "https://auraofintelligence.github.io/i-C-infinity-music-universe"
+REPO_BASE = "https://github.com/auraofintelligence/infinity-engine"
 
 CSS = """
 :root{--bg:#0e0e16;--panel:#171725;--line:#262640;--ink:#e9e9f2;--mut:#8d8da6;
@@ -83,6 +84,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <strong>Infinity Engine</strong>
 <nav><a href="{up}index.html">Progress</a>
 <a href="{up}pipeline.html">How it works</a>
+<a href="{REPO_BASE}/blob/main/docs/WORKFLOW.md">Operator guide</a>
 <a href="{UNIVERSE_BASE}/">Music universe</a></nav>
 </div></header>
 <main class="wrap">

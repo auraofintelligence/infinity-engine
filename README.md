@@ -42,4 +42,4 @@ Point `config.yaml` at your sources. On the production machine, set `sources.loc
 
 `providers.yaml` holds the current registry (researched 2026-07-20): draft/standard/premium tiers for video, lip-sync, TTS, image, LLM and embeddings, plus where to rent GPUs and what it costs. Swapping a model or vendor is a config edit, never a code change. Licence notes are inline because the universe is commercial: everything in the default path is Apache 2.0 or MIT.
 
-The deeper plan lives in [docs/PLAN.md](docs/PLAN.md).
+How to actually drive it, stage by stage, lives in the [operator guide](docs/WORKFLOW.md). The deeper plan lives in [docs/PLAN.md](docs/PLAN.md).
