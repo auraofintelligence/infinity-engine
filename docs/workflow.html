@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operator guide - Infinity Engine</title>
+<style>
+:root{--bg:#0e0e16;--panel:#171725;--line:#262640;--ink:#e9e9f2;--mut:#8d8da6;
+--a:#7fb4e6}
+*{box-sizing:border-box}body{font-family:system-ui,sans-serif;margin:0;
+background:var(--bg);color:var(--ink);line-height:1.55}
+a{color:var(--a);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1060px;margin:0 auto;padding:0 1.2rem}
+header{border-bottom:1px solid var(--line);padding:.9rem 0}
+header .wrap{display:flex;gap:1.4rem;align-items:baseline;flex-wrap:wrap}
+header strong{font-size:1.05rem}nav{display:flex;gap:1.1rem;flex-wrap:wrap}
+h1{font-size:2rem;font-weight:800;margin:2.2rem 0 .4rem}
+h2{margin-top:2.4rem}.lead{color:var(--mut);max-width:46rem}
+.bar{display:flex;height:16px;border-radius:8px;overflow:hidden;
+background:var(--panel);margin:1.2rem 0}
+.s-ingested{background:#3a3a58}.s-analysed{background:#1d5573}.s-briefed{background:#7a6600}
+.s-panels{background:#63419a}.s-keyframes{background:#8a4477}.s-video{background:#2f7a42}
+.s-published{background:#0f8a68}
+.pill{display:inline-block;padding:.08rem .6rem;border-radius:999px;
+font-size:.78rem;background:var(--panel)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+overflow:hidden}.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.card .pad{padding:.8rem .9rem 1rem}.card h3{margin:.1rem 0 .2rem;font-size:1rem}
+.card .muted,.muted{color:var(--mut);font-size:.85rem}
+.card .bar{height:8px;margin:.7rem 0 0}
+table{border-collapse:collapse;width:100%;margin:1.2rem 0 2.5rem}
+th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line);
+vertical-align:top}
+th{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+.theme{color:#9ad;font-size:.8rem;margin-right:.45rem;white-space:nowrap}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+gap:.7rem;margin:1.4rem 0}
+.legend div{background:var(--panel);border:1px solid var(--line);
+border-radius:10px;padding:.7rem .9rem;font-size:.9rem}
+footer{border-top:1px solid var(--line);margin-top:3.5rem;padding:1.6rem 0 2.4rem;
+color:var(--mut);font-size:.9rem}
+.stage-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.4rem 0}
+.stage-flow .pill{font-size:.85rem;padding:.3rem .8rem}
+.stage-flow span.arrow{color:var(--mut)}
+.doc{max-width:52rem}
+.doc h1{margin-top:1.6rem}.doc h2{margin-top:2.4rem;padding-top:1.4rem;
+border-top:1px solid var(--line)}.doc h3{margin-top:1.7rem}
+.doc p,.doc li{color:#d6d6e4}.doc li{margin:.2rem 0}
+.doc code{background:#20203300;background:var(--panel);border:1px solid var(--line);
+border-radius:5px;padding:.05rem .35rem;font-size:.88em}
+.doc pre{background:#0a0a12;border:1px solid var(--line);border-radius:10px;
+padding:1rem 1.1rem;overflow-x:auto}
+.doc pre code{background:none;border:none;padding:0;font-size:.82rem;
+line-height:1.45;color:#c8c8dc}
+.doc blockquote{border-left:3px solid var(--a);margin:1.2rem 0;padding:.3rem 1rem;
+color:var(--mut);background:var(--panel);border-radius:0 8px 8px 0}
+.doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.doc table{margin:1.2rem 0}.doc td{color:#d6d6e4}
+</style></head><body>
+<header><div class="wrap">
+<strong>Infinity Engine</strong>
+<nav><a href="index.html">Progress</a>
+<a href="pipeline.html">How it works</a>
+<a href="workflow.html">Operator guide</a>
+<a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
+</div></header>
+<main class="wrap">
+<div class='doc'><h1>Infinity Engine: how to drive it</h1>
+<p>This is the operator&#x27;s manual. It explains what happens at each stage, what you (Luke) actually do, where files go, and how to judge each pass. Read <a href="https://github.com/auraofintelligence/infinity-engine/blob/main/docs/PLAN.md">PLAN.md</a> for the why; this is the how.</p>
+<p>Two things up front:</p>
+<ul>
+<li><strong>What is built today:</strong> stages 1-3 (ingest, analyse, the human gate). Commands: <code>ingest</code>, <code>status</code>, <code>validate</code>, <code>brief</code>, <code>merge</code>, <code>jobs</code>, <code>dashboard</code>, <code>site</code>.</li>
+<li><strong>What is designed but not built yet:</strong> stages 4-7 (panels, keyframes, video, publish). The job/runner scaffolding exists, but the workers that generate images and video do not. Those are Phases 1-4.</li>
+</ul>
+<p>Everything runs from the repo root: <code>cd infinity-engine</code> then <code>python -m engine &lt;command&gt;</code>.</p>
+<hr>
+<h2>The one idea to hold in your head</h2>
+<p>Each song is a single markdown file in <code>vault/</code>. That file <strong>is</strong> the state of that song. Its <code>status:</code> field says which stage it has reached. Everything the engine does is: read those files, do one stage of work, write the result back into the file, bump the status. Git is the history; the SQLite log is just for tracking generation cost.</p>
+<pre><code>status flow:  ingested → analysed → briefed → panels → keyframes → video → published
+              \______ built today ______/   \____________ designed, Phase 1-4 ____________/
+              cheap text, no GPU cost         a human gate here      real GPU spend starts here</code></pre>
+<p>Cheap thinking first. A human gate in the middle (you). Expensive generation only ever runs on ideas you already approved.</p>
+<hr>
+<h2>Where everything lives</h2>
+<pre><code>infinity-engine/
+├── config.yaml          you edit: where sources are, which albums, which runner per tier
+├── providers.yaml       you edit: which model + which GPU host for each job type
+├── ontology.yaml        you edit rarely: the fixed vocabulary of tags/statuses
+├── vault/               the brain: one &lt;song-slug&gt;.md per song  (gitignored, never shipped)
+├── jobs/
+│   ├── prompts/         ideation packets: &lt;slug&gt;.prompt.txt
+│   ├── &lt;job-id&gt;/        one folder per generation job: spec.json + results/
+│   └── engine.db        SQLite log of every generation job and its cost
+├── docs/                the public monitor site (this folder) + these guides
+└── engine/              the code</code></pre>
+<p>The rule that keeps your data safe: <strong>the vault and orchestration never leave your machine.</strong> The only thing that ever goes to a rented GPU is one job folder (<code>spec.json</code> plus reference images). A rented box sees one song&#x27;s payload, nothing else.</p>
+<hr>
+<h2>Stage 1 — ingest  *(built)*</h2>
+<p><strong>What happens:</strong> <code>python -m engine ingest</code> reads the universe repo&#x27;s <code>catalogue.json</code> and each song&#x27;s HTML page, and writes one note per song into <code>vault/</code>. It pulls in title, album, track number, release link, the album&#x27;s visual world, and the full lyrics, plus a crude keyword guess at themes so no note is blank.</p>
+<p><strong>Your action:</strong> run it. That&#x27;s all. It is safe to re-run any time you push new songs to the universe repo; it only refreshes the imported fields and lyrics, and never overwrites analysis or a status you have advanced.</p>
+<p><strong>Which songs:</strong> controlled by the <code>albums:</code> allowlist in <code>config.yaml</code>. Right now that is the four core albums. Add a slug there to bring an album in.</p>
+<p><strong>Files:</strong> <code>vault/&lt;slug&gt;.md</code> created/updated.</p>
+<p><strong>How to evaluate the pass:</strong></p>
+<ul>
+<li><code>python -m engine status</code> — counts by album and by stage. Check the totals match what you expect.</li>
+<li><code>python -m engine validate</code> — every note checked against <code>ontology.yaml</code>. Must say all notes clean.</li>
+<li>Open any <code>vault/*.md</code> and read it. The frontmatter is the metadata; the body is the lyrics.</li>
+</ul>
+<hr>
+<h2>Stage 2 — analyse  *(built)*</h2>
+<p>This is the cheap text-thinking layer. It turns lyrics into a visual plan before a cent is spent on generation.</p>
+<p><strong>What happens:</strong> <code>python -m engine brief &lt;slug&gt;</code> writes a self-contained prompt into <code>jobs/prompts/&lt;slug&gt;.prompt.txt</code>. That prompt asks an LLM to return a JSON object with: <code>themes</code>, <code>mood</code>, <code>narrative_structure</code>, <code>visual_motifs</code> (filmable images from the lyrics), <code>emotional_arc</code>, <code>story_seed</code> (a micro-drama premise), and <code>panel_beats</code> (8-12 comic panels in order). Then <code>merge</code> folds that JSON back into the note and moves its status to <code>analysed</code>.</p>
+<p><strong>Your action, two ways:</strong></p>
+<ul>
+<li>*Hands-off:* <code>python -m engine brief &lt;slug&gt; --run-claude</code> runs the packet through your local <code>claude</code> CLI and merges the answer automatically.</li>
+<li>*Hands-on:* <code>python -m engine brief &lt;slug&gt;</code>, open the <code>.prompt.txt</code>, paste it into any chat (Claude, a local Qwen, whatever), save the JSON reply to a file, then <code>python -m engine merge &lt;slug&gt; that-file.json</code>.</li>
+</ul>
+<p>Do many at once with <code>python -m engine brief --all</code> (every song still at <code>ingested</code>).</p>
+<p><strong>Files:</strong> <code>jobs/prompts/&lt;slug&gt;.prompt.txt</code> in; the note&#x27;s frontmatter gains the analysis fields.</p>
+<p><strong>How to evaluate the pass:</strong> open the note and read <code>story_seed</code> and <code>panel_beats</code>. This is the cheapest place to iterate, so be picky. Does the story seed catch what the song is actually about? Do the panel beats make a sequence you would want to see? If not, either re-run the brief (models vary) or just edit the note by hand. This is where your taste enters the machine.</p>
+<hr>
+<h2>Stage 3 — briefed: the human gate  *(built, manual)*</h2>
+<p><strong>What happens:</strong> nothing automatic. This is you deciding a song is ready to cost money.</p>
+<p><strong>Your action:</strong> open the note and:</p>
+<ul>
+<li>confirm or rewrite the <code>panel_beats</code> until they are the shot list you want,</li>
+<li>set <code>lanes:</code> to what you are actually making (<code>lyric-video</code>, <code>comic</code>, <code>micro-drama</code>, <code>course-video</code>, <code>album-aggregate</code>),</li>
+<li>set <code>status: briefed</code>.</li>
+</ul>
+<p>Then <code>python -m engine site</code> and the song moves a notch on the public monitor.</p>
+<p><strong>How to evaluate:</strong> one question — is this idea worth GPU spend, and which shots carry it? Everything downstream renders what you approve here, so a weak brief wastes money later. Songs can sit at <code>analysed</code> indefinitely; only gate the ones you mean to make.</p>
+<blockquote>There is no <code>gate</code> command yet — you hand-edit the note. If that gets tedious across many songs I can add <code>python -m engine gate &lt;slug&gt; --lane micro-drama</code> to do it in one line. Say the word.</blockquote>
+<hr>
+<h2>Stage 4 — panels  *(designed, Phase 1 — not built)*</h2>
+<p><strong>Intended shape:</strong> <code>engine make panels &lt;slug&gt;</code> builds a job folder. <code>spec.json</code> carries the <code>panel_beats</code>, the album&#x27;s visual world, style references, and a character LoRA for any recurring cast. A ComfyUI workflow (Qwen-Image) renders 8-12 still panels. For drafts this runs on your production box via the <code>local</code> runner; no rented GPU needed.</p>
+<p><strong>Your action (future):</strong> run the command, then look at the panels.</p>
+<p><strong>Files (future):</strong> <code>jobs/&lt;slug&gt;-panels-&lt;id&gt;/spec.json</code> in, <code>results/panel-01.png …</code> out.</p>
+<p><strong>How you will evaluate:</strong> do the stills read as a coherent visual story, in your world, on-model for the cast? Stills are cheap and fast to re-roll, so this is the second cheap gate before video. You approve the strongest panels; those become the keyframes.</p>
+<p><strong>To bring this online you need:</strong> ComfyUI installed on the production box, the Qwen-Image weights, one working panel workflow, and a one-off character-LoRA train per recurring character (about A$2-7 of rented A100 time each, converted at AUD/USD 0.70). This is the next build step whenever you want it.</p>
+<hr>
+<h2>Stage 5 — keyframes  *(designed, Phase 2 prep — not built)*</h2>
+<p><strong>Intended shape:</strong> the approved panels become the start/end frames of video shots. Largely a selection-and-crop step: you pick which panel pairs bookend each motion.</p>
+<p><strong>Files (future):</strong> <code>keyframes/</code> inside the same job folder.</p>
+<p><strong>How you will evaluate:</strong> which pairs of stills imply good motion between them.</p>
+<hr>
+<h2>Stage 6 — video  *(designed, Phase 2 — not built)*</h2>
+<p><strong>Intended shape:</strong> <code>engine make video &lt;slug&gt;</code> builds a job whose <code>spec.json</code> carries keyframe pairs plus a motion prompt. It runs an open video model (Wan 2.2 or HunyuanVideo 1.5) on a <strong>rented</strong> GPU via the <code>remote_pod</code> runner. The job folder is pushed to the pod over SSH, the model renders short clips, results come back, and the cost is written to <code>jobs/engine.db</code>.</p>
+<p><strong>Your action (future):</strong> spin up a Vast.ai or RunPod pod, put its address into <code>providers.yaml</code> under <code>runners.remote_pod.host</code>, run the command. Draft clips cost a few cents each; a full draft sweep of all 96 songs is roughly A$18-22.</p>
+<p><strong>Files (future):</strong> <code>jobs/&lt;slug&gt;-video-&lt;id&gt;/results/shot-01.mp4 …</code></p>
+<p><strong>How you will evaluate:</strong> watch the clips. Look for the usual generative-video failures — faces morphing, objects drifting, hands. Re-roll the bad shots (they are individually cheap), approve the keepers.</p>
+<p><strong>To bring this online you need:</strong> a worker image (ComfyUI + the video model) on the pod, and the <code>remote_pod.command</code> in <code>providers.yaml</code> pointed at it. The runner plumbing already exists; only the worker is missing.</p>
+<hr>
+<h2>Stage 7 — published  *(designed, Phase 4 — not built)*</h2>
+<p><strong>Intended shape:</strong> approved clips are assembled to the beat (a <code>librosa</code> cut list driving <code>ffmpeg</code>), rendered per platform (9:16 vertical, 1:1, 16:9), and checked against a per-platform publish list. For micro-dramas and course videos, Phase 3 slots in first: TTS (Qwen3-TTS) for dialogue and lip-sync (LatentSync / InfiniteTalk) before assembly.</p>
+<p><strong>Files (future):</strong> <code>final/&lt;platform&gt;/&lt;slug&gt;.mp4</code>.</p>
+<p><strong>How you will evaluate:</strong> does it cut on the beat, hold up in the target aspect ratio, and clear your publish checklist.</p>
+<hr>
+<h2>How the pieces connect (the runner model)</h2>
+<p>A <strong>job</strong> is a folder: <code>spec.json</code> + any reference assets, with an empty <code>results/</code> waiting. That folder is the unit of work and the only thing that travels.</p>
+<p>A <strong>runner</strong> decides where that folder executes. Three kinds, chosen per tier in <code>config.yaml</code> (<code>default_runners:</code>) and configured in <code>providers.yaml</code> (<code>runners:</code>):</p>
+<table><thead><tr><th>Runner</th><th>What it does</th><th>Use for</th></tr></thead><tbody>
+<tr><td><code>local</code></td><td>runs a command on this machine against the job folder</td><td>draft panels, anything your own GPU can handle</td></tr>
+<tr><td><code>remote_pod</code></td><td>SSHes the folder to a rented GPU, runs one command, pulls <code>results/</code> back</td><td>standard/premium video on Vast.ai or RunPod</td></tr>
+<tr><td><code>saas</code></td><td>calls a hosted per-output API (fal.ai) — stub for now</td><td>a hero shot where a hosted model beats self-hosting</td></tr>
+</tbody></table>
+<p>So &quot;connecting a piece&quot; means: pick the model in <code>providers.yaml</code>, pick the runner for that tier, and (for <code>remote_pod</code>) drop the live pod address in when you rent one. Workflow code never changes — only config. Swapping Wan for a newer model next year is a two-line edit.</p>
+<hr>
+<h2>The loop, in one screen</h2>
+<pre><code>push new songs to the universe repo
+        │
+        ▼
+python -m engine ingest         # stage 1  → notes appear/update in vault/
+python -m engine validate       #            sanity check
+        │
+        ▼
+python -m engine brief &lt;slug&gt; --run-claude   # stage 2 → analysis in the note
+        │  (read it, fix it — cheap)
+        ▼
+edit the note: set panel_beats, lanes, status: briefed   # stage 3 → YOUR gate
+        │
+        ▼
+[Phase 1+]  engine make panels &lt;slug&gt;   → review stills
+            engine make video  &lt;slug&gt;   → review clips     (rented GPU, logged cost)
+            engine assemble    &lt;slug&gt;   → per-platform renders
+        │
+        ▼
+python -m engine site           # regenerate the monitor
+git add -A &amp;&amp; git commit &amp;&amp; git push    # the live site updates</code></pre>
+<p>The monitor at auraofintelligence.github.io/infinity-engine shows every song&#x27;s stage and updates each time you run <code>site</code> and push.</p>
+<hr>
+<h2>What to do next</h2>
+<p>Right now you can run stages 1-3 across all 96 songs for essentially free — that alone gives you a complete, edited visual plan (story seeds + panel beats) for the whole catalogue. The natural next build is <strong>Phase 1 (panels)</strong>, because it is the first stage that produces something you can look at, and it is the second cheap gate before any real spend. When you want it, that is the next thing I build.</p></div>
+</main>
+<footer><div class="wrap">A live monitor of the i C. infinity visual
+pipeline. Regenerated from the song vault as pieces complete.
+Lyrics live with the music, not here.<br>Luke &times; Claude.</div></footer>
+</body></html>

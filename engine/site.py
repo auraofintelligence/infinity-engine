@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from pathlib import Path
 
 STATUS_ORDER = ["ingested", "analysed", "briefed", "panels", "keyframes",
@@ -66,6 +67,20 @@ color:var(--mut);font-size:.9rem}
 .stage-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.4rem 0}
 .stage-flow .pill{font-size:.85rem;padding:.3rem .8rem}
 .stage-flow span.arrow{color:var(--mut)}
+.doc{max-width:52rem}
+.doc h1{margin-top:1.6rem}.doc h2{margin-top:2.4rem;padding-top:1.4rem;
+border-top:1px solid var(--line)}.doc h3{margin-top:1.7rem}
+.doc p,.doc li{color:#d6d6e4}.doc li{margin:.2rem 0}
+.doc code{background:#20203300;background:var(--panel);border:1px solid var(--line);
+border-radius:5px;padding:.05rem .35rem;font-size:.88em}
+.doc pre{background:#0a0a12;border:1px solid var(--line);border-radius:10px;
+padding:1rem 1.1rem;overflow-x:auto}
+.doc pre code{background:none;border:none;padding:0;font-size:.82rem;
+line-height:1.45;color:#c8c8dc}
+.doc blockquote{border-left:3px solid var(--a);margin:1.2rem 0;padding:.3rem 1rem;
+color:var(--mut);background:var(--panel);border-radius:0 8px 8px 0}
+.doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.doc table{margin:1.2rem 0}.doc td{color:#d6d6e4}
 """
 
 
@@ -84,7 +99,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <strong>Infinity Engine</strong>
 <nav><a href="{up}index.html">Progress</a>
 <a href="{up}pipeline.html">How it works</a>
-<a href="{REPO_BASE}/blob/main/docs/WORKFLOW.md">Operator guide</a>
+<a href="{up}workflow.html">Operator guide</a>
 <a href="{UNIVERSE_BASE}/">Music universe</a></nav>
 </div></header>
 <main class="wrap">
@@ -222,6 +237,23 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
     path = out_dir / "pipeline.html"
     path.write_text(_page("How it works", pipeline_body), encoding="utf-8")
     written.append(path)
+
+    # Operator guide: render docs/WORKFLOW.md into a styled page so it
+    # lives on the site itself, WORKFLOW.md staying the single source.
+    guide = out_dir / "WORKFLOW.md"
+    if guide.exists():
+        from .markdown import render as render_md
+        body = render_md(guide.read_text(encoding="utf-8"))
+        # Cross-doc .md links have no on-site page; send them to the
+        # GitHub blob, which renders markdown. workflow.html self-links
+        # are not emitted by the doc, so nothing to special-case.
+        body = re.sub(r'href="([\w./-]+\.md)"',
+                      rf'href="{REPO_BASE}/blob/main/docs/\1"', body)
+        path = out_dir / "workflow.html"
+        path.write_text(_page("Operator guide",
+                              f"<div class='doc'>{body}</div>"),
+                        encoding="utf-8")
+        written.append(path)
 
     # Prune stale album pages: if an album drops out of the allowlist,
     # its old page must not linger on the live site.
