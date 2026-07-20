@@ -1,0 +1,56 @@
+# Fixed tag ontology for the Infinity Engine vault.
+# The validate command checks every note against this file.
+# Add new values here first; never invent tags inline in a note.
+
+themes:
+  - AGI
+  - Blockchain
+  - GajraEarth
+  - GlobalGroupMarriages
+  - Protopia
+  - JoyfulResponsibleAbundance
+  - Straddie
+  - Love
+  - Grief
+  - Community
+  - Resilience
+  - CosmicMyth
+  - Governance
+  - Nature
+
+moods:
+  - anthemic
+  - tender
+  - defiant
+  - playful
+  - reflective
+  - urgent
+  - celebratory
+  - haunting
+  - romantic
+  - meditative
+
+narrative_structures:
+  - journey            # protagonist moves through a change
+  - call-and-response  # two voices, he/she pairs, dialogue form
+  - anthem             # collective declaration, no single protagonist
+  - vignette           # single scene held and deepened
+  - transformation     # before/after arc within one character
+  - chronicle          # events recounted across time
+  - invitation         # direct address pulling the listener in
+
+statuses:
+  - ingested    # note created from source, machine tags only
+  - analysed    # LLM/human analysis merged in
+  - briefed     # visual brief approved by Luke
+  - panels      # comic pre-viz panels generated
+  - keyframes   # panels promoted to video keyframes
+  - video       # video shots generated
+  - published   # released to a platform
+
+lanes:
+  - lyric-video
+  - comic
+  - course-video
+  - micro-drama
+  - album-aggregate

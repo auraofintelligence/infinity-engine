@@ -1,0 +1,143 @@
+# Model and compute registry, researched 2026-07-20.
+# Swapping a model or host = editing this file, never workflow code.
+# Prices are USD and drift; re-verify before a big batch.
+# Licence notes matter because the music universe is commercial.
+
+runners:
+  local:
+    kind: local
+    command: null   # set when a local worker script exists (Phase 1)
+  remote_pod:
+    kind: remote_pod
+    host: null      # fill in when a pod is up, e.g. root@1.2.3.4
+    port: 22
+    remote_dir: /workspace/jobs
+    command: "cd {remote_job_dir} && python /workspace/worker.py --spec spec.json --out results"
+  fal:
+    kind: saas
+    service: fal.ai
+
+# Where to rent the metal (2026-07-20 snapshot):
+#   draft batches:   Vast.ai interruptible RTX 4090 ~US$0.30/hr (per-second
+#                    billing, docker-native, built for restartable batch)
+#   reliability up:  RunPod community 4090 US$0.34/hr, secure A100 80GB
+#                    ~US$1.39/hr, H100 ~US$2.99/hr; network volumes keep
+#                    model weights warm between runs; Sydney region exists
+#   zero-ops:        fal.ai per-output (Wan hosted ~US$0.05/s of video)
+#                    for premium clips without managing weights
+
+models:
+  video:
+    draft:
+      name: HunyuanVideo 1.5
+      licence: Apache 2.0
+      vram_gb: 14-24
+      why: best quality per GB on a rented 4090/5090; ComfyUI native
+    standard:
+      name: Wan 2.2 A14B
+      licence: Apache 2.0
+      vram_gb: 24 (FP8) / 40-80 (FP16)
+      why: best open quality with a clean commercial licence; huge LoRA ecosystem
+    premium:
+      name: LTX-2.3
+      licence: LTX-2 Community (free commercial under US$10M/yr revenue)
+      vram_gb: 16-80
+      why: native synced audio+video, native 4K and vertical 1080x1920
+
+  lipsync:
+    draft:
+      name: MuseTalk 1.5
+      licence: MIT-style
+      vram_gb: 6-8
+      why: realtime-class, cheap bulk dubbing passes
+    standard:
+      name: LatentSync 1.x
+      licence: Apache 2.0
+      vram_gb: 8-12
+      why: best pure lip fidelity for dubbing existing footage
+    premium:
+      name: InfiniteTalk
+      licence: Apache 2.0
+      vram_gb: 24
+      why: unlimited-length audio-driven performance, head and body sync
+
+  avatar:
+    premium:
+      name: HunyuanVideo-Avatar
+      licence: Tencent community (check terms before commercial use)
+      vram_gb: 24-80
+      why: one image + audio to full-body emotion-controllable presenter
+
+  tts:
+    draft:
+      name: Kokoro-82M
+      licence: Apache 2.0
+      vram_gb: cpu-ok
+      why: fast fixed-voice narration; cannot clone
+    standard:
+      name: Qwen3-TTS
+      licence: Apache 2.0
+      vram_gb: 4-8
+      why: 3-second-reference cloning, commercial-safe default
+    premium:
+      name: Chatterbox Multilingual v3
+      licence: MIT
+      vram_gb: 6-8
+      why: beat ElevenLabs in blind tests; note output watermarking
+    avoid:
+      - F5-TTS (CC-BY-NC), Fish Speech (CC-BY-NC-SA), XTTS-v2 (CPML):
+        all non-commercial, excluded from this pipeline
+
+  image:
+    draft:
+      name: FLUX.2 Klein 4B
+      licence: Apache 2.0
+      vram_gb: 8-10
+      why: the only permissive FLUX.2 weight; commercial-safe drafts
+    standard:
+      name: Qwen-Image + Qwen-Image-Edit 2511
+      licence: Apache 2.0
+      vram_gb: 12-24
+      why: 2026 standard for character consistency via edit-with-reference;
+        best open text rendering for comic lettering and signage
+    premium:
+      name: FLUX.2 dev
+      licence: NON-COMMERCIAL open weights; paid licence for commercial
+      vram_gb: 32 (FP8) - 64
+      why: quality leader, 10 native reference images for character lock;
+        only usable here with a paid BFL licence
+    character_lock: >
+      Recurring cast: train a character LoRA on Qwen-Image or FLUX.1-dev,
+      roughly 30-60 min on one rented A100/4090 (about US$1-5 per character).
+
+  llm:
+    draft:
+      name: Qwen3.6-27B (Q4)
+      licence: Apache 2.0
+      vram_gb: 16-17
+      why: strongest single-24GB-card ideation model
+    premium:
+      name: GPT-OSS-120B
+      licence: Apache 2.0
+      vram_gb: 64-80
+      why: A100/H100-tier scripting brain for batch ideation on a pod
+    hosted:
+      name: claude CLI (already subscribed)
+      why: zero extra cost for interactive ideation; used by brief --run-claude
+
+  embeddings:
+    standard:
+      name: Qwen3-Embedding-0.6B
+      licence: Apache 2.0
+      why: cheap local semantic search over the vault
+    premium:
+      name: Qwen3-Embedding-8B
+      licence: Apache 2.0
+      why: tops open MTEB v2 when retrieval quality matters
+
+  beat_sync:
+    tools:
+      - librosa + ffmpeg (beat/onset extraction driving cut lists)
+      - Demucs (stem separation, key visuals off drums or vocals)
+      - ComfyUI_Yvann-Nodes (audio-reactive generation weights)
+      - lum3on/ComfyUI_AudioTools (BPM + frame-synced beat events)

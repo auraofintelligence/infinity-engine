@@ -1,0 +1,9 @@
+# The vault is regenerable from sources and may hold private lyrics;
+# it never ships with the pipeline code. Flip deliberately if you ever
+# want a public vault.
+vault/
+jobs/
+dashboard.html
+__pycache__/
+*.pyc
+.venv/

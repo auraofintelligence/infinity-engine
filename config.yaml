@@ -1,0 +1,26 @@
+# Infinity Engine local configuration.
+# Paths are local to THIS machine and never leave it.
+
+# Where song notes live. Gitignored by default: the vault is regenerable
+# from sources, so lyrics never ship with the pipeline code by accident.
+vault_dir: vault
+
+# Sources the ingest command reads. Both are optional; ingest uses
+# whichever exist.
+sources:
+  # The canonical universe repo (catalogue.json + per-song pages).
+  album_pack: ../i-C-infinity-music-universe
+  # A private folder of cleaned lyric files (.txt or .md, one song per
+  # file, filename becomes the slug). Point this at the vault on the
+  # production machine when running there.
+  local_lyrics: null
+
+# Job artefacts (payloads in, results out).
+jobs_dir: jobs
+db_path: jobs/engine.db
+
+# Default runner target per tier (must exist in providers.yaml runners).
+default_runners:
+  draft: local
+  standard: remote_pod
+  premium: remote_pod
