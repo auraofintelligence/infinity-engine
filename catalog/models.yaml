@@ -434,3 +434,82 @@ models:
     status: active
     likes: 3000
     why: The de-facto SfM camera-pose and point-cloud step feeding every splat trainer; commercial-friendly BSD.
+
+  # ---- audio (stem + music analysis for ingestion) ----
+  - id: allin1
+    name: All-In-One
+    category: audio
+    task: structure + beats + tempo
+    repo: https://github.com/mir-aidj/all-in-one
+    licence: MIT
+    vram_gb: "GPU rec, CPU ok (~73s/33min on 4090)"
+    comfy: no
+    status: active
+    likes: 900
+    why: One call gives timestamped sections (intro/verse/chorus/bridge/outro) plus beats, downbeats and tempo as JSON. The backbone of audio ingestion.
+  - id: whisperx
+    name: WhisperX
+    category: audio
+    task: lyric-to-audio alignment
+    repo: https://github.com/m-bain/whisperX
+    licence: BSD (Whisper MIT)
+    vram_gb: "~10 (large-v3); CPU possible"
+    comfy: no
+    status: active
+    likes: 3500
+    why: Run on the isolated vocal stem with your lyric text as the transcript for word/line timestamps; syncs visuals to the words.
+  - id: essentia
+    name: Essentia + MTG models
+    category: audio
+    task: mood / energy / danceability
+    url: https://essentia.upf.edu/models.html
+    licence: AGPL-3.0 code; most model weights CC-BY-NC (flag)
+    vram_gb: "CPU / light"
+    comfy: no
+    status: active
+    likes: 1200
+    why: Human-readable energy/mood/danceability/arousal-valence per stem and over time; drives visual intensity. Watch the NC weights if commercialised.
+  - id: beat-this
+    name: Beat This!
+    category: audio
+    task: beat / downbeat tracking
+    repo: https://github.com/CPJKU/beat_this
+    licence: MIT
+    vram_gb: "small; CPU fine"
+    comfy: no
+    status: recon
+    likes: 400
+    why: SOTA beat grid without DBN post-processing; handles tempo and metre changes for tight visual cuts.
+  - id: clap-laion
+    name: CLAP (LAION)
+    category: audio
+    task: text-audio embeddings
+    hf: laion/clap-htsat-unfused
+    licence: Apache 2.0
+    vram_gb: "modest"
+    comfy: no
+    status: recon
+    likes: 800
+    why: Query stems by natural-language mood ("dark", "euphoric"); the commercial-safe embedding option vs the NC MERT/Essentia weights.
+  - id: demucs
+    name: Demucs (htdemucs_ft)
+    category: audio
+    task: stem separation (fallback)
+    repo: https://github.com/facebookresearch/demucs
+    licence: MIT
+    vram_gb: "3-8"
+    comfy: yes
+    status: active
+    likes: 3000
+    why: 4-stem separator for non-Suno material or re-splitting a bounce. Suno already gives you stems, so this is the fallback.
+  - id: madmom
+    name: madmom
+    category: audio
+    task: key / chord / beat reference
+    repo: https://github.com/CPJKU/madmom
+    licence: BSD (some algos carry commercial caveats)
+    vram_gb: "CPU"
+    comfy: no
+    status: recon
+    likes: 1400
+    why: Long-standing beat/downbeat and ~90% chord/key detection; the harmony tag layer, lowest priority for visuals.

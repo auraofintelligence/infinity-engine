@@ -729,6 +729,7 @@ MODEL_CATEGORIES = {
     "lipsync": ("Lip-sync and avatars", "Audio-driven talking performance"),
     "llm": ("Language", "Ideation and scripting"),
     "embeddings": ("Embeddings", "Semantic search over the vault"),
+    "audio": ("Audio", "Stem and music analysis for timing, energy, beat-sync"),
     "worlds": ("3D and worlds", "Meshes, environments and explorable worlds"),
 }
 
@@ -773,7 +774,7 @@ CONTENT_BADGE = {"unfiltered": "planned", "filtered": "designed",
                  "strict": "hero"}
 _STRICT_FRONTIER = {"sora", "veo-3", "midjourney", "firefly-image",
                     "firefly-video", "gemini-image"}
-_NON_CONTENT_CATS = {"worlds", "control", "stt", "embeddings"}
+_NON_CONTENT_CATS = {"worlds", "control", "stt", "embeddings", "audio"}
 
 
 def _content(m: dict, is_open: bool) -> str:
