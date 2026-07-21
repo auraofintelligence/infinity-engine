@@ -376,3 +376,119 @@ frontier:
     affiliate_status: unknown
     affiliate_url: https://www.krea.ai/cpp
     affiliate_terms: "Creative Partners Program exists; terms not publicly confirmed."
+
+  # ---- 3D and worlds ----
+  - id: tripo
+    name: Tripo AI
+    vendor: VAST AI Research
+    category: worlds
+    access: web / api
+    pricing: subscription / credits
+    strength: Fast, production 3D characters and props with rigging and Blender/Unreal export.
+    url: https://www.tripo3d.ai/
+    affiliate_status: yes
+    affiliate_url: https://tripo.promotekit.com
+    affiliate_terms: "30% recurring for first 12 months, via PromoteKit; US$20 min payout."
+  - id: meshy
+    name: Meshy AI
+    vendor: Meshy
+    category: worlds
+    access: web / api
+    pricing: subscription
+    strength: Artist-friendly text/image-to-3D with strong PBR texturing, retopo and rigging.
+    url: https://www.meshy.ai/
+    affiliate_status: yes
+    affiliate_url: https://affiliates.meshy.ai/
+    affiliate_terms: "20% recurring for first 12 months, plus a give-a-month referral."
+  - id: rodin
+    name: Rodin (Hyper3D)
+    vendor: Deemos
+    category: worlds
+    access: web / api
+    pricing: subscription / pay-per-result
+    strength: Sculpt-level detail with clean quad topology and 3D editing; the asset-quality leader.
+    url: https://hyper3d.ai/
+    affiliate_status: unknown
+  - id: marble
+    name: Marble
+    vendor: World Labs
+    category: worlds
+    access: web
+    pricing: subscription (Pro grants commercial rights)
+    strength: Text/image/video to editable, downloadable 3D environments (splats + meshes). Best hosted fit for a film pipeline.
+    url: https://marble.worldlabs.ai/
+    affiliate_status: unknown
+  - id: skybox-ai
+    name: Skybox AI
+    vendor: Blockade Labs
+    category: worlds
+    access: web / api
+    pricing: subscription
+    strength: Text to 8K 360 environment plus depth; Unity/Blender/Unreal exports. Fast HDRI sets.
+    url: https://www.blockadelabs.com/
+    affiliate_status: unknown
+  - id: genie-3
+    name: Genie 3
+    vendor: Google DeepMind
+    category: worlds
+    access: research preview
+    pricing: limited preview
+    strength: Real-time navigable prompted worlds (720p/24fps). The frontier bar; not publicly accessible yet.
+    url: https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/
+    affiliate_status: "no"
+  - id: odyssey
+    name: Odyssey
+    vendor: Odyssey
+    category: worlds
+    access: research preview / waitlist
+    pricing: preview
+    strength: Streaming real-time interactive 3D scenes, explicitly pitched at filmmaking.
+    url: https://odyssey.ml/introducing-explorer
+    affiliate_status: unknown
+  - id: runway-gwm
+    name: Runway GWM-1
+    vendor: Runway
+    category: worlds
+    access: research preview
+    pricing: preview
+    strength: Interactive real-time world from text/image (720p/24fps); navigate and modify.
+    url: https://runwayml.com/research/introducing-runway-gwm-1
+    affiliate_status: unknown
+  - id: postshot
+    name: Postshot
+    vendor: Jawset
+    category: worlds
+    access: desktop (Windows)
+    pricing: free (non-commercial) / Indie / Studio
+    strength: Fastest desktop gaussian-splat trainer for artists, with a strong Unreal 5 plugin.
+    url: https://www.jawset.com/
+    affiliate_status: "no"
+  - id: luma-capture
+    name: Luma AI
+    vendor: Luma Labs
+    category: worlds
+    access: web / app / api
+    pricing: free / Pro (commercial)
+    strength: Cloud capture to interactive gaussian-splat scenes and web embeds. Note the Unreal plugin is unmaintained.
+    url: https://lumalabs.ai/
+    affiliate_status: referral
+    affiliate_terms: "Creative Partner Program (selective, 5k+ followers). Public affiliate signup URL unverified; don't rely on it."
+  - id: polycam
+    name: Polycam
+    vendor: Polycam
+    category: worlds
+    access: app / web
+    pricing: free / Pro (splatting is paid)
+    strength: Mobile LiDAR and photo capture with broad export; fast field scanning on iPhone/iPad.
+    url: https://poly.cam/
+    affiliate_status: referral
+    affiliate_terms: "Affiliate link exists (footer form); commission terms not published. Confirm before relying."
+  - id: realityscan
+    name: RealityScan
+    vendor: Epic Games
+    category: worlds
+    access: desktop
+    pricing: free under US$1M revenue, else US$1,850/seat/yr
+    strength: Highest-fidelity photogrammetry meshes with a tight Unreal pipeline; for LED-wall and UE sets.
+    url: https://www.realityscan.com/
+    affiliate_status: "no"

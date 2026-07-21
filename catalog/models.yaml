@@ -300,3 +300,137 @@ models:
     status: active
     likes: 700
     why: Cheap local semantic search over the lyric/script vault.
+
+  # ---- 3D and worlds (open-weight) ----
+  - id: trellis-2
+    name: TRELLIS.2
+    category: worlds
+    task: image-to-3D asset (PBR mesh)
+    hf: microsoft/TRELLIS.2-4B
+    licence: MIT
+    vram_gb: "24"
+    comfy: partial
+    status: active
+    likes: 3000
+    why: Strongest new open image-to-3D; full PBR + transparency from one backbone. Clean MIT.
+  - id: step1x-3d
+    name: Step1X-3D
+    category: worlds
+    task: image-to-3D asset (controllable)
+    hf: stepfun-ai/Step1X-3D
+    licence: Apache 2.0
+    vram_gb: "27"
+    comfy: no
+    status: active
+    likes: 1200
+    why: The cleanest commercial licence for textured 3D; strong geometry-texture alignment.
+  - id: hunyuan3d-2-1
+    name: Hunyuan3D 2.1
+    category: worlds
+    task: image-to-3D asset (PBR)
+    hf: tencent/Hunyuan3D-2.1
+    licence: Tencent Community (EXCLUDES EU/UK/South Korea; 1M-MAU cap)
+    vram_gb: "10-29"
+    comfy: yes
+    status: active
+    likes: 4000
+    why: Production image-to-3D with PBR materials; flag the region and MAU licence limits.
+  - id: partcrafter
+    name: PartCrafter
+    category: worlds
+    task: part-aware image-to-3D
+    hf: wgsxm/PartCrafter
+    licence: MIT
+    vram_gb: "8"
+    comfy: no
+    status: active
+    likes: 800
+    why: Multiple separable 3D parts from one image, no pre-segmentation; low VRAM, clean MIT.
+  - id: triposr
+    name: TripoSR
+    category: worlds
+    task: fast image-to-3D
+    hf: stabilityai/TripoSR
+    licence: MIT
+    vram_gb: "~6"
+    comfy: yes
+    status: active
+    likes: 2500
+    why: Sub-second single-image-to-mesh; the cheap MIT draft-tier baseline.
+  - id: direct3d-s2
+    name: Direct3D-S2
+    category: worlds
+    task: high-res image-to-3D
+    hf: wushuang98/Direct3D-S2
+    licence: MIT
+    vram_gb: "10 (512) - 24 (1024)"
+    comfy: no
+    status: recon
+    likes: 700
+    why: Gigascale image-to-3D up to 1024 resolution via sparse attention; permissive MIT.
+  - id: hunyuanworld-voyager
+    name: HunyuanWorld-Voyager
+    category: worlds
+    task: explorable world (RGBD)
+    hf: tencent/HunyuanWorld-Voyager
+    licence: Tencent HunyuanWorld Community (EXCLUDES EU/UK/South Korea; 1M-MAU cap)
+    vram_gb: "60-80"
+    comfy: no
+    status: recon
+    likes: 1500
+    why: Camera-controlled RGBD world with real-time 3D reconstruction; exports point clouds for virtual sets. Flag licence.
+  - id: nvidia-cosmos
+    name: NVIDIA Cosmos
+    category: worlds
+    task: world foundation model
+    hf: nvidia/Cosmos-Predict2.5-2B
+    licence: NVIDIA Open Model (commercial ok)
+    vram_gb: "39-80+"
+    comfy: no
+    status: recon
+    likes: 2000
+    why: Fine-tunable world-foundation models; commercial licence but 80GB-class, more physical-AI than cinematic.
+  - id: matrix-game
+    name: Matrix-Game 3.0
+    category: worlds
+    task: real-time interactive world
+    hf: Skywork/Matrix-Game-2.0
+    licence: MIT
+    vram_gb: "unstated"
+    comfy: no
+    status: watching
+    likes: 900
+    why: Real-time streaming interactive world with long-horizon memory; permissive MIT.
+  - id: prometheus-3d
+    name: Prometheus
+    category: worlds
+    task: feed-forward 3D scene
+    repo: https://github.com/XDimLab/Prometheus
+    licence: MIT
+    vram_gb: "48 (tested A6000)"
+    comfy: no
+    status: recon
+    likes: 400
+    why: Seconds-fast text-to-3D-scene as pixel-aligned Gaussians; MIT. For whole environments, not single props.
+  - id: gsplat-nerfstudio
+    name: gsplat + Nerfstudio
+    category: worlds
+    task: gaussian-splat training
+    repo: https://github.com/nerfstudio-project/gsplat
+    licence: Apache 2.0
+    vram_gb: "8-24"
+    comfy: no
+    status: active
+    likes: 3500
+    why: The main commercially-usable open splat-training stack; turn real footage into 3D sets you can light.
+  - id: colmap
+    name: COLMAP
+    category: worlds
+    task: photogrammetry / camera solve
+    repo: https://github.com/colmap/colmap
+    licence: BSD-3-Clause
+    vram_gb: "cpu + optional gpu"
+    comfy: no
+    status: active
+    likes: 3000
+    why: The de-facto SfM camera-pose and point-cloud step feeding every splat trainer; commercial-friendly BSD.

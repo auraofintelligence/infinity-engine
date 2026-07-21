@@ -708,6 +708,7 @@ MODEL_CATEGORIES = {
     "lipsync": ("Lip-sync and avatars", "Audio-driven talking performance"),
     "llm": ("Language", "Ideation and scripting"),
     "embeddings": ("Embeddings", "Semantic search over the vault"),
+    "worlds": ("3D and worlds", "Meshes, environments and explorable worlds"),
 }
 
 
@@ -734,7 +735,10 @@ def _model_card(m: dict) -> tuple:
         f'&middot; <b>HF likes:</b> {_esc(m.get("likes","?"))}</div>'
         + (f'<a class="pc-more" href="https://huggingface.co/'
            f'{_esc(m.get("hf",""))}" target="_blank" rel="noopener">'
-           f'Hugging Face &rarr;</a>' if m.get("hf") else ""))
+           f'Hugging Face &rarr;</a>' if m.get("hf")
+           else (f'<a class="pc-more" href="{_esc(m.get("repo",""))}" '
+                 'target="_blank" rel="noopener">Repo &rarr;</a>'
+                 if m.get("repo") else "")))
     attrs = {
         "category": [str(m.get("category", ""))],
         "status": [status],
@@ -1071,6 +1075,7 @@ FRONTIER_CATEGORIES = {
     "music": ("Music", "Song generation"),
     "upscale": ("Upscale and enhance", "Finishing and resolution"),
     "language": ("Language", "Scripting and ideation"),
+    "worlds": ("3D and worlds", "Meshes, environments, world models and capture"),
 }
 
 _AFFIL = {
