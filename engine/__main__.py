@@ -8,6 +8,10 @@
   python -m engine brief SLUG --run-claude   run packet through claude CLI
                                              and merge the result
   python -m engine merge SLUG FILE     merge an analysis JSON into a note
+  python -m engine ingest-audio PATH [--slug S] [--bpm N]
+                                       read Suno stems (folder or zip) into
+                                       an audio block; attach to a note if
+                                       --slug names one in the vault
   python -m engine jobs                recent job log
   python -m engine dashboard           regenerate dashboard.html
 """
@@ -113,6 +117,39 @@ def cmd_merge(cfg, args):
     print(f"{note.slug}: merged, status = {note.status}")
 
 
+def cmd_ingest_audio(cfg, args):
+    from pathlib import Path
+
+    from .audio import analyse_stems
+    source = Path(args.path)
+    if not source.exists():
+        sys.exit(f"not found: {source}")
+    print(f"reading stems from {source.name} ...")
+    audio = analyse_stems(source, bpm=args.bpm)
+    print(f"\n  {audio['bit_depth']}-bit {audio.get('encoding','')} / "
+          f"{audio['sample_rate']} Hz / {audio['channels']}ch, "
+          f"{audio['duration_s']}s"
+          + (f", {audio['tempo_bpm']} BPM" if audio.get("tempo_bpm") else ""))
+    print(f"  arrangement: {audio['arrangement']} "
+          f"({audio['arrangement_density']} stems active)\n")
+    for s in audio["stems"]:
+        mark = "*" if s["active"] else " "
+        print(f"  [{mark}] {s['role']:16} {s['group']:8} "
+              f"{s['rms_dbfs']:>7} dBFS  {s['file']}")
+    print(f"\n  active: {', '.join(audio['active_stems'])}")
+    if args.slug:
+        vault_dir = resolve(cfg, "vault_dir")
+        path = vault.note_path(vault_dir, args.slug)
+        if not path.exists():
+            sys.exit(f"\nno vault note for --slug {args.slug}; not attached")
+        note = vault.read_note(path)
+        note.meta["audio"] = audio
+        vault.write_note(vault_dir, note)
+        print(f"\n  attached audio block to {args.slug}")
+    else:
+        print("\n  (no --slug given; not attached to a note)")
+
+
 def cmd_jobs(cfg, args):
     conn = jobs_mod.open_db(resolve(cfg, "db_path"))
     rows = jobs_mod.list_jobs(conn)
@@ -164,6 +201,10 @@ def main():
     p_merge = sub.add_parser("merge")
     p_merge.add_argument("slug")
     p_merge.add_argument("file")
+    p_audio = sub.add_parser("ingest-audio")
+    p_audio.add_argument("path", help="folder or .zip of Suno WAV stems")
+    p_audio.add_argument("--slug", help="vault note to attach the audio block to")
+    p_audio.add_argument("--bpm", type=int, help="song tempo (Suno shows it)")
     sub.add_parser("jobs")
     sub.add_parser("dashboard")
     sub.add_parser("site")
@@ -173,8 +214,9 @@ def main():
         parser.error("brief needs song slugs or --all")
     cfg = load_config()
     {"ingest": cmd_ingest, "status": cmd_status, "validate": cmd_validate,
-     "brief": cmd_brief, "merge": cmd_merge, "jobs": cmd_jobs,
-     "dashboard": cmd_dashboard, "site": cmd_site}[args.command](cfg, args)
+     "brief": cmd_brief, "merge": cmd_merge, "ingest-audio": cmd_ingest_audio,
+     "jobs": cmd_jobs, "dashboard": cmd_dashboard,
+     "site": cmd_site}[args.command](cfg, args)
 
 
 if __name__ == "__main__":
