@@ -9,8 +9,14 @@
 # kind:    character | likeness | style | detail
 # private: true means it never leaves this machine or hits the public site
 
+# The `character:` field links a trained LoRA to a Cast id (catalog/cast.yaml).
+# The LoRA page mirrors the whole cast automatically and shows these trained
+# records against the matching character; entries with no `character:` are
+# external style/detail LoRAs.
+
 loras:
   - id: goddess-v1
+    character: goddess
     name: The Goddess
     kind: character
     base: Qwen-Image
@@ -21,6 +27,7 @@ loras:
     trigger: ohwx_goddess
     why: Recurring mythic lead across Straddie and Starseed; a load-bearing cast LoRA.
   - id: aura-v1
+    character: aura
     name: Aura
     kind: character
     base: Qwen-Image
@@ -35,6 +42,7 @@ loras:
   # acronym): Luke's anticipated association for AI alignment and Protopia.
   # It belongs to the universe's lore, not the cast; kept out of the LoRA list.
   - id: he-lead-v1
+    character: he-lead
     name: He-lead (paired vocals)
     kind: character
     base: Qwen-Image
@@ -45,6 +53,7 @@ loras:
     trigger: ohwx_helead
     why: The male voice of the he/she paired tracks.
   - id: she-lead-v1
+    character: she-lead
     name: She-lead (paired vocals)
     kind: character
     base: Qwen-Image
@@ -55,6 +64,7 @@ loras:
     trigger: ohwx_shelead
     why: The female voice of the he/she paired tracks.
   - id: band-support-v1
+    character: band-supports
     name: Band and supports
     kind: likeness
     base: Qwen-Image

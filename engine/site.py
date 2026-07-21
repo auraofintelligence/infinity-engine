@@ -773,45 +773,106 @@ def render_models(out_dir: Path) -> Path | None:
         facet_defs=facet_defs, groups=groups)
 
 
+# Which fine-tune approach each troupe warrants (the tiering: don't LoRA
+# everyone). Tier label doubles as the teal chip on the card.
+CAST_LORA_TIER = {
+    "music-universe": ("hero LoRA",
+                       "Train first: the recurring leads that carry the universe"),
+    "queens": ("template LoRA",
+               "Cultural-translation templates; train a Queen as you use her"),
+    "amity-crew": ("reference",
+                   "Consistent crew avatars; reference-first, LoRA if they recur on screen"),
+    "two-dogs": ("reference", "Podcast hosts; reference or a light LoRA"),
+}
+
+
+def _lora_status_class(status: str) -> str:
+    return {"active": "built", "trained": "built", "planned": "designed",
+            "recon": "planned", "concept": "planned"}.get(status, "planned")
+
+
 def render_loras(out_dir: Path) -> Path | None:
-    loras = _load_catalog(out_dir, "catalog/loras.yaml", "loras")
-    if not loras:
+    cast = _load_catalog(out_dir, "catalog/cast.yaml", "cast")
+    records = _load_catalog(out_dir, "catalog/loras.yaml", "loras")
+    if not cast and not records:
         return None
-    cards = []
-    for lo in loras:
-        status = lo.get("status", "planned")
-        st_class = {"active": "built", "recon": "planned",
-                    "planned": "designed"}.get(status, "designed")
-        priv = lo.get("private", False)
+    # Split loras.yaml into trained cast-LoRA records (keyed by character)
+    # and external style/detail LoRAs.
+    by_char = {r["character"]: r for r in records if r.get("character")}
+    external = [r for r in records if not r.get("character")]
+
+    def cast_card(c: dict) -> tuple:
+        troupe = c.get("troupe", "")
+        tier_label, tier_note = CAST_LORA_TIER.get(troupe, ("reference", ""))
+        rec = by_char.get(c["id"])
+        status = (rec.get("status") if rec else None) or (
+            "planned" if troupe == "music-universe" else "concept")
+        priv = c.get("private", False) or (rec.get("private") if rec else False)
+        trigger = rec.get("trigger") if rec else None
+        meta = f'<b>Role:</b> {_esc(c.get("role",""))}'
+        if trigger:
+            meta += f'<br><b>Trigger:</b> <code>{_esc(trigger)}</code>'
+        if tier_note:
+            meta += f'<br><span class="muted">{_esc(tier_note)}</span>'
         inner = (
+            f'<span class="pc-kicker">{_esc(c.get("represents",""))}</span>'
+            f'<h3>{_esc(c.get("name", c["id"]))}</h3>'
+            f'<span class="pc-task">{_esc(tier_label)}</span>'
+            f'<p class="pc-best">{_esc(c.get("summary",""))}</p>'
             '<div class="pc-badges">'
-            f'<span class="pc-b tier">{_esc(lo.get("kind",""))}</span>'
-            f'<span class="pc-b {st_class}">{_esc(status)}</span>'
+            f'<span class="pc-b {_lora_status_class(status)}">{_esc(status)}</span>'
             + ('<span class="pc-b hero">private</span>' if priv else "")
             + '</div>'
-            f'<h3>{_esc(lo.get("name", lo["id"]))}</h3>'
-            f'<p class="pc-sum">{_esc(lo.get("why",""))}</p>'
-            f'<div class="pc-meta"><b>Base:</b> {_esc(lo.get("base","?"))} '
-            f'&middot; <b>Source:</b> {_esc(lo.get("source","?"))}<br>'
-            f'<b>Trigger:</b> <code>{_esc(lo.get("trigger","-"))}</code></div>')
+            f'<div class="pc-meta">{meta}</div>')
         attrs = {
-            "kind": [str(lo.get("kind", ""))],
+            "troupe": [troupe],
+            "tier": [tier_label.split()[0]],
             "status": [status],
             "visibility": ["private" if priv else "shareable"],
         }
-        cards.append((attrs, inner))
+        return attrs, inner
+
+    groups = []
+    for troupe, (label, blurb) in CAST_TROUPES.items():
+        gcards = [cast_card(c) for c in cast if c.get("troupe") == troupe]
+        groups.append((label, blurb, gcards))
+    # External style/detail LoRAs.
+    ext_cards = []
+    for r in external:
+        status = r.get("status", "recon")
+        inner = (
+            f'<span class="pc-kicker">{_esc(r.get("source","hugging face"))}</span>'
+            f'<h3>{_esc(r.get("name", r["id"]))}</h3>'
+            f'<span class="pc-task">{_esc(r.get("kind","style"))}</span>'
+            f'<p class="pc-best">{_esc(r.get("why",""))}</p>'
+            '<div class="pc-badges">'
+            f'<span class="pc-b {_lora_status_class(status)}">{_esc(status)}</span></div>'
+            f'<div class="pc-meta"><b>Base:</b> {_esc(r.get("base","?"))} '
+            f'&middot; <b>Trigger:</b> <code>{_esc(r.get("trigger","-"))}</code></div>')
+        ext_cards.append(({"troupe": ["external"], "tier": ["style"],
+                           "status": [status],
+                           "visibility": ["shareable"]}, inner))
+    groups.append(("Style and detail (external)",
+                   "Style/detail LoRAs the watcher flags from Hugging Face to vet",
+                   ext_cards))
+
+    n = len(cast)
     facet_defs = [
-        ("Kind", "kind", _sorted_uniq(loras, "kind")),
-        ("Status", "status", ["active", "recon", "planned"]),
+        ("Troupe", "troupe", list(CAST_TROUPES) + ["external"]),
+        ("Tier", "tier", ["hero", "template", "reference", "style"]),
+        ("Status", "status", ["active", "trained", "planned", "concept"]),
         ("Visibility", "visibility", ["shareable", "private"]),
     ]
     return render_picker(
         out_dir, filename="loras.html", title="LoRA picker", noun="LoRA",
-        lead=("Fine-tunes the pipeline can pull: your own cast and likeness "
-              "LoRAs from the foundry, plus style and detail LoRAs the watcher "
-              "flags from Hugging Face for you to vet. Private ones never "
-              "leave your machine."),
-        facet_defs=facet_defs, cards=cards)
+        lead=(f"The fine-tune plan across the whole {n}-character map, mirrored "
+              "from the Cast. The teal chip is the tier: <b>hero LoRA</b> for "
+              "the leads to train first, <b>template LoRA</b> for the Queens as "
+              "cultural-translation templates, <b>reference</b> for ensembles "
+              "held with reference images until they earn a LoRA. Don't train "
+              "everyone; train what recurs. Style and detail LoRAs from Hugging "
+              "Face sit at the bottom."),
+        facet_defs=facet_defs, groups=groups)
 
 
 def render_compute(out_dir: Path) -> Path | None:
