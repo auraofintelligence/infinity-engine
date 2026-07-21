@@ -1,0 +1,37 @@
+# Just-in-time lessons: a plain 20-second explainer for each step, so you
+# learn as you go instead of needing to know it all first. The assistant
+# reads these out. Edit freely; keep them short and plain.
+
+read: >
+  Reading the song means Claude goes through the whole lyric and writes a
+  shot-by-shot plan: for each line, an image you could actually film or
+  draw. Nothing is made yet. This is the cheapest step and it shapes
+  everything after it, so it comes first.
+
+plan: >
+  Planning the panels turns that reading into a numbered list of comic
+  panels, and picks which model will draw them. It writes a job: a little
+  folder holding exactly what to make. Still no pictures, just the recipe.
+  This is the only thing that ever gets sent to a drawing machine.
+
+pictures: >
+  Making the pictures hands each panel to a drawing model. If you have a
+  rendering box connected, you get real images. If not, you get a preview:
+  the exact instructions for each panel, so you can check the plan before
+  spending anything on a machine.
+
+publish: >
+  Showing it on the site rebuilds your public pages so this song's page is
+  up to date. It never includes anything private, just what you have
+  chosen to show.
+
+connect: >
+  A rendering box is any computer running ComfyUI that draws your pictures.
+  It can be another PC of yours or an hourly hired box. You connect it once
+  by its address and the studio remembers it. Until then everything works
+  in preview.
+
+general: >
+  The idea: think cheaply in words first, keep a human in the loop, and
+  only spend real compute on ideas you have already approved. Every step
+  leaves a breadcrumb so you never lose your place.

@@ -1,0 +1,18 @@
+# What you're aiming to finish, and by when. Plain milestones the
+# assistant reads to answer "what's due?". Dates are your call; edit,
+# add, tick done: true as you go. Nothing here forces anything; it is
+# just so the studio can remind you where you meant to be.
+
+milestones:
+  - name: First comic-panel preview for a Protopian Gambit song
+    by: 2026-07-31
+    done: false
+  - name: Connect a rendering box and draw one song for real
+    by: 2026-08-15
+    done: false
+  - name: First lyric video finished and published
+    by: 2026-08-31
+    done: false
+  - name: A Protopian Gambit showcase set (hero songs) rendered
+    by: 2026-09-30
+    done: false

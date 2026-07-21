@@ -13,6 +13,7 @@ subprocess), so it runs on a fresh Python with no extra installs.
 from __future__ import annotations
 
 import json
+import secrets
 import subprocess
 import sys
 import threading
@@ -21,7 +22,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import fleet, flow, studio_state, vault
+from . import assistant, fleet, flow, studio_state, vault, voice
 from .config import load_config, resolve
 from .site import STATUS_ORDER
 
@@ -137,6 +138,11 @@ border-radius:999px;padding:.05rem .4rem}
 .fbtn{padding:.3rem .6rem;font-size:.78rem;border-radius:8px}
 .flink{color:var(--teal);font-size:.82rem}
 .fin{color:var(--teal);font-size:.8rem;font-family:var(--fm)}
+.answer{margin-top:.8rem;padding:.8rem .9rem;border-radius:11px;font-size:.95rem;
+line-height:1.5;background:rgba(43,227,194,.06);border:1px solid rgba(43,227,194,.25)}
+.answer.muted{background:rgba(255,255,255,.02);border-color:var(--line)}
+.vline{display:flex;align-items:center;gap:.5rem;margin-top:.7rem;font-size:.85rem;color:var(--mut)}
+.vline input{width:auto}
 """
 
 PAGE = """<!doctype html><html><head><meta charset="utf-8">
@@ -164,6 +170,20 @@ PAGE = """<!doctype html><html><head><meta charset="utf-8">
 </div>
 
 <pre id="out">Press "Pick a song to work on" and follow the glowing button.</pre>
+
+<div class="card">
+  <h2>Assistant</h2>
+  <p class="hint">Ask where you're up to, what's next, or what's due. Tick
+  the box to have answers read aloud.</p>
+  <div class="row">
+    <button data-ask="where">Where are we up to?</button>
+    <button data-ask="next">What's next?</button>
+    <button data-ask="due">What's due?</button>
+    <button class="ghost" data-ask="explain">Explain this step</button>
+  </div>
+  <div id="answer" class="answer muted">Ask me anything above.</div>
+  <label class="vline"><input type="checkbox" id="speak"> <span></span></label>
+</div>
 
 <div class="card">
   <h2>Rendering box <span id="cstatus" class="pill">checking...</span></h2>
@@ -235,6 +255,10 @@ async function boot(){
   paintGpu(home.server);
   renderTrail(home.trail);
   renderFleet();
+  const vspan=document.querySelector('.vline span');
+  if(home.voice&&home.voice.tts){vspan.textContent='read answers aloud (offline voice)';}
+  else{vspan.textContent='read aloud (not available on this machine)';
+    document.getElementById('speak').disabled=true;}
   renderList(songs);
   if(home.continue){
     await select(home.continue.slug);
@@ -367,6 +391,18 @@ async function connect(server){
 }
 document.getElementById('ctest').onclick=()=>connect(document.getElementById('cserver').value);
 document.getElementById('cdrop').onclick=()=>connect('');
+async function ask(q){
+  const a=document.getElementById('answer');
+  a.className='answer'; a.textContent='...';
+  let step=''; if(plan) step=plan.steps[plan.current].key;
+  const u='/api/ask?q='+q+'&slug='+encodeURIComponent(sel||'')+'&step='+step;
+  const j=await (await fetch(u)).json();
+  a.textContent=j.answer;
+  if(document.getElementById('speak').checked)
+    fetch('/api/speak',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:j.answer})});
+}
+document.querySelectorAll('button[data-ask]').forEach(b=>b.onclick=()=>ask(b.dataset.ask));
 document.getElementById('pick').onclick=async()=>{
   const j=await (await fetch('/api/next?gpu='+gpu)).json();
   if(j.slug){await select(j.slug);
@@ -407,9 +443,35 @@ def _options(values, sel=None):
                    for v in values)
 
 
+LOGIN_PAGE = """<!doctype html><html><head><meta charset="utf-8">
+<title>Infinity Engine</title><meta name="viewport"
+content="width=device-width, initial-scale=1"><style>
+body{margin:0;min-height:100vh;display:grid;place-items:center;
+font-family:system-ui,Segoe UI,sans-serif;color:#eae6ff;
+background:radial-gradient(1000px 700px at 60% -10%,rgba(124,77,255,.18),transparent),#05070c}
+.box{border:1px solid rgba(160,150,210,.2);border-radius:16px;padding:1.6rem 1.8rem;
+background:rgba(124,77,255,.08);max-width:340px;text-align:center}
+.mk{width:44px;height:44px;border-radius:50%;margin:0 auto .7rem;
+background:radial-gradient(circle at 35% 30%,#b79bff,#7c4dff 55%,#2a1a5e)}
+h1{font-size:1.2rem;margin:.2rem 0}p{color:#a89fce;font-size:.86rem}
+input{width:100%;padding:.6rem;margin:.6rem 0;border-radius:10px;font-size:1.1rem;
+text-align:center;letter-spacing:.2em;border:1px solid rgba(160,150,210,.3);
+background:rgba(0,0,0,.3);color:#eae6ff}
+button{width:100%;padding:.7rem;border:none;border-radius:10px;font-weight:700;
+font-size:1rem;color:#05070c;background:linear-gradient(135deg,#2be3c2,#ffcf6e)}
+.err{color:#ffcf6e;font-size:.85rem;min-height:1rem}
+</style></head><body><form class="box" action="/login" method="get">
+<div class="mk"></div><h1>Infinity Engine</h1>
+<p>Enter the access code shown on your studio machine.</p>
+<div class="err">__ERR__</div>
+<input name="key" placeholder="code" autofocus autocomplete="off">
+<button type="submit">Open the studio</button></form></body></html>"""
+
+
 class Handler(BaseHTTPRequestHandler):
     cfg = None
-    phone_url = None  # set when serving on the LAN (--lan)
+    phone_url = None    # set when serving on the LAN (--lan)
+    access_code = None  # required for non-localhost devices in --lan mode
 
     def log_message(self, *a):
         pass
@@ -444,9 +506,49 @@ class Handler(BaseHTTPRequestHandler):
         from . import comfy
         return comfy.ComfyClient(server).alive()
 
+    # --- access control: localhost is always open (airgap); other devices
+    #     need the code, so the panel is safe to reach over a tunnel/5G. ---
+    def _is_local(self) -> bool:
+        return self.client_address[0] in ("127.0.0.1", "::1")
+
+    def _cookie_key(self):
+        raw = self.headers.get("Cookie", "")
+        for part in raw.split(";"):
+            if part.strip().startswith("iek="):
+                return part.strip()[4:]
+        return None
+
+    def _authed(self, qs: dict) -> bool:
+        if self._is_local() or not Handler.access_code:
+            return True
+        key = self._cookie_key() or (qs.get("key") or [None])[0]
+        return key == Handler.access_code
+
+    def _login(self, qs: dict):
+        key = (qs.get("key") or [None])[0]
+        if key and key == Handler.access_code:
+            self.send_response(302)
+            self.send_header("Location", "/")
+            self.send_header("Set-Cookie", f"iek={key}; Path=/; SameSite=Lax")
+            self.end_headers()
+            return
+        body = LOGIN_PAGE.replace("__ERR__",
+                                  "wrong code, try again" if key else "")
+        self._send(200 if not key else 401, body, "text/html; charset=utf-8")
+
+    def _challenge(self, path: str):
+        if path.startswith("/api/"):
+            return self._send(401, json.dumps({"error": "locked"}))
+        self._send(200, LOGIN_PAGE.replace("__ERR__", ""),
+                   "text/html; charset=utf-8")
+
     def do_GET(self):
         parsed = urlparse(self.path)
         path, qs = parsed.path, parse_qs(parsed.query)
+        if path == "/login":
+            return self._login(qs)
+        if not self._authed(qs):
+            return self._challenge(path)
         if path == "/":
             page = (PAGE.replace("__CSS__", CSS)
                     .replace("__KINDS__", _options(KINDS))
@@ -466,6 +568,13 @@ class Handler(BaseHTTPRequestHandler):
             view = fleet.fleet_view(self.cfg["_root"], saved)
             view["phone_url"] = self.phone_url
             return self._send(200, json.dumps(view))
+        if path == "/api/ask":
+            q = (qs.get("q") or ["where"])[0]
+            slug = (qs.get("slug") or [""])[0]
+            step = (qs.get("step") or [""])[0] or None
+            note = next((n for n in self._notes() if n.slug == slug), None)
+            ans = assistant.answer(self.cfg, q, note=note, step_key=step)
+            return self._send(200, json.dumps({"answer": ans}))
         if path == "/api/home":
             state = studio_state.load(self.cfg)
             server = self._server()
@@ -477,7 +586,9 @@ class Handler(BaseHTTPRequestHandler):
                 cont = {"slug": last, "title": note.meta.get("title", last)}
             return self._send(200, json.dumps(
                 {"continue": cont, "trail": state.get("trail", [])[:8],
-                 "server": state.get("comfy_server"), "gpu": alive}))
+                 "server": state.get("comfy_server"), "gpu": alive,
+                 "voice": {"tts": voice.tts_available(),
+                           "stt": voice.stt_available()}}))
         if path == "/api/plan":
             slug = (qs.get("slug") or [""])[0]
             gpu = (qs.get("gpu") or ["false"])[0] == "true"
@@ -496,8 +607,13 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         length = int(self.headers.get("Content-Length", 0))
         req = json.loads(self.rfile.read(length) or "{}")
+        if not self._authed({}):
+            return self._send(401, json.dumps({"error": "locked"}))
         if path == "/api/connect":
             return self._connect(req)
+        if path == "/api/speak":
+            spoke = voice.say(req.get("text", ""))
+            return self._send(200, json.dumps({"spoke": spoke}))
         if path != "/api/run":
             return self._send(404, json.dumps({"error": "not found"}))
         try:
@@ -597,13 +713,22 @@ def serve(host="127.0.0.1", port=8765, open_browser=True, lan=False):
     bind = "0.0.0.0" if lan else host
     open_url = f"http://127.0.0.1:{port}/"
     if lan:
+        state = studio_state.load(Handler.cfg)
+        code = state.get("access_code") or secrets.token_hex(3)
+        if state.get("access_code") != code:
+            state["access_code"] = code
+            studio_state.save(Handler.cfg, state)
+        Handler.access_code = code
         ip = fleet.lan_ip()
         Handler.phone_url = f"http://{ip}:{port}/" if ip else None
     httpd = ThreadingHTTPServer((bind, port), Handler)
     print(f"Infinity Engine studio: {open_url}")
     if lan and Handler.phone_url:
-        print(f"On your phone / other devices (same wifi): {Handler.phone_url}")
-        print("(LAN mode: anyone on your network can reach this. Home wifi only.)")
+        print(f"\nOn another device (phone/tablet/laptop):")
+        print(f"  1. open   {Handler.phone_url}")
+        print(f"  2. code   {Handler.access_code}")
+        print(f"  one-tap link: {Handler.phone_url}login?key={Handler.access_code}")
+        print("(Other devices need the code; this machine never does.)")
     print("Leave this window open. Close it to stop.")
     if open_browser:
         threading.Timer(0.6, lambda: webbrowser.open(open_url)).start()
