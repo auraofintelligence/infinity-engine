@@ -269,6 +269,8 @@ border:1px solid transparent}
 background:rgba(124,77,255,.14);border-radius:5px;padding:.06rem .4rem}
 .pc-meta{font-size:.82rem;color:var(--mut);line-height:1.5}
 .pc-meta b{color:#d7d1ea;font-weight:600}
+.cast-ref{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;
+margin:-.3rem 0 .7rem;border:1px solid var(--line);background:rgba(255,255,255,.03)}
 .pc-more{border:none;background:none;color:var(--teal);cursor:pointer;
 font-size:.82rem;text-align:left;padding:0;display:inline-block;
 margin-top:.6rem;text-decoration:none;font-weight:600}
@@ -1679,19 +1681,34 @@ CAST_TROUPES = {
 }
 
 
-def _cast_card(c: dict) -> tuple:
+def _cast_card(c: dict, out_dir: Path | None = None) -> tuple:
     status = c.get("status", "concept")
     st_class = {"active": "built", "planned": "designed",
                 "concept": "planned"}.get(status, "planned")
     priv = c.get("private", False)
+    # Show a reference image only if the file has actually been dropped in,
+    # so a declared ref_image never 404s before the asset exists.
+    img_html = has_ref = ""
+    ref = c.get("ref_image")
+    if ref and out_dir and (out_dir / "assets" / "cast" / ref).exists():
+        img_html = (f'<img class="cast-ref" src="assets/cast/{_esc(ref)}" '
+                    f'alt="{_esc(c.get("name", c["id"]))} reference" '
+                    'loading="lazy">')
+        has_ref = '<span class="pc-b built">reference</span>'
+    design = (f'<p class="pc-detail" style="display:block">'
+              f'<b>Look:</b> {_esc(c.get("design"))}</p>'
+              if c.get("design") else "")
     inner = (
+        img_html +
         f'<span class="pc-kicker">{_esc(c.get("represents",""))}</span>'
         f'<h3>{_esc(c.get("name", c["id"]))}</h3>'
         f'<span class="pc-task">{_esc(c.get("role",""))}</span>'
         f'<p class="pc-best">{_esc(c.get("summary",""))}</p>'
         '<div class="pc-badges">'
         f'<span class="pc-b {st_class}">{_esc(status)}</span>'
-        + ('<span class="pc-b hero">private</span>' if priv else "") + '</div>')
+        + has_ref
+        + ('<span class="pc-b hero">private</span>' if priv else "") + '</div>'
+        + design)
     attrs = {
         "troupe": [str(c.get("troupe", ""))],
         "status": [status],
@@ -1706,7 +1723,8 @@ def render_cast(out_dir: Path) -> Path | None:
         return None
     groups = []
     for troupe, (label, blurb) in CAST_TROUPES.items():
-        gcards = [_cast_card(c) for c in cast if c.get("troupe") == troupe]
+        gcards = [_cast_card(c, out_dir) for c in cast
+                  if c.get("troupe") == troupe]
         groups.append((label, blurb, gcards))
     n = len(cast)
     facet_defs = [
