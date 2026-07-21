@@ -37,7 +37,7 @@ def _seed(job_id: str, n: int) -> int:
 
 
 def run_job(root: Path, job_dir: Path, *, offline: bool = False,
-            on_status=None) -> dict:
+            server: str | None = None, on_status=None) -> dict:
     """Render every shot in a job. Returns a manifest dict; also writes it
     to results/manifest.json. Raises on a real render failure."""
     spec = json.loads((job_dir / "spec.json").read_text(encoding="utf-8"))
@@ -61,7 +61,8 @@ def run_job(root: Path, job_dir: Path, *, offline: bool = False,
 
     client = None
     if not offline:
-        client = comfy.ComfyClient(ccfg.get("server", "http://127.0.0.1:8188"))
+        url = server or ccfg.get("server", "http://127.0.0.1:8188")
+        client = comfy.ComfyClient(url)
         if not client.alive():
             raise ConnectionError(
                 f"no ComfyUI at {client.server}; start it on the pod or pass "

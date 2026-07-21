@@ -460,6 +460,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <details class="nav-menu"><summary>Guide</summary><div class="nav-drop">
 <a href="{up}pipeline.html">How it works</a>
 <a href="{up}workflow.html">Operator guide</a>
+<a href="{up}gpu-setup.html">Set up a GPU</a>
 <a href="{up}formats.html">Formats</a>
 <a href="{up}plan.html">Master plan</a></div></details>
 <a href="{up}projects.html">Projects</a>
@@ -970,6 +971,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
     # link falls back to the GitHub blob, which renders markdown.
     from .markdown import render as render_md
     rendered_docs = {"WORKFLOW.md": ("workflow.html", "Operator guide"),
+                     "GPU-SETUP.md": ("gpu-setup.html", "Set up a GPU"),
                      "PLAN.md": ("plan.html", "Master plan")}
 
     def _doc_link(match):

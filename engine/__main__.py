@@ -19,10 +19,14 @@
                                        KIND = panels|keyframes|video|tts|
                                        lipsync|avatar
   python -m engine advance SLUG STATUS move a song to a new pipeline stage
-  python -m engine work [JOB_ID] [--offline]
+  python -m engine work [JOB_ID] [--offline] [--server URL]
                                        render queued jobs through ComfyUI on
                                        the GPU box. --offline emits the graphs
                                        it would submit, no GPU needed.
+                                       --server points at a pod's ComfyUI.
+  python -m engine doctor [--server URL]
+                                       show the wiring: paths, whether ComfyUI
+                                       is reachable, runners, queued jobs
   python -m engine jobs                recent job log
   python -m engine dashboard           regenerate dashboard.html
 """
@@ -248,6 +252,56 @@ def cmd_advance(cfg, args):
         print(f"{args.slug}: {old} -> {args.status}")
 
 
+def cmd_doctor(cfg, args):
+    """Show the wiring: paths, the ComfyUI touchpoint, runners, jobs. The
+    one place to see whether a GPU box is actually reachable."""
+    from . import comfy, worker
+    from .config import load_providers
+    root = cfg["_root"]
+    print("Infinity Engine wiring\n")
+
+    print("paths (local, never shipped):")
+    for key in ("vault_dir", "jobs_dir", "db_path"):
+        p = resolve(cfg, key)
+        print(f"  {key:10} {p}  {'ok' if p.exists() else '(missing)'}")
+
+    notes = vault.all_notes(resolve(cfg, "vault_dir"))
+    by_status = Counter(n.status for n in notes)
+    print(f"\nvault: {len(notes)} songs  "
+          + ", ".join(f"{s}:{c}" for s, c in by_status.most_common()))
+
+    ccfg = worker.load_comfy_config(root)
+    server = args.server or ccfg.get("server", "http://127.0.0.1:8188")
+    client = comfy.ComfyClient(server)
+    alive = client.alive()
+    reach = "YES" if alive else "no (start ComfyUI, or open an SSH tunnel)"
+    print("\nComfyUI touchpoint:")
+    print(f"  server    {server}")
+    print(f"  reachable {reach}")
+    print("  recipes (catalog/comfy.yaml) -> checkpoint each expects:")
+    for cat, tiers in (ccfg.get("recipes") or {}).items():
+        for tier, r in tiers.items():
+            print(f"    {cat}/{tier:8} {r.get('ckpt_name')}")
+
+    providers = load_providers()
+    print("\nrunners (providers.yaml) -> where jobs can render:")
+    for name, r in (providers.get("runners") or {}).items():
+        kind = r.get("kind")
+        where = r.get("host") or r.get("service") or "this machine"
+        ready = "ready" if (kind == "local" or r.get("host") or r.get("service")) \
+            else "host not set"
+        print(f"  {name:12} {kind:11} {where:22} {ready}")
+
+    conn = jobs_mod.open_db(resolve(cfg, "db_path"))
+    jb = Counter(r[0] for r in conn.execute(
+        "SELECT status FROM jobs").fetchall())
+    print("\njobs: " + (", ".join(f"{s}:{c}" for s, c in jb.items())
+                         or "none yet"))
+    if jb.get("queued"):
+        print(f"  {jb['queued']} queued -> render with: engine work"
+              + ("" if alive else " --offline"))
+
+
 def cmd_work(cfg, args):
     from . import worker
     jobs_dir = resolve(cfg, "jobs_dir")
@@ -272,6 +326,7 @@ def cmd_work(cfg, args):
         try:
             manifest = worker.run_job(
                 cfg["_root"], job_dir, offline=args.offline,
+                server=args.server,
                 on_status=lambda n, tot: print(f"    shot {n}/{tot}", end="\r"))
         except Exception as exc:  # noqa: BLE001 - report and move on
             jobs_mod.set_status(conn, job_id, "failed", notes=str(exc))
@@ -359,6 +414,10 @@ def main():
                         help="a job id; omit to run all queued jobs")
     p_work.add_argument("--offline", action="store_true",
                         help="emit ComfyUI graphs without a GPU/server")
+    p_work.add_argument("--server",
+                        help="ComfyUI URL override, e.g. http://POD_IP:8188")
+    p_doctor = sub.add_parser("doctor")
+    p_doctor.add_argument("--server", help="ComfyUI URL to test")
     sub.add_parser("jobs")
     sub.add_parser("dashboard")
     sub.add_parser("site")
@@ -370,8 +429,9 @@ def main():
     {"ingest": cmd_ingest, "status": cmd_status, "validate": cmd_validate,
      "brief": cmd_brief, "merge": cmd_merge, "review": cmd_review,
      "ingest-audio": cmd_ingest_audio, "make": cmd_make,
-     "advance": cmd_advance, "work": cmd_work, "jobs": cmd_jobs,
-     "dashboard": cmd_dashboard, "site": cmd_site}[args.command](cfg, args)
+     "advance": cmd_advance, "work": cmd_work, "doctor": cmd_doctor,
+     "jobs": cmd_jobs, "dashboard": cmd_dashboard,
+     "site": cmd_site}[args.command](cfg, args)
 
 
 if __name__ == "__main__":
