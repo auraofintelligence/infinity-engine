@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Latent Space - Infinity Engine</title>
+<script>document.documentElement.classList.add('js')</script>
+<style>@font-face{font-family:"Archivo Var";src:url("../assets/fonts/archivo-var.woff2") format("woff2-variations");font-weight:100 900;font-display:swap}@font-face{font-family:"JetBrains Mono Var";src:url("../assets/fonts/jetbrains-mono-var.woff2") format("woff2-variations");font-weight:100 800;font-display:swap}
+:root{--void:#05070c;--deep:#0a1420;--panel:rgba(124,77,255,.08);
+--violet:#7c4dff;--amethyst:#c9a6ff;--gold:#ffcf6e;--gold-soft:#ffe6b0;
+--teal:#2be3c2;--plasma:#ff5fd1;--text:#f6f4ff;--mut:#b9c3d6;
+--line:rgba(124,77,255,.28);--max:1120px;--radius:16px;
+--fd:"Archivo Var",ui-sans-serif,system-ui,sans-serif;
+--fm:"JetBrains Mono Var",Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;color:var(--text);font-family:var(--fd);font-weight:440;
+line-height:1.6;background:
+radial-gradient(ellipse 60rem 34rem at 14% -6%,rgba(124,77,255,.22),transparent),
+radial-gradient(ellipse 64rem 38rem at 90% 2%,rgba(43,227,194,.1),transparent),
+radial-gradient(ellipse 78rem 50rem at 50% 116%,rgba(42,20,88,.55),transparent),
+linear-gradient(180deg,#0c1220,#080c16 42%,var(--void));
+background-attachment:fixed;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+background:linear-gradient(90deg,rgba(201,166,255,.045) 1px,transparent 1px),
+linear-gradient(0deg,rgba(201,166,255,.045) 1px,transparent 1px);
+background-size:56px 56px;
+mask-image:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.03) 72%)}
+::selection{background:var(--gold);color:#201200}
+a{color:var(--amethyst);text-decoration:none}a:hover{color:#fff}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 clamp(1rem,4vw,2rem)}
+.site-header{position:sticky;top:0;z-index:50;
+border-bottom:1px solid var(--line);
+background:rgba(8,10,18,.82);backdrop-filter:blur(20px) saturate(1.3)}
+.site-header .wrap{display:flex;gap:.8rem 1.4rem;align-items:center;
+flex-wrap:wrap;padding:.7rem clamp(1rem,4vw,2rem)}
+.brand{display:inline-flex;align-items:center;gap:.65rem;text-decoration:none;
+margin-right:auto}
+.brand-mark{width:2.3rem;height:2.3rem;border-radius:50%;flex:none;
+border:1px solid rgba(255,207,110,.55);
+background:radial-gradient(circle at 38% 30%,var(--gold-soft),var(--violet) 46%,#2a1458 82%);
+box-shadow:0 0 26px rgba(124,77,255,.5),inset 0 0 12px rgba(255,255,255,.25)}
+.brand-text{display:grid;font-family:var(--fm);font-size:.66rem;
+text-transform:uppercase;letter-spacing:.06em;color:var(--mut);line-height:1.3}
+.brand-text strong{font-family:var(--fd);font-size:.95rem;color:#fff;
+text-transform:none;letter-spacing:0}
+nav{display:flex;gap:.15rem;flex-wrap:wrap;align-items:center;
+font-size:.84rem;font-weight:620}
+nav a{padding:.42rem .66rem;border-radius:999px;white-space:nowrap;
+color:var(--mut);transition:.2s}
+nav a:hover,nav a[aria-current="page"]{color:#fff;background:rgba(124,77,255,.2)}
+.nav-menu{position:relative}
+.nav-menu>summary{list-style:none;cursor:pointer;padding:.42rem .66rem;
+border-radius:999px;color:var(--mut);white-space:nowrap;transition:.2s;
+display:inline-flex;align-items:center;gap:.3rem}
+.nav-menu>summary::-webkit-details-marker{display:none}
+.nav-menu>summary::after{content:"\25BE";font-size:.7em;opacity:.7}
+.nav-menu[open]>summary,.nav-menu>summary:hover{color:#fff;background:rgba(124,77,255,.2)}
+.nav-drop{position:absolute;top:calc(100% + .4rem);left:0;z-index:60;
+display:grid;gap:.1rem;min-width:12rem;padding:.4rem;
+border:1px solid var(--line);border-radius:12px;background:rgba(12,12,26,.97);
+backdrop-filter:blur(14px);box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.nav-drop a{padding:.5rem .7rem}
+@media(max-width:760px){.nav-drop{position:static;box-shadow:none;
+background:rgba(255,255,255,.03);margin:.2rem 0}}
+h1,h2,h3{font-family:var(--fd);letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:clamp(2.1rem,5vw,3.1rem);font-weight:860;line-height:1;
+margin:2.2rem 0 .5rem;text-shadow:0 0 40px rgba(124,77,255,.35)}
+h2{font-size:clamp(1.4rem,3vw,1.9rem);font-weight:820;margin-top:2.6rem}
+h3{font-size:1.05rem;font-weight:740;margin:0 0 .4rem}
+.lead{color:var(--mut);max-width:52rem;font-size:1.05rem}
+.muted{color:var(--mut);font-size:.85rem}
+.bar{display:flex;height:16px;border-radius:999px;overflow:hidden;
+background:rgba(255,255,255,.05);margin:1.3rem 0;border:1px solid var(--line)}
+.s-ingested{background:#3a3358}.s-analysed{background:#2f5f8a}
+.s-briefed{background:#b08a1e}.s-panels{background:#7c4dff}
+.s-keyframes{background:var(--plasma)}.s-video{background:#1f9e7a}
+.s-published{background:var(--teal)}
+.pill{display:inline-block;padding:.12rem .6rem;border-radius:999px;
+font-size:.72rem;font-family:var(--fm);text-transform:uppercase;
+letter-spacing:.04em;border:1px solid var(--line);background:rgba(255,255,255,.05)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.card{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+background:linear-gradient(150deg,rgba(124,77,255,.16),rgba(10,10,22,.72));
+box-shadow:0 20px 50px rgba(0,0,0,.32);text-decoration:none;
+transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:rgba(43,227,194,.5)}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.card .pad{padding:.85rem .95rem 1.05rem}.card h3{margin:.1rem 0 .25rem;color:#fff}
+.card .bar{height:8px;margin:.7rem 0 0}
+table{border-collapse:collapse;width:100%;margin:1.2rem 0 2.5rem}
+th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);
+vertical-align:top}
+th{color:var(--gold);font-family:var(--fm);font-size:.72rem;
+text-transform:uppercase;letter-spacing:.08em}
+.theme{color:var(--amethyst);font-size:.8rem;margin-right:.45rem;white-space:nowrap}
+.song-struct{margin-top:.4rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.song-struct .song-seed{width:100%;color:#d6d1ea;font-size:.85rem;
+line-height:1.4;margin-bottom:.15rem}
+.song-struct .motif{font-size:.76rem;color:var(--amethyst);
+background:rgba(124,77,255,.12);border-radius:6px;padding:.06rem .45rem}
+.listen{font-family:var(--fm);font-size:.72rem;color:var(--teal);
+text-decoration:none;white-space:nowrap}.listen:hover{color:#fff}
+.shape{font-family:var(--fm);font-size:.72rem;letter-spacing:.12em;color:var(--gold);
+border:1px solid var(--line);border-radius:5px;padding:.1rem .5rem}
+/* per-song page: line-by-line director read */
+.line-ideas{display:grid;gap:.7rem;margin:1rem 0;max-width:52rem}
+.line-ideas .li{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);
+gap:1rem;padding:.85rem 1rem;border:1px solid var(--line);border-radius:12px;
+background:linear-gradient(150deg,rgba(124,77,255,.1),rgba(10,10,22,.55))}
+.line-ideas .li-lyric{color:var(--gold-soft);font-style:italic;line-height:1.4}
+.line-ideas .li-idea{color:#dcd8ee;font-size:.94rem;line-height:1.45}
+@media(max-width:620px){.line-ideas .li{grid-template-columns:1fr;gap:.35rem}
+.line-ideas .li-lyric{color:var(--gold)}}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:.7rem;margin:1.4rem 0}
+.legend div,.legend a{border:1px solid var(--line);border-radius:12px;
+padding:.7rem .9rem;font-size:.9rem;background:rgba(255,255,255,.03)}
+.legend a{display:block;text-decoration:none;transition:border-color .2s,background .2s}
+.legend a:hover{border-color:rgba(43,227,194,.5);background:rgba(43,227,194,.05)}
+.card .go{margin-top:.5rem;color:var(--teal);font-weight:640;font-size:.9rem}
+.site-footer{border-top:1px solid var(--line);margin-top:3.5rem;
+background:rgba(6,8,14,.6)}
+.site-footer .wrap{padding:1.8rem clamp(1rem,4vw,2rem) 2.4rem;
+color:var(--mut);font-size:.88rem}
+.stage-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.4rem 0}
+.stage-flow .pill{font-size:.78rem;padding:.28rem .7rem}
+.stage-flow span.arrow{color:var(--gold)}
+.doc{max-width:52rem}
+.doc h1{margin-top:1.6rem}.doc h2{padding-top:1.5rem;border-top:1px solid var(--line)}
+.doc h3{margin-top:1.7rem}.doc p,.doc li{color:#dcd8ee}.doc li{margin:.2rem 0}
+.doc code{border:1px solid var(--line);border-radius:5px;padding:.05rem .35rem;
+font-family:var(--fm);font-size:.84em;background:rgba(124,77,255,.12)}
+.doc pre{border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem;
+overflow-x:auto;background:rgba(3,4,10,.6)}
+.doc pre code{background:none;border:none;padding:0;font-size:.8rem;
+line-height:1.5;color:#cdc8e6}
+.doc blockquote{border-left:3px solid var(--gold);margin:1.2rem 0;
+padding:.3rem 1rem;color:var(--mut);background:rgba(255,255,255,.03);
+border-radius:0 8px 8px 0}
+.doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.doc table{margin:1.2rem 0}.doc td{color:#dcd8ee}
+/* faceted picker + pattern chooser */
+.pc-facets{display:flex;flex-direction:column;gap:.6rem;margin:1.5rem 0 1.4rem;
+padding:1rem 1.1rem;border:1px solid var(--line);border-radius:var(--radius);
+background:rgba(255,255,255,.03)}
+.pc-frow{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.pc-flabel{color:var(--gold);font-family:var(--fm);font-size:.68rem;
+text-transform:uppercase;letter-spacing:.1em;width:5.4rem;flex:none}
+.pc-chip{cursor:pointer;user-select:none;border:1px solid var(--line);
+background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;
+padding:.28rem .8rem;font-size:.83rem;transition:.15s}
+.pc-chip:hover{border-color:var(--teal)}
+.pc-chip.on{background:var(--violet);border-color:var(--violet);color:#fff;
+font-weight:640;box-shadow:0 0 18px rgba(124,77,255,.4)}
+.pc-chip.lane-recon.on{background:var(--teal);border-color:var(--teal);color:#062f28}
+.pc-chip.lane-release.on{background:var(--gold);border-color:var(--gold);color:#241700}
+.pc-chip.lane-hero.on{background:var(--plasma);border-color:var(--plasma);color:#2a0620}
+.pc-clear{margin-left:auto;color:var(--mut);cursor:pointer;font-size:.82rem;
+background:none;border:none;text-decoration:underline}
+.pc-count{color:var(--mut);font-family:var(--fm);font-size:.82rem;margin:.2rem 0 1rem}
+.pc-group{margin:0 0 2.2rem}
+.pc-group-head{display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap;
+margin:1.8rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+.pc-group-head h2{margin:0;font-size:1.3rem}
+.pc-group-head span{color:var(--mut);font-size:.9rem}
+.pc-group.hidden{display:none}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+gap:1rem}
+.pc-card{border:1px solid var(--line);border-radius:var(--radius);
+padding:1.05rem 1.1rem;display:flex;flex-direction:column;gap:.55rem;
+background:linear-gradient(155deg,rgba(124,77,255,.14),rgba(10,10,22,.66));
+transition:transform .18s,border-color .18s}
+.pc-card:hover{transform:translateY(-2px);border-color:rgba(43,227,194,.45)}
+.pc-card.hidden{display:none}
+.pc-card h3{margin:0;font-size:1.08rem;line-height:1.2;color:#fff}
+.pc-kicker{font-family:var(--fm);font-size:.68rem;text-transform:uppercase;
+letter-spacing:.12em;color:var(--gold)}
+.pc-best{font-size:.96rem;color:#efeaff;margin:0;font-weight:600;line-height:1.35}
+.pc-task{display:inline-flex;align-self:flex-start;font-family:var(--fm);
+font-size:.75rem;padding:.2rem .6rem;border-radius:8px;color:#062f28;
+background:var(--teal);font-weight:700}
+.pc-badges{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.pc-b{font-family:var(--fm);font-size:.66rem;text-transform:uppercase;
+letter-spacing:.05em;border-radius:999px;padding:.1rem .55rem;
+border:1px solid transparent}
+.pc-b.recon{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.pc-b.release{background:rgba(255,207,110,.16);color:var(--gold-soft);border-color:rgba(255,207,110,.4)}
+.pc-b.hero{background:rgba(255,95,209,.16);color:#ffc7ec;border-color:rgba(255,95,209,.4)}
+.pc-b.tier{background:rgba(255,255,255,.06);color:#cfc9e6}
+.pc-b.built{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.pc-b.designed{background:rgba(255,255,255,.06);color:#c9c3e0}
+.pc-b.planned{background:rgba(201,166,255,.16);color:var(--amethyst);border-color:rgba(201,166,255,.4)}
+.pc-sum{color:#d6d1ea;font-size:.9rem;margin:0}
+.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.pc-tag{font-family:var(--fm);font-size:.7rem;color:var(--amethyst);
+background:rgba(124,77,255,.14);border-radius:5px;padding:.06rem .4rem}
+.pc-meta{font-size:.82rem;color:var(--mut);line-height:1.5}
+.pc-meta b{color:#d7d1ea;font-weight:600}
+.pc-more{border:none;background:none;color:var(--teal);cursor:pointer;
+font-size:.82rem;text-align:left;padding:0}
+.pc-detail{display:none;font-size:.85rem;color:#d3cee6;
+border-top:1px solid var(--line);padding-top:.6rem;margin-top:.2rem}
+.pc-detail.open{display:block}.pc-detail p{margin:.25rem 0}
+.pc-add{margin-top:.2rem;border:1px solid var(--teal);background:none;
+color:var(--teal);border-radius:8px;padding:.4rem;cursor:pointer;
+font-size:.85rem;font-weight:640}
+.pc-add.added{background:var(--teal);color:#062f28}
+.pc-tray{position:sticky;top:.6rem;z-index:5;
+border:1px solid var(--line);border-radius:var(--radius);padding:.85rem 1.05rem;
+margin:0 0 1.4rem;background:rgba(12,12,26,.9);backdrop-filter:blur(12px)}
+.pc-tray h2{margin:.1rem 0 .5rem;font-size:1.05rem}
+.pc-tray-empty{color:var(--mut);font-size:.88rem}
+.pc-tray ol{margin:.3rem 0 0;padding-left:1.2rem}
+.pc-tray li{margin:.15rem 0;font-size:.9rem}
+.pc-tray li button{border:none;background:none;color:var(--plasma);cursor:pointer;
+font-size:.9rem;margin-left:.3rem}
+@media(max-width:560px){.pc-flabel{width:100%}.brand-text{display:none}}
+/* ---- fancy bits: motion + promo ---- */
+@view-transition{navigation:auto}
+.scroll-progress{position:fixed;top:0;left:0;right:0;z-index:60;height:2px;
+pointer-events:none}
+.scroll-progress i{display:block;height:100%;width:100%;transform-origin:left;
+transform:scaleX(0);background:linear-gradient(90deg,var(--gold),var(--violet),var(--teal))}
+.site-header{transition:padding .2s,background .2s,border-color .2s}
+.site-header.is-condensed .site-header{padding:.4rem clamp(1rem,4vw,2rem)}
+.site-header.is-condensed{box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.eyebrow{margin:0 0 .7rem;color:var(--gold);font-family:var(--fm);font-size:.76rem;
+font-weight:640;letter-spacing:.2em;text-transform:uppercase}
+.eyebrow::before{content:"// ";color:rgba(255,207,110,.55)}
+.button{display:inline-flex;align-items:center;gap:.5rem;min-height:2.7rem;
+padding:.65rem 1.3rem;border-radius:999px;text-decoration:none;font-weight:720;
+border:1px solid transparent;cursor:pointer;transition:transform .2s,box-shadow .2s,
+background .2s,border-color .2s}
+.button:hover{transform:translateY(-2px)}
+.button-primary{background:linear-gradient(135deg,var(--gold),var(--plasma) 60%,var(--violet));
+color:#1a0e05;box-shadow:0 8px 30px rgba(255,207,110,.28)}
+.button-secondary{border-color:var(--line);background:rgba(255,255,255,.06);color:#fff}
+.button-secondary:hover{border-color:rgba(43,227,194,.6);background:rgba(43,227,194,.1)}
+.promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.promo-card{position:relative;display:flex;flex-direction:column;gap:.6rem;
+padding:1.3rem 1.35rem;border:1px solid var(--line);border-radius:var(--radius);
+background:linear-gradient(155deg,rgba(124,77,255,.16),rgba(10,10,22,.72));
+box-shadow:0 20px 50px rgba(0,0,0,.32);text-decoration:none;
+transition:transform .2s,border-color .2s}
+.promo-card:hover{transform:translateY(-4px);border-color:rgba(43,227,194,.5)}
+.promo-card h3{font-size:1.25rem;color:#fff;margin:0}
+.promo-card .tagline{color:var(--gold-soft);font-size:.92rem;margin:0}
+.promo-card p{color:var(--mut);font-size:.92rem;margin:0}
+.promo-card .promo-foot{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+margin-top:auto;padding-top:.5rem}
+.promo-card .go{color:var(--teal);font-weight:640;font-size:.9rem}
+.st{font-family:var(--fm);font-size:.66rem;text-transform:uppercase;
+letter-spacing:.06em;border-radius:999px;padding:.12rem .6rem;border:1px solid transparent}
+.st-live{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.st-development{background:rgba(255,207,110,.16);color:var(--gold-soft);border-color:rgba(255,207,110,.4)}
+.st-design{background:rgba(201,166,255,.16);color:var(--amethyst);border-color:rgba(201,166,255,.4)}
+.st-concept{background:rgba(255,255,255,.06);color:#c9c3e0}
+/* Reveal-on-scroll. Gated on html.js (set synchronously in <head>) so
+   there is no first-paint flash. The is-visible resting state is fully
+   visible, and a JS fallback timer adds it to everything shortly after
+   load, so content can never be stranded invisible if the observer or a
+   paused animation misbehaves. */
+html.js .pc-card,html.js .card,html.js .reveal{opacity:0;
+transform:translateY(18px);
+transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+html.js .pc-card.is-visible,html.js .card.is-visible,html.js .reveal.is-visible{
+opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+html.js .pc-card,html.js .card,html.js .reveal{opacity:1;transform:none;transition:none}
+.scroll-progress{display:none}}
+/* ---- readable docs ---- */
+.doc{max-width:54rem;font-size:1.02rem}
+.doc h2{font-size:clamp(1.5rem,3vw,2rem)}
+.doc h3{font-size:1.2rem}
+.doc p{margin:.9rem 0}.doc ul{margin:.9rem 0}
+.doc>p:first-of-type,.doc .doc-lead{font-size:1.15rem;color:#e7e2f6;line-height:1.55}
+.doc table{font-size:.92rem}
+.doc th{background:rgba(124,77,255,.1)}
+.doc tbody tr:hover{background:rgba(124,77,255,.06)}
+/* ---- flow diagram (native, themeable) ---- */
+.flow{display:grid;gap:0;margin:1.6rem 0 2.6rem;max-width:44rem}
+.flow-node{display:grid;grid-template-columns:2.6rem 1fr auto;gap:.9rem;
+align-items:center;padding:.9rem 1.1rem;border:1px solid var(--line);
+border-radius:14px;background:linear-gradient(150deg,rgba(124,77,255,.16),rgba(10,10,22,.7))}
+.flow-node .fn{display:grid;place-items:center;width:2.6rem;height:2.6rem;
+border-radius:50%;font-family:var(--fm);font-weight:800;color:#08131f;
+background:radial-gradient(circle at 38% 30%,var(--gold-soft),var(--violet) 70%)}
+.flow-node b{display:block;color:#fff;font-family:var(--fd);font-size:1.05rem}
+.flow-node span{color:var(--mut);font-size:.9rem}
+.flow-node .fs{font-family:var(--fm);font-size:.62rem;text-transform:uppercase;
+letter-spacing:.06em;padding:.15rem .5rem;border-radius:999px;white-space:nowrap}
+.flow-node .fs.built{background:rgba(43,227,194,.16);color:var(--teal);border:1px solid rgba(43,227,194,.4)}
+.flow-node .fs.designed{background:rgba(201,166,255,.16);color:var(--amethyst);border:1px solid rgba(201,166,255,.4)}
+.flow-node .fs.gate{background:rgba(255,207,110,.18);color:var(--gold-soft);border:1px solid rgba(255,207,110,.5)}
+.flow-node.gate{border-color:rgba(255,207,110,.5)}
+.flow-arrow{justify-self:center;color:var(--gold);font-size:1.1rem;line-height:1;
+padding:.28rem 0}
+.flow-hero{width:100%;border-radius:16px;border:1px solid var(--line);
+margin:1.4rem 0 2rem;display:block}
+/* ---- footer sitemap ---- */
+.foot-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));
+gap:1.2rem 1.4rem;width:100%;padding-bottom:1.4rem;margin-bottom:1.3rem;
+border-bottom:1px solid var(--line)}
+.foot-nav h4{margin:0 0 .5rem;font-family:var(--fm);font-size:.7rem;
+text-transform:uppercase;letter-spacing:.1em;color:var(--gold)}
+.foot-nav ul{list-style:none;margin:0;padding:0;display:grid;gap:.28rem}
+.foot-nav a{color:var(--mut);font-size:.88rem;text-decoration:none}
+.foot-nav a:hover{color:#fff}
+/* ---- floating to-top ---- */
+.to-top{position:fixed;right:1.1rem;bottom:1.1rem;z-index:70;width:2.8rem;
+height:2.8rem;border-radius:50%;border:1px solid var(--line);cursor:pointer;
+background:rgba(12,12,26,.9);backdrop-filter:blur(12px);color:var(--gold);
+font-size:1.1rem;display:grid;place-items:center;opacity:0;transform:translateY(12px);
+pointer-events:none;transition:opacity .3s,transform .3s,border-color .2s}
+.to-top.show{opacity:1;transform:none;pointer-events:auto}
+.to-top:hover{border-color:var(--gold);color:#fff}
+/* ---- kintsugi seam divider (repair-gold, self-drawing) ---- */
+.seam{position:relative;width:100%;max-width:var(--max);height:2.6rem;border:0;
+margin:clamp(1.6rem,3.6vw,2.8rem) auto}
+.seam svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;
+filter:drop-shadow(0 0 6px rgba(255,207,110,.4))}
+.seam .seam-path{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;
+stroke-dasharray:1;stroke-dashoffset:1;
+transition:stroke-dashoffset 1.8s cubic-bezier(.16,1,.3,1)}
+.seam .seam-branch{stroke-width:1.4;opacity:.66;transition-delay:1.1s;transition-duration:.9s}
+.seam.is-drawn .seam-path{stroke-dashoffset:0}
+.seam .seam-light{fill:none;stroke:#fff7e6;stroke-width:2.6;stroke-linecap:round;
+stroke-dasharray:.05 .95;stroke-dashoffset:1;opacity:0;transition:opacity .8s ease 1.8s}
+.seam.is-drawn .seam-light{opacity:.7;animation:seam-flow 8s linear infinite;animation-delay:2s}
+@keyframes seam-flow{from{stroke-dashoffset:1}to{stroke-dashoffset:-1}}
+html:not(.js) .seam .seam-path{stroke-dashoffset:0;transition:none}
+html:not(.js) .seam .seam-light{display:none}
+@media(prefers-reduced-motion:reduce){
+.seam .seam-path{stroke-dashoffset:0;transition:none}.seam .seam-light{display:none}}
+</style></head><body>
+<div class="scroll-progress"><i></i></div>
+<header class="site-header"><div class="wrap">
+<a class="brand" href="../index.html">
+<span class="brand-mark"></span>
+<span class="brand-text"><strong>Infinity Engine</strong>
+<span>i C. infinity</span></span></a>
+<nav>
+<a href="../index.html">Progress</a>
+<a href="../patterns.html">Patterns</a>
+<a href="../cast.html">Cast</a>
+<details class="nav-menu"><summary>Registry</summary><div class="nav-drop">
+<a href="../models.html">Models</a>
+<a href="../frontier.html">Frontier</a>
+<a href="../loras.html">LoRAs</a>
+<a href="../compute.html">Compute</a>
+<a href="../recon.html">Recon</a></div></details>
+<details class="nav-menu"><summary>Guide</summary><div class="nav-drop">
+<a href="../pipeline.html">How it works</a>
+<a href="../workflow.html">Operator guide</a>
+<a href="../plan.html">Master plan</a></div></details>
+<a href="../projects.html">Projects</a>
+<a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
+</div></header>
+<main class="wrap">
+<p class="eyebrow">A Protopian Gambit &middot; track 12</p><h1>Latent Space</h1><p class="muted"><span class="pill s-analysed">analysed</span></p><p class="lead">On the morning after a loss, a Straddie family keeps setting the extra place at the table. Grief walks the dune path beside them all day like a doubled shadow; by dusk the whole community gathers at a fire to speak the names aloud, and the youngest turns the mourning ritual into a dance so the dead are carried forward as light.</p><p class="muted"><b>Arc:</b> From the silence of an empty chair to a communal, defiant rising that carries the dead forward as light rather than leaving them behind.</p><div class="seam" aria-hidden="true"><svg viewBox="0 0 1200 46" preserveAspectRatio="none" focusable="false"><defs><linearGradient id="seamA" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffcf6e"/><stop offset=".5" stop-color="#fff3d6"/><stop offset="1" stop-color="#c9a6ff"/></linearGradient></defs><path class="seam-path" pathLength="1" stroke="url(#seamA)" d="M0 24 L130 21 L210 27 L300 13 L352 25 L470 19 L525 31 L640 17 L735 23 L805 11 L885 27 L995 19 L1085 25 L1200 21"/><path class="seam-path seam-branch" pathLength="1" stroke="url(#seamA)" d="M300 13 L318 3"/><path class="seam-path seam-branch" pathLength="1" stroke="url(#seamA)" d="M525 31 L540 43"/><path class="seam-path seam-branch" pathLength="1" stroke="url(#seamA)" d="M805 11 L791 2"/><path class="seam-light" pathLength="1" d="M0 24 L130 21 L210 27 L300 13 L352 25 L470 19 L525 31 L640 17 L735 23 L805 11 L885 27 L995 19 L1085 25 L1200 21"/></svg></div><h2>Images to shoot</h2><div class="song-struct" style="margin:.4rem 0 1rem"><span class="motif">an empty chair at a set table</span><span class="motif">a favourite record still spinning on its run-out groove</span><span class="motif">laughter lingering in a doorway no one walks through</span><span class="motif">a lone walker&#x27;s shadow doubled on the dune trail</span><span class="motif">night surf pulling at a figure standing firm</span><span class="motif">green shoots through a dusk cultural burn</span><span class="motif">a fire circle speaking names into rising sparks</span><span class="motif">repair-gold seams glowing along a cracked photo frame</span><span class="motif">a blade of dawn light crossing a dim community hall</span><span class="motif">builders at dawn carrying lanterns toward camera</span></div><h2>Line by line</h2><div class="line-ideas"><div class="li"><div class="li-lyric">&ldquo;An empty chair, a favorite song / That suddenly says it all&rdquo;</div><div class="li-idea">Hold on a single empty dining chair at a fully set table; on the turntable a record rides the run-out groove, needle ticking. The absence is the subject.</div></div><div class="li"><div class="li-lyric">&ldquo;The laughter lingers in the room / But footsteps never come&rdquo;</div><div class="li-idea">Lock focus on a sunlit doorway; dust motes hang where a person would stand. We wait a beat too long. Nobody enters.</div></div><div class="li"><div class="li-lyric">&ldquo;And yet we dress the morning sky / Like every day&#x27;s begun&rdquo;</div><div class="li-idea">Hands opening curtains at dawn, the family performing normal: breakfast laid for one too many. Everyday gestures made heavy.</div></div><div class="li"><div class="li-lyric">&ldquo;Grief, you&#x27;re a shadow on the trail&rdquo;</div><div class="li-idea">A single walker on a coastal dune path, low sun stretching their shadow long and, for a frame, doubling it, as if someone keeps pace beside them.</div></div><div class="li"><div class="li-lyric">&ldquo;But we don&#x27;t break, we bend&rdquo;</div><div class="li-idea">A she-oak on the headland bent hard in the onshore wind but not snapping. Coastal, Straddie, quietly literal.</div></div><div class="li"><div class="li-lyric">&ldquo;Through broken nights and waves that bite&rdquo;</div><div class="li-idea">Night surf, cold water dragging at ankles; a figure stands firm in the wash while the tide tries to move them.</div></div><div class="li"><div class="li-lyric">&ldquo;Through the ashes, through the flame / We still rise&rdquo;</div><div class="li-idea">A controlled cultural burn at dusk; behind the last flames, green shoots are already up through blackened ground. Loss and repair in one frame.</div></div><div class="li"><div class="li-lyric">&ldquo;We still rise, we call their name&rdquo;</div><div class="li-idea">A circle at a beach fire; each person speaks a name aloud and it lifts away as sparks. Cut names to sparks to stars.</div></div><div class="li"><div class="li-lyric">&ldquo;We carry stories in our eyes / Like ancient songs we save&rdquo;</div><div class="li-idea">Extreme close on eyes catching firelight; in the reflection, half-seen faces of the ones being mourned.</div></div><div class="li"><div class="li-lyric">&ldquo;Every hug we give away / Is stitched with those we miss&rdquo;</div><div class="li-idea">An embrace held long enough that, for one frame in the overlap of arms, a third pair is implied.</div></div><div class="li"><div class="li-lyric">&ldquo;Love doesn&#x27;t die, it shifts, it shines&rdquo;</div><div class="li-idea">Repair-gold (the album&#x27;s kintsugi motif) runs molten along the crack of a broken photo frame, the seam glowing rather than hiding the break.</div></div><div class="li"><div class="li-lyric">&ldquo;And let the light in once again&rdquo;</div><div class="li-idea">A hand pushes a shutter open; a single blade of gold dawn light crosses a dim community hall and lands on empty chairs.</div></div><div class="li"><div class="li-lyric">&ldquo;It builds the wings beneath our feet&rdquo;</div><div class="li-idea">Not literal wings: the updraft off the headland lifting seabirds while a person on the clifftop is steadied, not pushed, by the same wind.</div></div><div class="li"><div class="li-lyric">&ldquo;Holding grief and hope side by side&rdquo;</div><div class="li-idea">Split, symmetrical framing: one hand holds a folded photograph, the other a seedling in soil. Neither wins.</div></div><div class="li"><div class="li-lyric">&ldquo;We still sing, with trembling breath / Because the gift was worth the death&rdquo;</div><div class="li-idea">Breath fogs in cold dawn air, held, then released as a candle is relit from another already burning.</div></div><div class="li"><div class="li-lyric">&ldquo;And every step, a sacred vow / We hold the light, we live for now&rdquo;</div><div class="li-idea">A dawn procession of builders, each carrying a lantern, walking slowly toward camera as the sky comes up behind them.</div></div></div><p style="margin-top:2rem"><a href="../albums/a-protopian-gambit.html">&larr; A Protopian Gambit</a></p>
+</main>
+<button class="to-top" aria-label="Back to top" title="Back to top">&uarr;</button>
+<footer class="site-footer"><div class="wrap">
+<div class="foot-nav">
+<div><h4>Pipeline</h4><ul>
+<li><a href="../index.html">Progress</a></li>
+<li><a href="../patterns.html">Patterns</a></li>
+<li><a href="../pipeline.html">How it works</a></li>
+<li><a href="../workflow.html">Operator guide</a></li>
+<li><a href="../plan.html">Master plan</a></li></ul></div>
+<div><h4>Registry</h4><ul>
+<li><a href="../models.html">Models</a></li>
+<li><a href="../frontier.html">Frontier</a></li>
+<li><a href="../loras.html">LoRAs</a></li>
+<li><a href="../compute.html">Compute</a></li>
+<li><a href="../recon.html">Recon</a></li></ul></div>
+<div><h4>Universe</h4><ul>
+<li><a href="../cast.html">Cast</a></li>
+<li><a href="../projects.html">Projects</a></li>
+<li><a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></li>
+<li><a href="https://github.com/auraofintelligence/infinity-engine">Source (GitHub)</a></li></ul></div>
+</div>
+<p>A live monitor of the i C. infinity visual pipeline. Regenerated from
+the song vault as pieces complete. Lyrics live with the music, not here.
+Luke &times; Claude.</p>
+</div></footer>
+<script>
+(function(){var h=document.querySelector('.site-header'),
+p=document.querySelector('.scroll-progress i');
+var tt=document.querySelector('.to-top');
+function s(){var y=scrollY||0,d=document.body.scrollHeight-innerHeight;
+if(p)p.style.transform='scaleX('+(d>0?Math.min(y/d,1):0)+')';
+if(h)h.classList.toggle('is-condensed',y>24);
+if(tt)tt.classList.toggle('show',y>500)}
+addEventListener('scroll',s,{passive:true});s();
+if(tt)tt.addEventListener('click',function(){scrollTo({top:0,behavior:'smooth'})});
+// close an open nav menu when clicking elsewhere
+document.addEventListener('click',function(e){
+document.querySelectorAll('.nav-menu[open]').forEach(function(m){
+if(!m.contains(e.target))m.removeAttribute('open')})});
+var els=document.querySelectorAll('.pc-card,.card,.reveal');
+var io=new IntersectionObserver(function(es){es.forEach(function(e){
+if(e.isIntersecting){e.target.classList.add('is-visible');io.unobserve(e.target)}})},
+{rootMargin:'0px 0px -6% 0px'});
+els.forEach(function(el){io.observe(el)});
+// safety net: nothing stays hidden, even if the observer never fires or
+// a transition is frozen. Snap instantly (transition:none) so opacity
+// can't be stranded mid-interpolation.
+setTimeout(function(){els.forEach(function(el){
+if(!el.classList.contains('is-visible')){el.style.transition='none';
+el.classList.add('is-visible')}})},1400);
+// kintsugi seams: draw when scrolled into view
+var seams=document.querySelectorAll('.seam');
+var so=new IntersectionObserver(function(es){es.forEach(function(e){
+if(e.isIntersecting){e.target.classList.add('is-drawn');so.unobserve(e.target)}})},
+{rootMargin:'0px 0px -8% 0px'});
+seams.forEach(function(el){so.observe(el)});
+setTimeout(function(){seams.forEach(function(el){el.classList.add('is-drawn')})},1600);})();
+</script>
+</body></html>

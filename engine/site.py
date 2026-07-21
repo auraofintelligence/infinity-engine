@@ -121,6 +121,19 @@ text-transform:uppercase;letter-spacing:.08em}
 line-height:1.4;margin-bottom:.15rem}
 .song-struct .motif{font-size:.76rem;color:var(--amethyst);
 background:rgba(124,77,255,.12);border-radius:6px;padding:.06rem .45rem}
+.listen{font-family:var(--fm);font-size:.72rem;color:var(--teal);
+text-decoration:none;white-space:nowrap}.listen:hover{color:#fff}
+.shape{font-family:var(--fm);font-size:.72rem;letter-spacing:.12em;color:var(--gold);
+border:1px solid var(--line);border-radius:5px;padding:.1rem .5rem}
+/* per-song page: line-by-line director read */
+.line-ideas{display:grid;gap:.7rem;margin:1rem 0;max-width:52rem}
+.line-ideas .li{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);
+gap:1rem;padding:.85rem 1rem;border:1px solid var(--line);border-radius:12px;
+background:linear-gradient(150deg,rgba(124,77,255,.1),rgba(10,10,22,.55))}
+.line-ideas .li-lyric{color:var(--gold-soft);font-style:italic;line-height:1.4}
+.line-ideas .li-idea{color:#dcd8ee;font-size:.94rem;line-height:1.45}
+@media(max-width:620px){.line-ideas .li{grid-template-columns:1fr;gap:.35rem}
+.line-ideas .li-lyric{color:var(--gold)}}
 .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
 gap:.7rem;margin:1.4rem 0}
 .legend div,.legend a{border:1px solid var(--line);border-radius:12px;
@@ -505,6 +518,52 @@ def _seam() -> str:
         '</svg></div>')
 
 
+def _song_page(note, album_slug: str | None) -> str:
+    """A per-song page: the LLM's director read (story seed, motifs and the
+    line-by-line ideas) once analysed, else its status and section shape."""
+    m = note.meta
+    title = _esc(m.get("title", note.slug))
+    crumb = (f'<a href="../albums/{album_slug}.html">&larr; {_esc(m.get("album",""))}</a>'
+             if album_slug else "")
+    head = (
+        f'<p class="eyebrow">{_esc(m.get("album",""))}'
+        + (f" &middot; track {m['track']}" if m.get("track") else "") + "</p>"
+        f"<h1>{title}</h1>"
+        f'<p class="muted"><span class="pill s-{note.status}">{note.status}</span>'
+        + (f' &middot; <a class="listen" href="{_esc(m["release_url"])}" '
+           'target="_blank" rel="noopener">listen &#9654;</a>'
+           if m.get("release_url") else "") + "</p>")
+    seed = m.get("story_seed")
+    ideas = m.get("line_ideas") or []
+    motifs = m.get("visual_motifs") or []
+    if not seed and not ideas:
+        shape = _section_shape(m.get("structure"))
+        body = (
+            '<p class="lead">Not analysed yet. Analysis reads the whole '
+            "lyric and returns a director's line-by-line read; run "
+            f"<code>python -m engine brief {note.slug} --run-claude</code>.</p>"
+            + (f'<p class="muted">Section flow (for timing): '
+               f'<span class="shape">{shape}</span></p>' if shape else ""))
+    else:
+        chips = "".join(f'<span class="motif">{_esc(x)}</span>' for x in motifs)
+        arc = m.get("emotional_arc")
+        li = "".join(
+            f'<div class="li"><div class="li-lyric">&ldquo;{_esc(x.get("lyric",""))}'
+            f'&rdquo;</div><div class="li-idea">{_esc(x.get("idea",""))}</div></div>'
+            for x in ideas)
+        body = (
+            (f'<p class="lead">{_esc(seed)}</p>' if seed else "")
+            + (f'<p class="muted"><b>Arc:</b> {_esc(arc)}</p>' if arc else "")
+            + _seam()
+            + ("<h2>Images to shoot</h2>"
+               f'<div class="song-struct" style="margin:.4rem 0 1rem">{chips}</div>'
+               if chips else "")
+            + ("<h2>Line by line</h2>"
+               f'<div class="line-ideas">{li}</div>' if li else ""))
+    back = ('<p style="margin-top:2rem">' + crumb + "</p>") if crumb else ""
+    return head + body + back
+
+
 def _pipeline_flow() -> str:
     """Native, theme-aware pipeline diagram (fallback for the hero image)."""
     stages = [
@@ -610,10 +669,12 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             meta = note.meta
             themes = "".join(f'<span class="theme">{_esc(t)}</span>'
                              for t in meta.get("themes") or [])
-            title_cell = _esc(meta.get("title", note.slug))
+            title_cell = (f'<a href="../songs/{note.slug}.html">'
+                          f'{_esc(meta.get("title", note.slug))}</a>')
             if meta.get("release_url"):
-                title_cell = (f'<a href="{_esc(meta["release_url"])}">'
-                              f"{title_cell}</a>")
+                title_cell += (f' <a class="listen" href="'
+                               f'{_esc(meta["release_url"])}" target="_blank" '
+                               'rel="noopener">listen &#9654;</a>')
             rows.append(
                 "<tr>"
                 f"<td>{meta.get('track') or ''}</td>"
@@ -636,6 +697,17 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             "<th>Themes</th></tr>" + "".join(rows) + "</table>")
         path = out_dir / "albums" / f"{album['slug']}.html"
         path.write_text(_page(album["title"], body, depth=1), encoding="utf-8")
+        written.append(path)
+
+    # One page per song (the LLM's line-by-line read once analysed).
+    (out_dir / "songs").mkdir(exist_ok=True)
+    slug_album = {n.slug: a["slug"] for a in catalogue.get("albums", [])
+                  for n in by_album.get(a["title"], [])}
+    for note in notes:
+        body = _song_page(note, slug_album.get(note.slug))
+        path = out_dir / "songs" / f"{note.slug}.html"
+        path.write_text(_page(note.meta.get("title", note.slug), body,
+                              depth=1), encoding="utf-8")
         written.append(path)
 
     # Pipeline explainer.

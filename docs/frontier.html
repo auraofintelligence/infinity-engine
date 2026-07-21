@@ -97,6 +97,19 @@ text-transform:uppercase;letter-spacing:.08em}
 line-height:1.4;margin-bottom:.15rem}
 .song-struct .motif{font-size:.76rem;color:var(--amethyst);
 background:rgba(124,77,255,.12);border-radius:6px;padding:.06rem .45rem}
+.listen{font-family:var(--fm);font-size:.72rem;color:var(--teal);
+text-decoration:none;white-space:nowrap}.listen:hover{color:#fff}
+.shape{font-family:var(--fm);font-size:.72rem;letter-spacing:.12em;color:var(--gold);
+border:1px solid var(--line);border-radius:5px;padding:.1rem .5rem}
+/* per-song page: line-by-line director read */
+.line-ideas{display:grid;gap:.7rem;margin:1rem 0;max-width:52rem}
+.line-ideas .li{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);
+gap:1rem;padding:.85rem 1rem;border:1px solid var(--line);border-radius:12px;
+background:linear-gradient(150deg,rgba(124,77,255,.1),rgba(10,10,22,.55))}
+.line-ideas .li-lyric{color:var(--gold-soft);font-style:italic;line-height:1.4}
+.line-ideas .li-idea{color:#dcd8ee;font-size:.94rem;line-height:1.45}
+@media(max-width:620px){.line-ideas .li{grid-template-columns:1fr;gap:.35rem}
+.line-ideas .li-lyric{color:var(--gold)}}
 .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
 gap:.7rem;margin:1.4rem 0}
 .legend div,.legend a{border:1px solid var(--line);border-radius:12px;
