@@ -1,0 +1,258 @@
+# Model registry: the candidate and adopted open-weight models per
+# category. The model picker page reads this. The recon watcher
+# (tools/watch_models.py) proposes additions into recon-queue.yaml;
+# vetted winners get promoted in here by hand.
+#
+# status:  active   in the working stack
+#          recon    flagged, being tested in the Recon lane
+#          watching on the radar, not yet tested
+# comfy:   first-class ComfyUI support (yes/no/partial)
+# likes:   approximate Hugging Face likes at last check (the watcher
+#          refreshes these); a rough hype signal, not gospel.
+# Researched 2026-07-20; re-verify on the next dated scan.
+
+models:
+  # ---- video ----
+  - id: wan-2-2
+    name: Wan 2.2 A14B
+    category: video
+    task: text/image-to-video
+    hf: Wan-AI/Wan2.2-T2V-A14B
+    licence: Apache 2.0
+    vram_gb: "24 (FP8) / 40-80 (FP16)"
+    comfy: yes
+    status: active
+    likes: 1900
+    why: Best open quality with a clean commercial licence; huge LoRA ecosystem.
+  - id: hunyuanvideo-1-5
+    name: HunyuanVideo 1.5
+    category: video
+    task: text/image-to-video
+    hf: tencent/HunyuanVideo-1.5
+    licence: Apache 2.0
+    vram_gb: "14-24"
+    comfy: yes
+    status: active
+    likes: 1400
+    why: Best quality per GB on a rented 4090/5090; the draft-tier workhorse.
+  - id: ltx-2-3
+    name: LTX-2.3
+    category: video
+    task: text/image-to-video + audio
+    hf: Lightricks/LTX-Video
+    licence: LTX-2 Community (free commercial under US$10M/yr)
+    vram_gb: "16-80"
+    comfy: yes
+    status: active
+    likes: 2600
+    why: Native synced audio+video, native 4K and vertical 1080x1920.
+  - id: kandinsky-5
+    name: Kandinsky 5.0 Video
+    category: video
+    task: text-to-video
+    hf: kandinskylab/Kandinsky-5.0-T2V-Lite
+    licence: open (check per-weight)
+    vram_gb: "12 (Lite) / 40+ (Pro)"
+    comfy: partial
+    status: watching
+    likes: 700
+    why: Lite 2B is a fast, cheap draft option; worth a Recon bake-off.
+
+  # ---- control / motion ----
+  - id: wan-vace
+    name: Wan-VACE
+    category: control
+    task: controllable video (pose/depth/ref)
+    hf: Wan-AI/Wan2.1-VACE-14B
+    licence: Apache 2.0
+    vram_gb: "24-80"
+    comfy: yes
+    status: recon
+    likes: 900
+    why: All-in-one control for directed hero shots; the core of the control rig.
+  - id: dwpose
+    name: DWPose
+    category: control
+    task: pose estimation
+    hf: yzd-v/DWPose
+    licence: Apache 2.0
+    vram_gb: "low / local"
+    comfy: yes
+    status: active
+    likes: 400
+    why: Capture pose from any footage; runs local, no GPU spend.
+  - id: sam-2
+    name: SAM 2
+    category: control
+    task: segmentation (image/video)
+    hf: facebook/sam2-hiera-large
+    licence: Apache 2.0
+    vram_gb: "low / local"
+    comfy: yes
+    status: active
+    likes: 3200
+    why: Detect, lift and lock objects/backgrounds across shots.
+  - id: depth-anything-v2
+    name: Depth Anything v2
+    category: control
+    task: depth estimation
+    hf: depth-anything/Depth-Anything-V2-Large
+    licence: Apache 2.0
+    vram_gb: "low / local"
+    comfy: yes
+    status: active
+    likes: 1500
+    why: Depth maps for control-conditioned generation.
+
+  # ---- image ----
+  - id: qwen-image-edit
+    name: Qwen-Image + Edit 2511
+    category: image
+    task: text-to-image + edit
+    hf: Qwen/Qwen-Image
+    licence: Apache 2.0
+    vram_gb: "12-24"
+    comfy: yes
+    status: active
+    likes: 2100
+    why: 2026 standard for character consistency; best open text/lettering.
+  - id: flux-2-klein
+    name: FLUX.2 Klein 4B
+    category: image
+    task: text-to-image
+    hf: black-forest-labs/FLUX.2-Klein
+    licence: Apache 2.0
+    vram_gb: "8-10"
+    comfy: yes
+    status: active
+    likes: 1800
+    why: The only permissive FLUX.2 weight; commercial-safe drafts.
+  - id: flux-2-dev
+    name: FLUX.2 dev
+    category: image
+    task: text-to-image
+    hf: black-forest-labs/FLUX.2-dev
+    licence: NON-COMMERCIAL (paid licence for commercial)
+    vram_gb: "32 (FP8) - 64"
+    comfy: yes
+    status: watching
+    likes: 5400
+    why: Quality leader with 10 native reference images; needs a paid licence here.
+
+  # ---- tts ----
+  - id: qwen3-tts
+    name: Qwen3-TTS
+    category: tts
+    task: text-to-speech + cloning
+    hf: Qwen/Qwen3-TTS
+    licence: Apache 2.0
+    vram_gb: "4-8"
+    comfy: partial
+    status: active
+    likes: 1200
+    why: 3-second-reference cloning, commercial-safe default voice engine.
+  - id: chatterbox-v3
+    name: Chatterbox Multilingual v3
+    category: tts
+    task: text-to-speech + cloning
+    hf: ResembleAI/chatterbox
+    licence: MIT
+    vram_gb: "6-8"
+    comfy: no
+    status: active
+    likes: 1600
+    why: Beat ElevenLabs in blind tests; note output watermarking.
+  - id: kokoro-82m
+    name: Kokoro-82M
+    category: tts
+    task: text-to-speech (fixed voices)
+    hf: hexgrad/Kokoro-82M
+    licence: Apache 2.0
+    vram_gb: "cpu-ok"
+    comfy: no
+    status: active
+    likes: 4100
+    why: Fastest narration voice; cannot clone.
+
+  # ---- stt ----
+  - id: whisper-large-v3
+    name: Whisper large v3
+    category: stt
+    task: speech-to-text
+    hf: openai/whisper-large-v3
+    licence: Apache 2.0
+    vram_gb: "6-10"
+    comfy: partial
+    status: active
+    likes: 4600
+    why: The transcription and autocaption backbone; strong multilingual.
+  - id: faster-whisper
+    name: faster-whisper (distil)
+    category: stt
+    task: speech-to-text
+    hf: Systran/faster-whisper-large-v3
+    licence: MIT
+    vram_gb: "2-6"
+    comfy: no
+    status: active
+    likes: 900
+    why: Near-realtime STT for bulk captioning on modest hardware.
+
+  # ---- lipsync / avatar ----
+  - id: infinitetalk
+    name: InfiniteTalk
+    category: lipsync
+    task: audio-driven performance
+    hf: MeiGen-AI/InfiniteTalk
+    licence: Apache 2.0
+    vram_gb: "24"
+    comfy: yes
+    status: active
+    likes: 800
+    why: Unlimited-length audio-driven video with head and body sync.
+  - id: latentsync
+    name: LatentSync 1.x
+    category: lipsync
+    task: lip-sync dubbing
+    hf: ByteDance/LatentSync
+    licence: Apache 2.0
+    vram_gb: "8-12"
+    comfy: yes
+    status: active
+    likes: 1100
+    why: Best pure lip fidelity for dubbing existing footage.
+  - id: musetalk-1-5
+    name: MuseTalk 1.5
+    category: lipsync
+    task: realtime lip-sync
+    hf: TMElyralab/MuseTalk
+    licence: MIT-style
+    vram_gb: "6-8"
+    comfy: yes
+    status: active
+    likes: 1300
+    why: Realtime-class, the cheap bulk dubbing pass.
+
+  # ---- llm / embeddings ----
+  - id: qwen3-6-27b
+    name: Qwen3.6-27B
+    category: llm
+    task: ideation / scripting
+    hf: Qwen/Qwen3.6-27B
+    licence: Apache 2.0
+    vram_gb: "16-17 (Q4)"
+    comfy: no
+    status: active
+    likes: 2200
+    why: Strongest single-24GB-card ideation model for local scripting.
+  - id: qwen3-embedding
+    name: Qwen3-Embedding-0.6B
+    category: embeddings
+    task: semantic search
+    hf: Qwen/Qwen3-Embedding-0.6B
+    licence: Apache 2.0
+    vram_gb: "low"
+    comfy: no
+    status: active
+    likes: 700
+    why: Cheap local semantic search over the lyric/script vault.

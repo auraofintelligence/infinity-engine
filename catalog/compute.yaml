@@ -1,0 +1,109 @@
+# Compute registry: where to rent the metal, for the compute comparer.
+# Prices in AUD, converted from provider USD at AUD/USD 0.70 (2026-07-20).
+# Marketplace rates (Vast/Salad) drift; treat as a snapshot, re-verify
+# before a big batch. The manual quarterly price scan updates this file.
+#
+# best_for:  immediate  fast spin-up, interactive / small bursts
+#            batch       cheapest per hour, restartable overnight work
+# spinup:    fast (seconds, warm pool) | medium (minutes) | slow (image pull)
+
+compute:
+  - id: vast-4090-int
+    provider: Vast.ai
+    offering: interruptible
+    card: RTX 4090
+    price_aud_hr: 0.45
+    billing: per-second
+    interruptible: yes
+    spinup: medium
+    best_for: batch
+    region: marketplace (AU sometimes)
+    notes: Best $/VRAM-hour for restartable draft batches; script checkpoint-and-resume.
+  - id: salad-5090-batch
+    provider: Salad
+    offering: batch priority
+    card: RTX 5090
+    price_aud_hr: 0.40
+    billing: per-second
+    interruptible: yes
+    spinup: slow
+    best_for: batch
+    region: distributed consumer nodes
+    notes: Cheapest anywhere, but no persistent volumes; needs external checkpointing.
+  - id: runpod-4090-comm
+    provider: RunPod
+    offering: community cloud
+    card: RTX 4090
+    price_aud_hr: 0.50
+    billing: per-second
+    interruptible: spot option
+    spinup: medium
+    best_for: batch
+    region: many (Sydney sometimes)
+    notes: Reliability step up from Vast, with real network volumes so weights persist.
+  - id: runpod-a100-secure
+    provider: RunPod
+    offering: secure cloud
+    card: A100 80GB
+    price_aud_hr: 2.00
+    billing: per-second
+    interruptible: spot option
+    spinup: medium
+    best_for: immediate
+    region: many (Sydney sometimes)
+    notes: All-round hero tier; network volumes for 40GB+ model weights.
+  - id: runpod-h100-secure
+    provider: RunPod
+    offering: secure cloud
+    card: H100
+    price_aud_hr: 4.30
+    billing: per-second
+    interruptible: spot option
+    spinup: medium
+    best_for: immediate
+    region: many
+    notes: Top self-hosted tier for the heaviest video + control stacks.
+  - id: modal-h100
+    provider: Modal
+    offering: serverless
+    card: H100
+    price_aud_hr: 5.65
+    billing: per-second
+    interruptible: no
+    spinup: fast
+    best_for: immediate
+    region: US/EU
+    notes: Excellent cold starts (container snapshots); A$43/mo free credits. Best for bursty runs.
+  - id: modal-a100
+    provider: Modal
+    offering: serverless
+    card: A100 80GB
+    price_aud_hr: 3.60
+    billing: per-second
+    interruptible: no
+    spinup: fast
+    best_for: immediate
+    region: US/EU
+    notes: Scale-to-zero; great for the embeddings/TTS/image side jobs.
+  - id: fal-video
+    provider: fal.ai
+    offering: per-output API
+    card: hosted (Wan/Kling/Veo)
+    price_aud_hr: "≈A$0.07 per second of video"
+    billing: per-output
+    interruptible: n/a
+    spinup: fast
+    best_for: immediate
+    region: US/EU
+    notes: Zero-ops hero shots where a hosted model beats self-hosting.
+  - id: lambda-a100
+    provider: Lambda
+    offering: on-demand
+    card: A100 80GB
+    price_aud_hr: 3.99
+    billing: per-minute
+    interruptible: no
+    spinup: medium
+    best_for: immediate
+    region: US
+    notes: Simple VMs, no spot; steady rather than cheap.

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compute comparer - Infinity Engine</title>
+<style>
+:root{--bg:#0e0e16;--panel:#171725;--line:#262640;--ink:#e9e9f2;--mut:#8d8da6;
+--a:#7fb4e6}
+*{box-sizing:border-box}body{font-family:system-ui,sans-serif;margin:0;
+background:var(--bg);color:var(--ink);line-height:1.55}
+a{color:var(--a);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1060px;margin:0 auto;padding:0 1.2rem}
+header{border-bottom:1px solid var(--line);padding:.9rem 0}
+header .wrap{display:flex;gap:1.4rem;align-items:baseline;flex-wrap:wrap}
+header strong{font-size:1.05rem}nav{display:flex;gap:1.1rem;flex-wrap:wrap}
+h1{font-size:2rem;font-weight:800;margin:2.2rem 0 .4rem}
+h2{margin-top:2.4rem}.lead{color:var(--mut);max-width:46rem}
+.bar{display:flex;height:16px;border-radius:8px;overflow:hidden;
+background:var(--panel);margin:1.2rem 0}
+.s-ingested{background:#3a3a58}.s-analysed{background:#1d5573}.s-briefed{background:#7a6600}
+.s-panels{background:#63419a}.s-keyframes{background:#8a4477}.s-video{background:#2f7a42}
+.s-published{background:#0f8a68}
+.pill{display:inline-block;padding:.08rem .6rem;border-radius:999px;
+font-size:.78rem;background:var(--panel)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+overflow:hidden}.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.card .pad{padding:.8rem .9rem 1rem}.card h3{margin:.1rem 0 .2rem;font-size:1rem}
+.card .muted,.muted{color:var(--mut);font-size:.85rem}
+.card .bar{height:8px;margin:.7rem 0 0}
+table{border-collapse:collapse;width:100%;margin:1.2rem 0 2.5rem}
+th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line);
+vertical-align:top}
+th{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+.theme{color:#9ad;font-size:.8rem;margin-right:.45rem;white-space:nowrap}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+gap:.7rem;margin:1.4rem 0}
+.legend div{background:var(--panel);border:1px solid var(--line);
+border-radius:10px;padding:.7rem .9rem;font-size:.9rem}
+footer{border-top:1px solid var(--line);margin-top:3.5rem;padding:1.6rem 0 2.4rem;
+color:var(--mut);font-size:.9rem}
+.stage-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.4rem 0}
+.stage-flow .pill{font-size:.85rem;padding:.3rem .8rem}
+.stage-flow span.arrow{color:var(--mut)}
+.doc{max-width:52rem}
+.doc h1{margin-top:1.6rem}.doc h2{margin-top:2.4rem;padding-top:1.4rem;
+border-top:1px solid var(--line)}.doc h3{margin-top:1.7rem}
+.doc p,.doc li{color:#d6d6e4}.doc li{margin:.2rem 0}
+.doc code{background:#20203300;background:var(--panel);border:1px solid var(--line);
+border-radius:5px;padding:.05rem .35rem;font-size:.88em}
+.doc pre{background:#0a0a12;border:1px solid var(--line);border-radius:10px;
+padding:1rem 1.1rem;overflow-x:auto}
+.doc pre code{background:none;border:none;padding:0;font-size:.82rem;
+line-height:1.45;color:#c8c8dc}
+.doc blockquote{border-left:3px solid var(--a);margin:1.2rem 0;padding:.3rem 1rem;
+color:var(--mut);background:var(--panel);border-radius:0 8px 8px 0}
+.doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.doc table{margin:1.2rem 0}.doc td{color:#d6d6e4}
+/* pattern chooser */
+.pc-facets{display:flex;flex-direction:column;gap:.7rem;margin:1.4rem 0 1.8rem}
+.pc-frow{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.pc-flabel{color:var(--mut);font-size:.72rem;text-transform:uppercase;
+letter-spacing:.06em;width:5.2rem;flex:none}
+.pc-chip{cursor:pointer;user-select:none;border:1px solid var(--line);
+background:var(--panel);color:var(--ink);border-radius:999px;
+padding:.28rem .8rem;font-size:.85rem;transition:.15s}
+.pc-chip:hover{border-color:var(--a)}
+.pc-chip.on{background:var(--a);border-color:var(--a);color:#08131f;font-weight:600}
+.pc-chip.lane-recon.on{background:#5aa0d8;border-color:#5aa0d8}
+.pc-chip.lane-release.on{background:#d0a23a;border-color:#d0a23a}
+.pc-chip.lane-hero.on{background:#c86aa6;border-color:#c86aa6}
+.pc-clear{margin-left:auto;color:var(--mut);cursor:pointer;font-size:.82rem;
+background:none;border:none;text-decoration:underline}
+.pc-count{color:var(--mut);font-size:.9rem;margin:.4rem 0 1rem}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+gap:1rem}
+.pc-card{background:var(--panel);border:1px solid var(--line);border-radius:13px;
+padding:1rem 1.05rem;display:flex;flex-direction:column;gap:.5rem}
+.pc-card.hidden{display:none}
+.pc-card h3{margin:0;font-size:1.02rem;line-height:1.25}
+.pc-badges{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.pc-b{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;
+border-radius:999px;padding:.08rem .5rem}
+.pc-b.recon{background:#1d3a52;color:#bfe0ff}.pc-b.release{background:#4d3d0f;color:#ffe6a6}
+.pc-b.hero{background:#4d2340;color:#ffc7ec}
+.pc-b.tier{background:#2a2a40;color:#c9c9e6}
+.pc-b.built{background:#123f2e;color:#8ff0c4}.pc-b.designed{background:#2a2a40;color:#b7b7d6}
+.pc-b.planned{background:#3a2440;color:#e0b7f0}
+.pc-sum{color:#d3d3e2;font-size:.9rem;margin:0}
+.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.pc-tag{font-size:.72rem;color:#9ad;background:#182a3a;border-radius:5px;
+padding:.05rem .4rem}
+.pc-meta{font-size:.82rem;color:var(--mut)}.pc-meta b{color:#cdd6df;font-weight:600}
+.pc-more{border:none;background:none;color:var(--a);cursor:pointer;font-size:.82rem;
+text-align:left;padding:0}
+.pc-detail{display:none;font-size:.85rem;color:#cdd0dc;border-top:1px solid var(--line);
+padding-top:.6rem;margin-top:.2rem}
+.pc-detail.open{display:block}.pc-detail p{margin:.25rem 0}
+.pc-add{margin-top:.2rem;border:1px solid var(--a);background:none;color:var(--a);
+border-radius:8px;padding:.35rem;cursor:pointer;font-size:.85rem;font-weight:600}
+.pc-add.added{background:var(--a);color:#08131f}
+.pc-tray{position:sticky;top:.6rem;z-index:5;background:#12121e;
+border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;margin:0 0 1.4rem}
+.pc-tray h2{margin:.1rem 0 .5rem;font-size:1rem}
+.pc-tray-empty{color:var(--mut);font-size:.88rem}
+.pc-tray ol{margin:.3rem 0 0;padding-left:1.2rem}
+.pc-tray li{margin:.15rem 0;font-size:.9rem}
+.pc-tray li button{border:none;background:none;color:#e2758f;cursor:pointer;
+font-size:.9rem;margin-left:.3rem}
+@media(max-width:560px){.pc-flabel{width:100%}}
+</style></head><body>
+<header><div class="wrap">
+<strong>Infinity Engine</strong>
+<nav><a href="index.html">Progress</a>
+<a href="patterns.html">Patterns</a>
+<a href="models.html">Models</a>
+<a href="loras.html">LoRAs</a>
+<a href="compute.html">Compute</a>
+<a href="recon.html">Recon</a>
+<a href="pipeline.html">How it works</a>
+<a href="workflow.html">Operator guide</a>
+<a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
+</div></header>
+<main class="wrap">
+<h1>Compute comparer</h1><p class='lead'>Where to rent GPUs, compared on what actually matters: fast spin-up for interactive and hero runs, or cheapest per hour for off-peak batch. Prices in AUD (converted at AUD/USD 0.70, 2026-07-20); marketplace rates drift, so re-verify before a big batch.</p><div class="pc-facets"><div class="pc-frow"><span class="pc-flabel">Best for</span><button class="pc-chip " data-group="bestfor" data-value="immediate" onclick="pcToggle(this)">immediate</button><button class="pc-chip " data-group="bestfor" data-value="batch" onclick="pcToggle(this)">batch</button></div><div class="pc-frow"><span class="pc-flabel">Spin-up</span><button class="pc-chip " data-group="spinup" data-value="fast" onclick="pcToggle(this)">fast</button><button class="pc-chip " data-group="spinup" data-value="medium" onclick="pcToggle(this)">medium</button><button class="pc-chip " data-group="spinup" data-value="slow" onclick="pcToggle(this)">slow</button></div><div class="pc-frow"><span class="pc-flabel">Provider</span><button class="pc-chip " data-group="provider" data-value="falai" onclick="pcToggle(this)">falai</button><button class="pc-chip " data-group="provider" data-value="lambda" onclick="pcToggle(this)">lambda</button><button class="pc-chip " data-group="provider" data-value="modal" onclick="pcToggle(this)">modal</button><button class="pc-chip " data-group="provider" data-value="runpod" onclick="pcToggle(this)">runpod</button><button class="pc-chip " data-group="provider" data-value="salad" onclick="pcToggle(this)">salad</button><button class="pc-chip " data-group="provider" data-value="vastai" onclick="pcToggle(this)">vastai</button></div><div class="pc-frow"><button class="pc-clear" onclick="pcClear()">clear all filters</button></div></div><div class="pc-count" id="pcCount"></div><div class="pc-grid"><div class="pc-card" data-provider="vastai" data-bestfor="batch" data-spinup="medium"><div class="pc-badges"><span class="pc-b tier">Vast.ai</span><span class="pc-b recon">batch</span></div><h3>RTX 4090</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$0.45</b>/hr</div><p class="pc-sum">Best $/VRAM-hour for restartable draft batches; script checkpoint-and-resume.</p><div class="pc-meta"><b>Offering:</b> interruptible &middot; <b>Billing:</b> per-second<br><b>Spin-up:</b> medium &middot; <b>Region:</b> marketplace (AU sometimes)</div></div><div class="pc-card" data-provider="salad" data-bestfor="batch" data-spinup="slow"><div class="pc-badges"><span class="pc-b tier">Salad</span><span class="pc-b recon">batch</span></div><h3>RTX 5090</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$0.4</b>/hr</div><p class="pc-sum">Cheapest anywhere, but no persistent volumes; needs external checkpointing.</p><div class="pc-meta"><b>Offering:</b> batch priority &middot; <b>Billing:</b> per-second<br><b>Spin-up:</b> slow &middot; <b>Region:</b> distributed consumer nodes</div></div><div class="pc-card" data-provider="runpod" data-bestfor="batch" data-spinup="medium"><div class="pc-badges"><span class="pc-b tier">RunPod</span><span class="pc-b recon">batch</span><span class="pc-b release">spot</span></div><h3>RTX 4090</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$0.5</b>/hr</div><p class="pc-sum">Reliability step up from Vast, with real network volumes so weights persist.</p><div class="pc-meta"><b>Offering:</b> community cloud &middot; <b>Billing:</b> per-second<br><b>Spin-up:</b> medium &middot; <b>Region:</b> many (Sydney sometimes)</div></div><div class="pc-card" data-provider="runpod" data-bestfor="immediate" data-spinup="medium"><div class="pc-badges"><span class="pc-b tier">RunPod</span><span class="pc-b hero">immediate</span><span class="pc-b release">spot</span></div><h3>A100 80GB</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$2.0</b>/hr</div><p class="pc-sum">All-round hero tier; network volumes for 40GB+ model weights.</p><div class="pc-meta"><b>Offering:</b> secure cloud &middot; <b>Billing:</b> per-second<br><b>Spin-up:</b> medium &middot; <b>Region:</b> many (Sydney sometimes)</div></div><div class="pc-card" data-provider="runpod" data-bestfor="immediate" data-spinup="medium"><div class="pc-badges"><span class="pc-b tier">RunPod</span><span class="pc-b hero">immediate</span><span class="pc-b release">spot</span></div><h3>H100</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$4.3</b>/hr</div><p class="pc-sum">Top self-hosted tier for the heaviest video + control stacks.</p><div class="pc-meta"><b>Offering:</b> secure cloud &middot; <b>Billing:</b> per-second<br><b>Spin-up:</b> medium &middot; <b>Region:</b> many</div></div><div class="pc-card" data-provider="modal" data-bestfor="immediate" data-spinup="fast"><div class="pc-badges"><span class="pc-b tier">Modal</span><span class="pc-b hero">immediate</span></div><h3>H100</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$5.65</b>/hr</div><p class="pc-sum">Excellent cold starts (container snapshots); A$43/mo free credits. Best for bursty runs.</p><div class="pc-meta"><b>Offering:</b> serverless &middot; <b>Billing:</b> per-second<br><b>Spin-up:</b> fast &middot; <b>Region:</b> US/EU</div></div><div class="pc-card" data-provider="modal" data-bestfor="immediate" data-spinup="fast"><div class="pc-badges"><span class="pc-b tier">Modal</span><span class="pc-b hero">immediate</span></div><h3>A100 80GB</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$3.6</b>/hr</div><p class="pc-sum">Scale-to-zero; great for the embeddings/TTS/image side jobs.</p><div class="pc-meta"><b>Offering:</b> serverless &middot; <b>Billing:</b> per-second<br><b>Spin-up:</b> fast &middot; <b>Region:</b> US/EU</div></div><div class="pc-card" data-provider="falai" data-bestfor="immediate" data-spinup="fast"><div class="pc-badges"><span class="pc-b tier">fal.ai</span><span class="pc-b hero">immediate</span></div><h3>hosted (Wan/Kling/Veo)</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$≈A$0.07 per second of video</b></div><p class="pc-sum">Zero-ops hero shots where a hosted model beats self-hosting.</p><div class="pc-meta"><b>Offering:</b> per-output API &middot; <b>Billing:</b> per-output<br><b>Spin-up:</b> fast &middot; <b>Region:</b> US/EU</div></div><div class="pc-card" data-provider="lambda" data-bestfor="immediate" data-spinup="medium"><div class="pc-badges"><span class="pc-b tier">Lambda</span><span class="pc-b hero">immediate</span></div><h3>A100 80GB</h3><div class="pc-meta" style="font-size:1.1rem;color:#cdd6df"><b>A$3.99</b>/hr</div><p class="pc-sum">Simple VMs, no spot; steady rather than cheap.</p><div class="pc-meta"><b>Offering:</b> on-demand &middot; <b>Billing:</b> per-minute<br><b>Spin-up:</b> medium &middot; <b>Region:</b> US</div></div></div><script>const PC_NOUN="option";
+const pcState={};
+document.querySelectorAll('.pc-chip[data-group]').forEach(c=>{
+  pcState[c.dataset.group]=pcState[c.dataset.group]||new Set()});
+function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
+  const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
+  else{s.add(v);el.classList.add('on')}pcFilter()}
+function pcClear(){for(const g in pcState)pcState[g].clear();
+  document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
+  pcFilter()}
+function pcMatch(card){for(const g in pcState){const sel=pcState[g];
+  if(!sel.size)continue;
+  const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
+  if(![...sel].some(v=>vals.includes(v)))return false}return true}
+function pcFilter(){let n=0;document.querySelectorAll('.pc-card').forEach(c=>{
+  const ok=pcMatch(c);c.classList.toggle('hidden',!ok);if(ok)n++});
+  document.getElementById('pcCount').textContent=
+    n+' '+PC_NOUN+(n===1?'':'s')+' shown'}
+function pcMore(b){b.nextElementSibling.classList.toggle('open')}
+</script>
+</main>
+<footer><div class="wrap">A live monitor of the i C. infinity visual
+pipeline. Regenerated from the song vault as pieces complete.
+Lyrics live with the music, not here.<br>Luke &times; Claude.</div></footer>
+</body></html>

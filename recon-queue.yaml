@@ -1,0 +1,30 @@
+# Recon queue. Auto-appended by tools/watch_models.py; hand-edit freely.
+# Vet each candidate, then promote into catalog/models.yaml or reject.
+
+queue:
+- id: kandinsky-5
+  name: Kandinsky 5.0 Video Lite
+  category: video
+  flagged_reason: hyped
+  flagged_date: 2026-07-20
+  link: https://huggingface.co/kandinskylab/Kandinsky-5.0-T2V-Lite
+  status: new
+  notes: Fast 2B draft-tier video. Bake off against HunyuanVideo 1.5 on a cast-rich
+    song.
+- id: wan-vace
+  name: Wan-VACE
+  category: control
+  flagged_reason: new
+  flagged_date: 2026-07-20
+  link: https://huggingface.co/Wan-AI/Wan2.1-VACE-14B
+  status: testing
+  notes: Core of the control rig (pose/depth/ref). Test a directed hero shot end to
+    end.
+- id: omnivoice
+  name: OmniVoice
+  category: tts
+  flagged_reason: hyped
+  flagged_date: 2026-07-20
+  link: https://huggingface.co/k2-fsa/OmniVoice
+  status: new
+  notes: 600+ language zero-shot cloning; the multilingual wildcard for the dub lane.

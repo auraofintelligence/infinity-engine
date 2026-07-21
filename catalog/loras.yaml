@@ -1,0 +1,74 @@
+# LoRA registry: fine-tunes the pipeline can pull, for the LoRA picker.
+# Two kinds:
+#   - your own cast/likeness LoRAs (trained by the Character LoRA foundry;
+#     these are the load-bearing ones, versioned, some private)
+#   - external style/detail LoRAs sourced from Hugging Face (the watcher
+#     flags trending ones into recon-queue.yaml; promote the good ones here)
+#
+# status:  active (trained/adopted) | recon (testing) | planned (to train)
+# kind:    character | likeness | style | detail
+# private: true means it never leaves this machine or hits the public site
+
+loras:
+  - id: goddess-v1
+    name: The Goddess
+    kind: character
+    base: Qwen-Image
+    source: own (foundry)
+    licence: reserved
+    private: false
+    status: planned
+    trigger: ohwx_goddess
+    why: Recurring mythic lead across Straddie and Starseed; a load-bearing cast LoRA.
+  - id: aura-v1
+    name: Aura
+    kind: character
+    base: Qwen-Image
+    source: own (foundry)
+    licence: reserved
+    private: false
+    status: planned
+    trigger: ohwx_aura
+    why: The Aura figure across the Starseed arc.
+  - id: gajra-v1
+    name: G.A.J.R.A.
+    kind: character
+    base: Qwen-Image
+    source: own (foundry)
+    licence: reserved
+    private: false
+    status: planned
+    trigger: ohwx_gajra
+    why: The G.A.J.R.A. figure; recurring in the cosmic-tech chapter.
+  - id: he-lead-v1
+    name: He-lead (paired vocals)
+    kind: character
+    base: Qwen-Image
+    source: own (foundry)
+    licence: reserved
+    private: false
+    status: planned
+    trigger: ohwx_helead
+    why: The male voice of the he/she paired tracks.
+  - id: she-lead-v1
+    name: She-lead (paired vocals)
+    kind: character
+    base: Qwen-Image
+    source: own (foundry)
+    licence: reserved
+    private: false
+    status: planned
+    trigger: ohwx_shelead
+    why: The female voice of the he/she paired tracks.
+  - id: band-support-v1
+    name: Band and supports
+    kind: likeness
+    base: Qwen-Image
+    source: own (foundry)
+    licence: reserved
+    private: true
+    status: planned
+    trigger: ohwx_band
+    why: Real band and support performers; consented likenesses, kept private.
+  # External style/detail LoRAs land here after the watcher flags them and
+  # you vet them in Recon. Seeded empty on purpose: no unverified HF ids.

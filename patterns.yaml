@@ -238,3 +238,73 @@ patterns:
     inputs: A story seed, cast, and approved shots.
     outputs: A 9:16 micro-drama.
     risk: Lip-sync is a real gate; vet on a Recon pass first.
+
+  - id: tts-voiceover
+    name: TTS voiceover
+    lane: [recon, release, hero]
+    stage: voice
+    tier: draft
+    status: designed
+    tags: [voice, narration, not-music]
+    summary: Narration or spoken-word voiceover from a script. The non-music backbone.
+    models: [Qwen3-TTS, Kokoro-82M]
+    cost: "-"
+    inputs: A script and a chosen voice.
+    outputs: A voice track ready to cut against picture.
+    risk: Runs light and local; Kokoro is CPU-viable for fast drafts.
+
+  - id: voice-clone
+    name: Voice clone (character / singer)
+    lane: [recon, hero]
+    stage: voice
+    tier: standard
+    status: designed
+    tags: [voice, likeness, asset]
+    summary: A cloned voice for a recurring character or singer, registered like a cast asset.
+    models: [Qwen3-TTS, Chatterbox v3]
+    cost: "-"
+    inputs: A few seconds of consented reference audio.
+    outputs: A reusable voice profile in the asset registry.
+    risk: Keep consent and private voices local; mark the asset private.
+
+  - id: stt-transcribe
+    name: Speech-to-text transcribe
+    lane: [recon, release, hero]
+    stage: voice
+    tier: draft
+    status: designed
+    tags: [stt, not-music, captions-source]
+    summary: Transcribe dialogue or voiceover to timed text. Feeds captions, edits and search.
+    models: [Whisper large v3, faster-whisper]
+    cost: "-"
+    inputs: Any audio or video with speech.
+    outputs: A timed transcript (word and segment timestamps).
+    risk: Local and cheap; distil/faster variants run near realtime.
+
+  - id: autocaptions
+    name: Auto captions / subtitles
+    lane: [release, hero]
+    stage: voice
+    tier: draft
+    status: designed
+    tags: [captions, stt, assemble, multi-platform]
+    summary: Generate SRT from transcription and burn styled captions for phone-first viewing.
+    models: [Whisper large v3, ffmpeg]
+    cost: "-"
+    inputs: A clip with speech, or an existing transcript.
+    outputs: An SRT and a caption-burned render.
+    risk: Always proofread auto-captions before publish; names and lyrics trip them.
+
+  - id: audio-dub
+    name: Cultural-translation dub
+    lane: [hero]
+    stage: voice
+    tier: standard
+    status: planned
+    tags: [voice, stt, translation, not-music]
+    summary: Transcribe, translate, re-voice and re-sync into another language. For the cultural-translation work.
+    models: [Whisper large v3, Qwen3-TTS, LatentSync]
+    cost: "voice + lipsync cost"
+    inputs: A finished clip and a target language.
+    outputs: A dubbed, lip-synced version.
+    risk: Translation needs a human check for meaning and register, not just literal words.

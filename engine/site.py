@@ -151,6 +151,10 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <strong>Infinity Engine</strong>
 <nav><a href="{up}index.html">Progress</a>
 <a href="{up}patterns.html">Patterns</a>
+<a href="{up}models.html">Models</a>
+<a href="{up}loras.html">LoRAs</a>
+<a href="{up}compute.html">Compute</a>
+<a href="{up}recon.html">Recon</a>
 <a href="{up}pipeline.html">How it works</a>
 <a href="{up}workflow.html">Operator guide</a>
 <a href="{UNIVERSE_BASE}/">Music universe</a></nav>
@@ -308,10 +312,12 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
                         encoding="utf-8")
         written.append(path)
 
-    # Pattern chooser (data-driven from patterns.yaml).
-    pattern_page = render_patterns(out_dir)
-    if pattern_page:
-        written.append(pattern_page)
+    # Pattern chooser and the registry pickers (data-driven).
+    for builder in (render_patterns, render_models, render_loras,
+                    render_compute, render_recon):
+        page = builder(out_dir)
+        if page:
+            written.append(page)
 
     # Prune stale album pages: if an album drops out of the allowlist,
     # its old page must not linger on the live site.
@@ -329,7 +335,8 @@ def load_catalogue(pack_dir: Path) -> dict:
 
 
 LANES = ["recon", "release", "hero"]
-STAGES = ["analyse", "cast", "panels", "motion", "scene", "video", "assemble"]
+STAGES = ["analyse", "cast", "voice", "panels", "motion", "scene", "video",
+          "assemble"]
 TIERS = ["draft", "standard", "premium"]
 
 
@@ -410,31 +417,40 @@ def render_patterns(out_dir: Path) -> Path | None:
         + facets
         + '<div class="pc-count" id="pcCount"></div>'
         + f'<div class="pc-grid" id="pcGrid">{cards}</div>'
-        + f"<script>const PC_NAMES={id_names};{_PATTERNS_JS}</script>")
+        + f'<script>const PC_NOUN="pattern";const PC_NAMES={id_names};'
+        + f"{_FILTER_CORE_JS}{_PATTERNS_TRAY_JS}</script>")
     path = out_dir / "patterns.html"
     path.write_text(_page("Patterns", body), encoding="utf-8")
     return path
 
 
-_PATTERNS_JS = r"""
-const pcState={lane:new Set(),stage:new Set(),tier:new Set(),tags:new Set()};
-let pcPlan=[];
-try{pcPlan=JSON.parse(localStorage.getItem('pcPlan')||'[]')}catch(e){pcPlan=[]}
+# Group-agnostic filter core, shared by the pattern chooser and every
+# picker. pcState is built from whatever data-group chips are on the page,
+# so the same code filters any facet set.
+_FILTER_CORE_JS = r"""
+const pcState={};
+document.querySelectorAll('.pc-chip[data-group]').forEach(c=>{
+  pcState[c.dataset.group]=pcState[c.dataset.group]||new Set()});
 function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
   const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
   else{s.add(v);el.classList.add('on')}pcFilter()}
 function pcClear(){for(const g in pcState)pcState[g].clear();
   document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
   pcFilter()}
-function pcMatch(card){for(const g of ['lane','stage','tier','tags']){
-  const sel=pcState[g];if(!sel.size)continue;
+function pcMatch(card){for(const g in pcState){const sel=pcState[g];
+  if(!sel.size)continue;
   const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
   if(![...sel].some(v=>vals.includes(v)))return false}return true}
 function pcFilter(){let n=0;document.querySelectorAll('.pc-card').forEach(c=>{
   const ok=pcMatch(c);c.classList.toggle('hidden',!ok);if(ok)n++});
   document.getElementById('pcCount').textContent=
-    n+' pattern'+(n===1?'':'s')+' shown'}
+    n+' '+PC_NOUN+(n===1?'':'s')+' shown'}
 function pcMore(b){b.nextElementSibling.classList.toggle('open')}
+"""
+
+_PATTERNS_TRAY_JS = r"""
+let pcPlan=[];
+try{pcPlan=JSON.parse(localStorage.getItem('pcPlan')||'[]')}catch(e){pcPlan=[]}
 function pcAdd(b){const id=b.dataset.id;
   if(pcPlan.includes(id)){pcPlan=pcPlan.filter(x=>x!==id)}
   else{pcPlan.push(id)}pcSave();pcRenderTray();pcSyncAdd()}
@@ -454,3 +470,228 @@ function pcRenderTray(){const t=document.getElementById('pcTray');
   t.innerHTML='<h2>Your plan ('+pcPlan.length+')</h2><ol>'+items+'</ol>'}
 pcRenderTray();pcSyncAdd();pcFilter();
 """
+
+
+def _facet_row(label: str, group: str, values: list) -> str:
+    chips = "".join(_chip(group, v) for v in values)
+    return (f'<div class="pc-frow"><span class="pc-flabel">{label}</span>'
+            f'{chips}</div>')
+
+
+def render_picker(out_dir: Path, *, filename: str, title: str, noun: str,
+                  lead: str, facet_defs: list, cards: list) -> Path:
+    """Generic faceted card picker. facet_defs is a list of
+    (label, group, [values]); each card is (attrs_dict, html)."""
+    facet_html = "".join(_facet_row(lbl, grp, vals)
+                         for lbl, grp, vals in facet_defs if vals)
+    facet_html += ('<div class="pc-frow"><button class="pc-clear" '
+                   'onclick="pcClear()">clear all filters</button></div>')
+    card_html = []
+    for attrs, inner in cards:
+        data = " ".join(f'data-{k}="{" ".join(v)}"' for k, v in attrs.items())
+        card_html.append(f'<div class="pc-card" {data}>{inner}</div>')
+    body = (
+        f"<h1>{_esc(title)}</h1>"
+        f"<p class='lead'>{lead}</p>"
+        f'<div class="pc-facets">{facet_html}</div>'
+        '<div class="pc-count" id="pcCount"></div>'
+        f'<div class="pc-grid">{"".join(card_html)}</div>'
+        f'<script>const PC_NOUN="{noun}";{_FILTER_CORE_JS}</script>')
+    path = out_dir / filename
+    path.write_text(_page(title, body), encoding="utf-8")
+    return path
+
+
+def _load_catalog(out_dir: Path, name: str, key: str) -> list:
+    import yaml
+    src = out_dir.parent / name
+    if not src.exists():
+        return []
+    return (yaml.safe_load(src.read_text(encoding="utf-8")) or {}).get(key, [])
+
+
+def _sorted_uniq(items: list, field: str) -> list:
+    return sorted({str(i.get(field)) for i in items if i.get(field)})
+
+
+def render_models(out_dir: Path) -> Path | None:
+    models = _load_catalog(out_dir, "catalog/models.yaml", "models")
+    if not models:
+        return None
+    cards = []
+    for m in models:
+        status = m.get("status", "watching")
+        st_class = {"active": "built", "recon": "planned",
+                    "watching": "designed"}.get(status, "designed")
+        comfy = m.get("comfy", "no")
+        inner = (
+            f'<div class="pc-badges">'
+            f'<span class="pc-b tier">{_esc(m.get("category",""))}</span>'
+            f'<span class="pc-b {st_class}">{_esc(status)}</span>'
+            + (f'<span class="pc-b built">ComfyUI</span>' if comfy == "yes"
+               else "") + '</div>'
+            f'<h3>{_esc(m.get("name", m["id"]))}</h3>'
+            f'<p class="pc-sum">{_esc(m.get("why",""))}</p>'
+            f'<div class="pc-meta"><b>Task:</b> {_esc(m.get("task",""))}<br>'
+            f'<b>Licence:</b> {_esc(m.get("licence",""))}<br>'
+            f'<b>VRAM:</b> {_esc(m.get("vram_gb","?"))} GB '
+            f'&middot; <b>HF likes:</b> {_esc(m.get("likes","?"))}</div>'
+            + (f'<a class="pc-more" href="https://huggingface.co/'
+               f'{_esc(m.get("hf",""))}" target="_blank" rel="noopener">'
+               f'Hugging Face &rarr;</a>' if m.get("hf") else ""))
+        attrs = {
+            "category": [str(m.get("category", ""))],
+            "status": [status],
+            "licence": ["commercial" if "Apache" in str(m.get("licence", ""))
+                        or "MIT" in str(m.get("licence", "")) else "restricted"],
+        }
+        cards.append((attrs, inner))
+    facet_defs = [
+        ("Category", "category", _sorted_uniq(models, "category")),
+        ("Status", "status", ["active", "recon", "watching"]),
+        ("Licence", "licence", ["commercial", "restricted"]),
+    ]
+    return render_picker(
+        out_dir, filename="models.html", title="Model picker", noun="model",
+        lead=("Open-weight models per category, sourced from Hugging Face. "
+              "Green means it's in the working stack; recon means it's being "
+              "tested; watching means it's on the radar. Licence 'commercial' "
+              "is Apache or MIT and safe for the universe; 'restricted' needs "
+              "a closer look. The recon watcher keeps this fresh."),
+        facet_defs=facet_defs, cards=cards)
+
+
+def render_loras(out_dir: Path) -> Path | None:
+    loras = _load_catalog(out_dir, "catalog/loras.yaml", "loras")
+    if not loras:
+        return None
+    cards = []
+    for lo in loras:
+        status = lo.get("status", "planned")
+        st_class = {"active": "built", "recon": "planned",
+                    "planned": "designed"}.get(status, "designed")
+        priv = lo.get("private", False)
+        inner = (
+            '<div class="pc-badges">'
+            f'<span class="pc-b tier">{_esc(lo.get("kind",""))}</span>'
+            f'<span class="pc-b {st_class}">{_esc(status)}</span>'
+            + ('<span class="pc-b hero">private</span>' if priv else "")
+            + '</div>'
+            f'<h3>{_esc(lo.get("name", lo["id"]))}</h3>'
+            f'<p class="pc-sum">{_esc(lo.get("why",""))}</p>'
+            f'<div class="pc-meta"><b>Base:</b> {_esc(lo.get("base","?"))} '
+            f'&middot; <b>Source:</b> {_esc(lo.get("source","?"))}<br>'
+            f'<b>Trigger:</b> <code>{_esc(lo.get("trigger","-"))}</code></div>')
+        attrs = {
+            "kind": [str(lo.get("kind", ""))],
+            "status": [status],
+            "visibility": ["private" if priv else "shareable"],
+        }
+        cards.append((attrs, inner))
+    facet_defs = [
+        ("Kind", "kind", _sorted_uniq(loras, "kind")),
+        ("Status", "status", ["active", "recon", "planned"]),
+        ("Visibility", "visibility", ["shareable", "private"]),
+    ]
+    return render_picker(
+        out_dir, filename="loras.html", title="LoRA picker", noun="LoRA",
+        lead=("Fine-tunes the pipeline can pull: your own cast and likeness "
+              "LoRAs from the foundry, plus style and detail LoRAs the watcher "
+              "flags from Hugging Face for you to vet. Private ones never "
+              "leave your machine."),
+        facet_defs=facet_defs, cards=cards)
+
+
+def render_compute(out_dir: Path) -> Path | None:
+    rows = _load_catalog(out_dir, "catalog/compute.yaml", "compute")
+    if not rows:
+        return None
+    cards = []
+    for c in rows:
+        best = c.get("best_for", "")
+        inner = (
+            '<div class="pc-badges">'
+            f'<span class="pc-b tier">{_esc(c.get("provider",""))}</span>'
+            + (f'<span class="pc-b {"recon" if best=="batch" else "hero"}">'
+               f'{_esc(best)}</span>' if best else "")
+            + (f'<span class="pc-b release">spot</span>'
+               if str(c.get("interruptible","")).startswith(("yes","spot"))
+               else "") + '</div>'
+            f'<h3>{_esc(c.get("card", c["id"]))}</h3>'
+            f'<div class="pc-meta" style="font-size:1.1rem;color:#cdd6df">'
+            f'<b>A${_esc(c.get("price_aud_hr","?"))}</b>'
+            + ("/hr" if isinstance(c.get("price_aud_hr"), (int, float))
+               else "") + '</div>'
+            f'<p class="pc-sum">{_esc(c.get("notes",""))}</p>'
+            f'<div class="pc-meta"><b>Offering:</b> {_esc(c.get("offering",""))} '
+            f'&middot; <b>Billing:</b> {_esc(c.get("billing",""))}<br>'
+            f'<b>Spin-up:</b> {_esc(c.get("spinup",""))} '
+            f'&middot; <b>Region:</b> {_esc(c.get("region",""))}</div>')
+        attrs = {
+            "provider": [str(c.get("provider", "")).lower().replace(".", "")],
+            "bestfor": [str(best)] if best else [],
+            "spinup": [str(c.get("spinup", ""))],
+        }
+        cards.append((attrs, inner))
+    facet_defs = [
+        ("Best for", "bestfor", ["immediate", "batch"]),
+        ("Spin-up", "spinup", ["fast", "medium", "slow"]),
+        ("Provider", "provider", _sorted_uniq(
+            [{"p": str(c.get("provider", "")).lower().replace(".", "")}
+             for c in rows], "p")),
+    ]
+    return render_picker(
+        out_dir, filename="compute.html", title="Compute comparer",
+        noun="option",
+        lead=("Where to rent GPUs, compared on what actually matters: fast "
+              "spin-up for interactive and hero runs, or cheapest per hour for "
+              "off-peak batch. Prices in AUD (converted at AUD/USD 0.70, "
+              "2026-07-20); marketplace rates drift, so re-verify before a big "
+              "batch."),
+        facet_defs=facet_defs, cards=cards)
+
+
+def render_recon(out_dir: Path) -> Path | None:
+    queue = _load_catalog(out_dir, "recon-queue.yaml", "queue")
+    cards = []
+    for q in queue:
+        status = q.get("status", "new")
+        st_class = {"new": "designed", "testing": "planned",
+                    "adopted": "built", "rejected": "hero"}.get(status,
+                                                                "designed")
+        inner = (
+            '<div class="pc-badges">'
+            f'<span class="pc-b tier">{_esc(q.get("category",""))}</span>'
+            f'<span class="pc-b {st_class}">{_esc(status)}</span>'
+            f'<span class="pc-b release">{_esc(q.get("flagged_reason",""))}</span>'
+            '</div>'
+            f'<h3>{_esc(q.get("name", q["id"]))}</h3>'
+            f'<p class="pc-sum">{_esc(q.get("notes",""))}</p>'
+            f'<div class="pc-meta"><b>Flagged:</b> '
+            f'{_esc(q.get("flagged_date",""))}</div>'
+            + (f'<a class="pc-more" href="{_esc(q.get("link",""))}" '
+               'target="_blank" rel="noopener">source &rarr;</a>'
+               if q.get("link") else ""))
+        attrs = {
+            "category": [str(q.get("category", ""))],
+            "status": [status],
+            "reason": [str(q.get("flagged_reason", ""))],
+        }
+        cards.append((attrs, inner))
+    facet_defs = [
+        ("Category", "category", _sorted_uniq(queue, "category")),
+        ("Status", "status", ["new", "testing", "adopted", "rejected"]),
+        ("Why", "reason", _sorted_uniq(queue, "flagged_reason")),
+    ]
+    intro = (
+        "Candidates the watcher flagged, plus anything you drop in. This is "
+        "the inbox of the Recon lane: vet each one on a fast, cheap pass, then "
+        "promote the winners into the model registry or reject them. Run "
+        "<code>python tools/watch_models.py</code> (or the scheduled task) to "
+        "refresh it. See the "
+        f'<a href="{REPO_BASE}/blob/main/docs/RECON-WATCHER.md">watcher spec</a>.')
+    if not cards:
+        intro += " Nothing in the queue right now."
+    return render_picker(
+        out_dir, filename="recon.html", title="Recon area", noun="candidate",
+        lead=intro, facet_defs=facet_defs, cards=cards)

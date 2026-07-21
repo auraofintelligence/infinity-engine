@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en-AU"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How it works - Infinity Engine</title>
+<title>Recon area - Infinity Engine</title>
 <style>
 :root{--bg:#0e0e16;--panel:#171725;--line:#262640;--ink:#e9e9f2;--mut:#8d8da6;
 --a:#7fb4e6}
@@ -122,7 +122,26 @@ font-size:.9rem;margin-left:.3rem}
 <a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
 </div></header>
 <main class="wrap">
-<h1>How the engine works</h1><p class='lead'>Songs become visuals through a fixed set of stages. The cheap thinking happens first in text; a human direction point sits in the middle; the expensive video generation only ever renders already-approved ideas.</p><div class='stage-flow'><span class='pill s-ingested'>ingested</span><span class='arrow'>&rarr;</span><span class='pill s-analysed'>analysed</span><span class='arrow'>&rarr;</span><span class='pill s-briefed'>briefed</span><span class='arrow'>&rarr;</span><span class='pill s-panels'>panels</span><span class='arrow'>&rarr;</span><span class='pill s-keyframes'>keyframes</span><span class='arrow'>&rarr;</span><span class='pill s-video'>video</span><span class='arrow'>&rarr;</span><span class='pill s-published'>published</span></div><h2>The stages</h2><div class='legend'><div><span class='pill s-ingested'>ingested</span><br><span class='muted'>lyrics and context are in the vault</span></div><div><span class='pill s-analysed'>analysed</span><br><span class='muted'>themes, mood and story seed mapped</span></div><div><span class='pill s-briefed'>briefed</span><br><span class='muted'>Luke has approved a visual direction</span></div><div><span class='pill s-panels'>panels</span><br><span class='muted'>comic pre-viz panels exist</span></div><div><span class='pill s-keyframes'>keyframes</span><br><span class='muted'>panels promoted to video keyframes</span></div><div><span class='pill s-video'>video</span><br><span class='muted'>video shots generated</span></div><div><span class='pill s-published'>published</span><br><span class='muted'>released to a platform</span></div></div><h2>What exists today</h2><p>The vault, the ideation loop and this monitor are live. Comic pre-viz, video generation, voice and lip-sync are designed and would run on rented GPUs against open-weight models; they come online stage by stage, and this site will show each song advance as they do.</p><h2>Five lanes, one spine</h2><p class='muted'>Lyric videos, comics and graphic novels, avatar-presented course videos, vertical micro-dramas, and whole-album aggregates all share the same early stages, so work done once serves every format.</p>
+<h1>Recon area</h1><p class='lead'>Candidates the watcher flagged, plus anything you drop in. This is the inbox of the Recon lane: vet each one on a fast, cheap pass, then promote the winners into the model registry or reject them. Run <code>python tools/watch_models.py</code> (or the scheduled task) to refresh it. See the <a href="https://github.com/auraofintelligence/infinity-engine/blob/main/docs/RECON-WATCHER.md">watcher spec</a>.</p><div class="pc-facets"><div class="pc-frow"><span class="pc-flabel">Category</span><button class="pc-chip " data-group="category" data-value="control" onclick="pcToggle(this)">control</button><button class="pc-chip " data-group="category" data-value="tts" onclick="pcToggle(this)">tts</button><button class="pc-chip " data-group="category" data-value="video" onclick="pcToggle(this)">video</button></div><div class="pc-frow"><span class="pc-flabel">Status</span><button class="pc-chip " data-group="status" data-value="new" onclick="pcToggle(this)">new</button><button class="pc-chip " data-group="status" data-value="testing" onclick="pcToggle(this)">testing</button><button class="pc-chip " data-group="status" data-value="adopted" onclick="pcToggle(this)">adopted</button><button class="pc-chip " data-group="status" data-value="rejected" onclick="pcToggle(this)">rejected</button></div><div class="pc-frow"><span class="pc-flabel">Why</span><button class="pc-chip " data-group="reason" data-value="hyped" onclick="pcToggle(this)">hyped</button><button class="pc-chip " data-group="reason" data-value="new" onclick="pcToggle(this)">new</button></div><div class="pc-frow"><button class="pc-clear" onclick="pcClear()">clear all filters</button></div></div><div class="pc-count" id="pcCount"></div><div class="pc-grid"><div class="pc-card" data-category="video" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">video</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>Kandinsky 5.0 Video Lite</h3><p class="pc-sum">Fast 2B draft-tier video. Bake off against HunyuanVideo 1.5 on a cast-rich song.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-20</div><a class="pc-more" href="https://huggingface.co/kandinskylab/Kandinsky-5.0-T2V-Lite" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="control" data-status="testing" data-reason="new"><div class="pc-badges"><span class="pc-b tier">control</span><span class="pc-b planned">testing</span><span class="pc-b release">new</span></div><h3>Wan-VACE</h3><p class="pc-sum">Core of the control rig (pose/depth/ref). Test a directed hero shot end to end.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-20</div><a class="pc-more" href="https://huggingface.co/Wan-AI/Wan2.1-VACE-14B" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="tts" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">tts</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>OmniVoice</h3><p class="pc-sum">600+ language zero-shot cloning; the multilingual wildcard for the dub lane.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-20</div><a class="pc-more" href="https://huggingface.co/k2-fsa/OmniVoice" target="_blank" rel="noopener">source &rarr;</a></div></div><script>const PC_NOUN="candidate";
+const pcState={};
+document.querySelectorAll('.pc-chip[data-group]').forEach(c=>{
+  pcState[c.dataset.group]=pcState[c.dataset.group]||new Set()});
+function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
+  const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
+  else{s.add(v);el.classList.add('on')}pcFilter()}
+function pcClear(){for(const g in pcState)pcState[g].clear();
+  document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
+  pcFilter()}
+function pcMatch(card){for(const g in pcState){const sel=pcState[g];
+  if(!sel.size)continue;
+  const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
+  if(![...sel].some(v=>vals.includes(v)))return false}return true}
+function pcFilter(){let n=0;document.querySelectorAll('.pc-card').forEach(c=>{
+  const ok=pcMatch(c);c.classList.toggle('hidden',!ok);if(ok)n++});
+  document.getElementById('pcCount').textContent=
+    n+' '+PC_NOUN+(n===1?'':'s')+' shown'}
+function pcMore(b){b.nextElementSibling.classList.toggle('open')}
+</script>
 </main>
 <footer><div class="wrap">A live monitor of the i C. infinity visual
 pipeline. Regenerated from the song vault as pieces complete.
