@@ -311,3 +311,19 @@ cast:
     private: true
     summary: Co-host voiced and directed by Angel; the repo leaves his inner voice to him, never scripts it.
   # Guests choose their own spirit animal; that slot stays open by design.
+
+  # ---- community mascots (education + marketing for local clubs) ----
+  - id: finnius
+    name: Finnius
+    troupe: mascots
+    role: mascot / educator
+    represents: dolphin (Point Lookout Fishing Club)
+    status: concept
+    summary: The Point Lookout Fishing Club's dolphin mascot; fishing know-how, marine care and club marketing. Luke is PLFC secretary; the club is dormant until he returns to it.
+  - id: mozzie
+    name: Mozzie
+    troupe: mascots
+    role: mascot / hype
+    represents: mosquito (Sandy Sports Club)
+    status: concept
+    summary: The Sandy Sports Club's cheeky mosquito mascot, a nod to Minjerribah meaning place of mosquito; sport, health and event marketing.

@@ -1250,6 +1250,8 @@ CAST_LORA_TIER = {
     "amity-crew": ("reference",
                    "Consistent crew avatars; reference-first, LoRA if they recur on screen"),
     "two-dogs": ("reference", "Podcast hosts; reference or a light LoRA"),
+    "mascots": ("mascot LoRA",
+                "Club mascots want a locked look for merch and education; train when the club activates"),
 }
 
 
@@ -1326,7 +1328,7 @@ def render_loras(out_dir: Path) -> Path | None:
     n = len(cast)
     facet_defs = [
         ("Troupe", "troupe", list(CAST_TROUPES) + ["external"]),
-        ("Tier", "tier", ["hero", "template", "reference", "style"]),
+        ("Tier", "tier", ["hero", "template", "reference", "mascot", "style"]),
         ("Status", "status", ["active", "trained", "planned", "concept"]),
         ("Visibility", "visibility", ["shareable", "private"]),
     ]
@@ -1482,6 +1484,8 @@ CAST_TROUPES = {
                    "The AI filmmaking assistants, each an Australian animal spirit"),
     "two-dogs": ("Two Dogs podcast",
                  "Spirit-animal hosts; guests bring their own animal"),
+    "mascots": ("Community mascots",
+                "Club mascots with education and marketing content lanes"),
 }
 
 
