@@ -180,6 +180,15 @@ grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.35rem .9rem}
 .stage-list a:hover{color:var(--teal)}
 code{font-family:var(--fm);font-size:.85em;background:rgba(255,255,255,.06);
 border:1px solid var(--line);border-radius:5px;padding:.05rem .35rem;color:#dfe8ff}
+.song-nav{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:.4rem 0}
+.song-nav a{display:flex;flex-direction:column;gap:.2rem;text-decoration:none;
+border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;
+background:rgba(255,255,255,.03);transition:border-color .2s,background .2s}
+.song-nav a:hover{border-color:rgba(43,227,194,.5);background:rgba(43,227,194,.05)}
+.song-nav .sn-next{text-align:right}
+.song-nav .sn-dir{font-family:var(--fm);font-size:.7rem;text-transform:uppercase;
+letter-spacing:.05em;color:var(--teal)}
+.song-nav .sn-title{color:#e8e3ff;font-weight:600;font-size:.95rem}
 .moves{counter-reset:mv;list-style:none;padding:0;margin:1.2rem 0;
 display:grid;gap:.55rem}
 .moves li{position:relative;padding:.7rem .9rem .7rem 3rem;
@@ -655,7 +664,22 @@ def _stage_page(status: str, songs: list, catalogue: dict) -> str:
         + _seam() + listing)
 
 
-def _song_page(note, album_slug: str | None) -> str:
+def _song_nav(prev, nxt) -> str:
+    """Previous / next song within the album, by track order."""
+    if not prev and not nxt:
+        return ""
+    left = (f'<a class="sn-prev" href="{prev.slug}.html">'
+            f'<span class="sn-dir">&larr; Previous</span>'
+            f'<span class="sn-title">{_esc(prev.meta.get("title", prev.slug))}'
+            f'</span></a>' if prev else "<span></span>")
+    right = (f'<a class="sn-next" href="{nxt.slug}.html">'
+             f'<span class="sn-dir">Next &rarr;</span>'
+             f'<span class="sn-title">{_esc(nxt.meta.get("title", nxt.slug))}'
+             f'</span></a>' if nxt else "<span></span>")
+    return f'<nav class="song-nav">{left}{right}</nav>'
+
+
+def _song_page(note, album_slug: str | None, prev=None, nxt=None) -> str:
     """A per-song page: the LLM's director read (story seed, motifs and the
     line-by-line ideas) once analysed, else its status and section shape."""
     m = note.meta
@@ -705,8 +729,9 @@ def _song_page(note, album_slug: str | None) -> str:
             + ("<h2>Line by line</h2>"
                f'<div class="line-ideas">{li}</div>' if li else ""))
     lyrics = ("<h2>Lyrics</h2>" + _lyrics_html(note.body)) if note.body.strip() else ""
-    back = ('<p style="margin-top:2rem">' + crumb + "</p>") if crumb else ""
-    return head + body + _seam() + lyrics + back
+    nav = _song_nav(prev, nxt)
+    back = ('<p style="margin-top:1.4rem">' + crumb + "</p>") if crumb else ""
+    return head + body + _seam() + lyrics + _seam() + nav + back
 
 
 def _pipeline_flow() -> str:
@@ -850,8 +875,17 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
     (out_dir / "songs").mkdir(exist_ok=True)
     slug_album = {n.slug: a["slug"] for a in catalogue.get("albums", [])
                   for n in by_album.get(a["title"], [])}
+    # Prev/next within each album, in track order.
+    siblings: dict[str, tuple] = {}
+    for album in catalogue.get("albums", []):
+        ordered = sorted(by_album.get(album["title"], []),
+                         key=lambda n: n.meta.get("track") or 0)
+        for i, n in enumerate(ordered):
+            siblings[n.slug] = (ordered[i - 1] if i > 0 else None,
+                                ordered[i + 1] if i < len(ordered) - 1 else None)
     for note in notes:
-        body = _song_page(note, slug_album.get(note.slug))
+        prev, nxt = siblings.get(note.slug, (None, None))
+        body = _song_page(note, slug_album.get(note.slug), prev, nxt)
         path = out_dir / "songs" / f"{note.slug}.html"
         path.write_text(_page(note.meta.get("title", note.slug), body,
                               depth=1), encoding="utf-8")

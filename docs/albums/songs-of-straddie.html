@@ -154,6 +154,15 @@ grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.35rem .9rem}
 .stage-list a:hover{color:var(--teal)}
 code{font-family:var(--fm);font-size:.85em;background:rgba(255,255,255,.06);
 border:1px solid var(--line);border-radius:5px;padding:.05rem .35rem;color:#dfe8ff}
+.song-nav{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:.4rem 0}
+.song-nav a{display:flex;flex-direction:column;gap:.2rem;text-decoration:none;
+border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;
+background:rgba(255,255,255,.03);transition:border-color .2s,background .2s}
+.song-nav a:hover{border-color:rgba(43,227,194,.5);background:rgba(43,227,194,.05)}
+.song-nav .sn-next{text-align:right}
+.song-nav .sn-dir{font-family:var(--fm);font-size:.7rem;text-transform:uppercase;
+letter-spacing:.05em;color:var(--teal)}
+.song-nav .sn-title{color:#e8e3ff;font-weight:600;font-size:.95rem}
 .moves{counter-reset:mv;list-style:none;padding:0;margin:1.2rem 0;
 display:grid;gap:.55rem}
 .moves li{position:relative;padding:.7rem .9rem .7rem 3rem;
