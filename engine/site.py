@@ -325,6 +325,24 @@ font-size:1.1rem;display:grid;place-items:center;opacity:0;transform:translateY(
 pointer-events:none;transition:opacity .3s,transform .3s,border-color .2s}
 .to-top.show{opacity:1;transform:none;pointer-events:auto}
 .to-top:hover{border-color:var(--gold);color:#fff}
+/* ---- kintsugi seam divider (repair-gold, self-drawing) ---- */
+.seam{position:relative;width:100%;max-width:var(--max);height:2.6rem;border:0;
+margin:clamp(1.6rem,3.6vw,2.8rem) auto}
+.seam svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;
+filter:drop-shadow(0 0 6px rgba(255,207,110,.4))}
+.seam .seam-path{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;
+stroke-dasharray:1;stroke-dashoffset:1;
+transition:stroke-dashoffset 1.8s cubic-bezier(.16,1,.3,1)}
+.seam .seam-branch{stroke-width:1.4;opacity:.66;transition-delay:1.1s;transition-duration:.9s}
+.seam.is-drawn .seam-path{stroke-dashoffset:0}
+.seam .seam-light{fill:none;stroke:#fff7e6;stroke-width:2.6;stroke-linecap:round;
+stroke-dasharray:.05 .95;stroke-dashoffset:1;opacity:0;transition:opacity .8s ease 1.8s}
+.seam.is-drawn .seam-light{opacity:.7;animation:seam-flow 8s linear infinite;animation-delay:2s}
+@keyframes seam-flow{from{stroke-dashoffset:1}to{stroke-dashoffset:-1}}
+html:not(.js) .seam .seam-path{stroke-dashoffset:0;transition:none}
+html:not(.js) .seam .seam-light{display:none}
+@media(prefers-reduced-motion:reduce){
+.seam .seam-path{stroke-dashoffset:0;transition:none}.seam .seam-light{display:none}}
 """
 
 _FONT_FACES = (
@@ -424,7 +442,14 @@ els.forEach(function(el){{io.observe(el)}});
 // can't be stranded mid-interpolation.
 setTimeout(function(){{els.forEach(function(el){{
 if(!el.classList.contains('is-visible')){{el.style.transition='none';
-el.classList.add('is-visible')}}}})}},1400);}})();
+el.classList.add('is-visible')}}}})}},1400);
+// kintsugi seams: draw when scrolled into view
+var seams=document.querySelectorAll('.seam');
+var so=new IntersectionObserver(function(es){{es.forEach(function(e){{
+if(e.isIntersecting){{e.target.classList.add('is-drawn');so.unobserve(e.target)}}}})}},
+{{rootMargin:'0px 0px -8% 0px'}});
+seams.forEach(function(el){{so.observe(el)}});
+setTimeout(function(){{seams.forEach(function(el){{el.classList.add('is-drawn')}})}},1600);}})();
 </script>
 </body></html>"""
 
@@ -456,6 +481,28 @@ def _song_ideas(note) -> str:
         bits += ("".join(f'<span class="motif">{_esc(im)}</span>'
                          for im in images[:6]))
     return f'<div class="song-struct">{bits}</div>'
+
+
+_SEAM_D = ("M0 24 L130 21 L210 27 L300 13 L352 25 L470 19 L525 31 L640 17 "
+           "L735 23 L805 11 L885 27 L995 19 L1085 25 L1200 21")
+
+
+def _seam() -> str:
+    """A kintsugi repair-gold seam divider: self-draws and a light flows
+    along it when scrolled into view (decoration only, aria-hidden)."""
+    return (
+        '<div class="seam" aria-hidden="true">'
+        '<svg viewBox="0 0 1200 46" preserveAspectRatio="none" focusable="false">'
+        '<defs><linearGradient id="seamA" x1="0" y1="0" x2="1" y2="0">'
+        '<stop offset="0" stop-color="#ffcf6e"/>'
+        '<stop offset=".5" stop-color="#fff3d6"/>'
+        '<stop offset="1" stop-color="#c9a6ff"/></linearGradient></defs>'
+        f'<path class="seam-path" pathLength="1" stroke="url(#seamA)" d="{_SEAM_D}"/>'
+        '<path class="seam-path seam-branch" pathLength="1" stroke="url(#seamA)" d="M300 13 L318 3"/>'
+        '<path class="seam-path seam-branch" pathLength="1" stroke="url(#seamA)" d="M525 31 L540 43"/>'
+        '<path class="seam-path seam-branch" pathLength="1" stroke="url(#seamA)" d="M805 11 L791 2"/>'
+        f'<path class="seam-light" pathLength="1" d="{_SEAM_D}"/>'
+        '</svg></div>')
 
 
 def _pipeline_flow() -> str:
@@ -545,6 +592,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             f"<span class='pill s-{s}'>{s}</span><br>"
             f"<span class='muted'>{STATUS_BLURB[s]}</span></a>"
             for s in STATUS_ORDER) + "</div>"
+        + _seam() +
         "<h2>Albums</h2>"
         f"<div class='grid'>{''.join(cards)}</div>")
     path = out_dir / "index.html"
@@ -583,6 +631,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             "<p class='muted' style='font-size:.82rem'>Songs show their "
             "story seed and strongest visual images once analysed (the LLM "
             "reads the full lyric). Un-analysed songs list only their status.</p>"
+            + _seam() +
             "<table><tr><th>#</th><th>Song</th><th>Status</th><th>Mood</th>"
             "<th>Themes</th></tr>" + "".join(rows) + "</table>")
         path = out_dir / "albums" / f"{album['slug']}.html"
@@ -646,7 +695,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
                         'alt="i C. infinity music video and karaoke pipeline">')
             else:
                 hero = _pipeline_flow()
-            body = hero + body
+            body = hero + _seam() + body
         path = out_dir / html_name
         path.write_text(_page(title, f"<div class='doc'>{body}</div>"),
                         encoding="utf-8")
