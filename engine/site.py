@@ -425,6 +425,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <details class="nav-menu"><summary>Guide</summary><div class="nav-drop">
 <a href="{up}pipeline.html">How it works</a>
 <a href="{up}workflow.html">Operator guide</a>
+<a href="{up}formats.html">Formats</a>
 <a href="{up}plan.html">Master plan</a></div></details>
 <a href="{up}projects.html">Projects</a>
 <a href="{UNIVERSE_BASE}/">Music universe</a></nav>
@@ -440,6 +441,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <li><a href="{up}patterns.html">Patterns</a></li>
 <li><a href="{up}pipeline.html">How it works</a></li>
 <li><a href="{up}workflow.html">Operator guide</a></li>
+<li><a href="{up}formats.html">Formats</a></li>
 <li><a href="{up}plan.html">Master plan</a></li></ul></div>
 <div><h4>Registry</h4><ul>
 <li><a href="{up}models.html">Models</a></li>
@@ -836,7 +838,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
     # Pattern chooser, registry pickers and promo (data-driven).
     for builder in (render_patterns, render_cast, render_models, render_loras,
                     render_frontier, render_compute, render_recon,
-                    render_projects):
+                    render_formats, render_projects):
         page = builder(out_dir)
         if page:
             written.append(page)
@@ -1618,6 +1620,63 @@ def render_frontier(out_dir: Path) -> Path | None:
         noun="model", lead=disclosure, facet_defs=facet_defs, groups=groups,
         sorts=[("A-Z", "sortname", False),
                ("Affiliate first", "sortnum", True)])
+
+
+FORMAT_KINDS = [
+    ("video", "Video"), ("video/still", "Video or still"),
+    ("loop", "Loops"), ("still", "Stills"), ("embed", "Web"),
+    ("print", "Print and merch"),
+]
+
+
+def render_formats(out_dir: Path) -> Path | None:
+    import yaml
+    src = out_dir.parent / "formats.yaml"
+    if not src.exists():
+        return None
+    data = yaml.safe_load(src.read_text(encoding="utf-8")) or {}
+    formats = data.get("formats", [])
+    priority = data.get("priority", {})
+    blocks = []
+    seen = set()
+    for kind, label in FORMAT_KINDS:
+        rows = [f for f in formats if f.get("kind") == kind]
+        if not rows:
+            continue
+        seen.add(kind)
+        trs = "".join(
+            "<tr>"
+            f'<td><span class="shape">{_esc(f.get("icon",""))}</span></td>'
+            f"<td><b>{_esc(f.get('label',''))}</b><br>"
+            f"<span class='muted' style='font-size:.8rem'>{_esc(f.get('key',''))}</span></td>"
+            f"<td>{_esc(f.get('size',''))}<br>"
+            f"<span class='muted'>{_esc(f.get('aspect',''))}</span></td>"
+            f"<td>{_esc(f.get('notes',''))}</td></tr>"
+            for f in rows)
+        blocks.append(
+            f"<h2>{_esc(label)}</h2><table><tr><th></th><th>Format</th>"
+            f"<th>Size</th><th>Notes</th></tr>{trs}</table>")
+    prio = "".join(
+        f"<tr><td><b>{_esc(lane)}</b></td><td>"
+        + " &rarr; ".join(f'<span class="motif">{_esc(k)}</span>' for k in ks)
+        + "</td></tr>" for lane, ks in priority.items())
+    body = (
+        "<h1>Formats and release</h1>"
+        "<p class='lead'>One master render per treatment, then every platform "
+        "and print size from that one source. This matrix comes from the "
+        "ai-native-indie-distribution asset guide and drives the render "
+        "targets and the release packs. Print and merch (lyric posters, metal "
+        "prints, t-shirts) sit alongside the screen formats.</p>"
+        + _seam() + "".join(blocks)
+        + "<h2>Render priority per lane</h2>"
+        "<p class='muted' style='font-size:.85rem'>The default order each lane "
+        "renders its formats; the first undone one is what the engine flags as "
+        "\"next up\".</p>"
+        f"<table><tr><th>Lane</th><th>Order</th></tr>{prio}</table>")
+    path = out_dir / "formats.html"
+    path.write_text(_page("Formats", f"<div class='doc'>{body}</div>"),
+                    encoding="utf-8")
+    return path
 
 
 PROJECT_STATUS = {"live": "st-live", "development": "st-development",
