@@ -550,7 +550,9 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path, qs = parsed.path, parse_qs(parsed.query)
         if path == "/favicon.svg":
-            p = self.cfg["_root"] / "docs" / "assets" / "favicon.svg"
+            # The studio uses its own sibling icon (with the live pip) so its
+            # tab is distinct from the public site's.
+            p = self.cfg["_root"] / "docs" / "assets" / "favicon-studio.svg"
             data = p.read_bytes() if p.exists() else b""
             return self._send(200 if data else 404, data, "image/svg+xml")
         if path == "/login":
