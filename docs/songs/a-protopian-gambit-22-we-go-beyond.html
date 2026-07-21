@@ -52,7 +52,8 @@ border-radius:999px;color:var(--mut);white-space:nowrap;transition:.2s;
 display:inline-flex;align-items:center;gap:.3rem}
 .nav-menu>summary::-webkit-details-marker{display:none}
 .nav-menu>summary::after{content:"\25BE";font-size:.7em;opacity:.7}
-.nav-menu[open]>summary,.nav-menu>summary:hover{color:#fff;background:rgba(124,77,255,.2)}
+.nav-menu[open]>summary,.nav-menu>summary:hover,
+.nav-menu>summary[data-active]{color:#fff;background:rgba(124,77,255,.2)}
 .nav-drop{position:absolute;top:calc(100% + .4rem);left:0;z-index:60;
 display:grid;gap:.1rem;min-width:12rem;padding:.4rem;
 border:1px solid var(--line);border-radius:12px;background:rgba(12,12,26,.97);
@@ -415,6 +416,12 @@ var so=new IntersectionObserver(function(es){es.forEach(function(e){
 if(e.isIntersecting){e.target.classList.add('is-drawn');so.unobserve(e.target)}})},
 {rootMargin:'0px 0px -8% 0px'});
 seams.forEach(function(el){so.observe(el)});
-setTimeout(function(){seams.forEach(function(el){el.classList.add('is-drawn')})},1600);})();
+setTimeout(function(){seams.forEach(function(el){el.classList.add('is-drawn')})},1600);
+// mark the current page in the nav
+var here=(location.pathname.split('/').pop())||'index.html';
+document.querySelectorAll('nav a,.nav-drop a').forEach(function(a){
+var href=a.getAttribute('href')||'';
+if(href.split('/').pop()===here){a.setAttribute('aria-current','page');
+var m=a.closest('.nav-menu');if(m)m.querySelector('summary').setAttribute('data-active','1')}});})();
 </script>
 </body></html>

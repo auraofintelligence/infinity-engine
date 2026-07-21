@@ -76,7 +76,8 @@ border-radius:999px;color:var(--mut);white-space:nowrap;transition:.2s;
 display:inline-flex;align-items:center;gap:.3rem}
 .nav-menu>summary::-webkit-details-marker{display:none}
 .nav-menu>summary::after{content:"\\25BE";font-size:.7em;opacity:.7}
-.nav-menu[open]>summary,.nav-menu>summary:hover{color:#fff;background:rgba(124,77,255,.2)}
+.nav-menu[open]>summary,.nav-menu>summary:hover,
+.nav-menu>summary[data-active]{color:#fff;background:rgba(124,77,255,.2)}
 .nav-drop{position:absolute;top:calc(100% + .4rem);left:0;z-index:60;
 display:grid;gap:.1rem;min-width:12rem;padding:.4rem;
 border:1px solid var(--line);border-radius:12px;background:rgba(12,12,26,.97);
@@ -462,7 +463,13 @@ var so=new IntersectionObserver(function(es){{es.forEach(function(e){{
 if(e.isIntersecting){{e.target.classList.add('is-drawn');so.unobserve(e.target)}}}})}},
 {{rootMargin:'0px 0px -8% 0px'}});
 seams.forEach(function(el){{so.observe(el)}});
-setTimeout(function(){{seams.forEach(function(el){{el.classList.add('is-drawn')}})}},1600);}})();
+setTimeout(function(){{seams.forEach(function(el){{el.classList.add('is-drawn')}})}},1600);
+// mark the current page in the nav
+var here=(location.pathname.split('/').pop())||'index.html';
+document.querySelectorAll('nav a,.nav-drop a').forEach(function(a){{
+var href=a.getAttribute('href')||'';
+if(href.split('/').pop()===here){{a.setAttribute('aria-current','page');
+var m=a.closest('.nav-menu');if(m)m.querySelector('summary').setAttribute('data-active','1')}}}});}})();
 </script>
 </body></html>"""
 
@@ -719,7 +726,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
         "The cheap thinking happens first in text; a human direction point "
         "sits in the middle; the expensive video generation only ever renders "
         "already-approved ideas.</p>"
-        + flow +
+        + flow + _seam() +
         "<h2>The stages</h2><div class='legend'>" + "".join(
             f"<div><span class='pill s-{s}'>{s}</span><br>"
             f"<span class='muted'>{STATUS_BLURB[s]}</span></div>"
@@ -1590,6 +1597,7 @@ def render_projects(out_dir: Path) -> Path | None:
         "beside. Some are live, most are in development or design; the tag on "
         "each says where it really is. Nothing here is finished being "
         "imagined.</p>"
+        + _seam() +
         f'<div class="promo-grid">{"".join(cards)}</div>')
     path = out_dir / "projects.html"
     path.write_text(_page("Projects", body), encoding="utf-8")
