@@ -150,6 +150,8 @@ letter-spacing:.12em;color:var(--gold);margin:1.1rem 0 .3rem}
 .lyrics .ly-sec:first-child{margin-top:0}
 .lyrics .ly-line{color:#e7e2f6}
 .lyrics .ly-gap{height:.7rem}
+.phrase-q{font-family:var(--fd);font-size:1.12rem;font-weight:640;
+font-style:italic;color:var(--gold-soft);line-height:1.35}
 .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
 gap:.7rem;margin:1.4rem 0}
 .legend div,.legend a{border:1px solid var(--line);border-radius:12px;
@@ -416,6 +418,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <a href="{up}index.html">Progress</a>
 <a href="{up}patterns.html">Patterns</a>
 <a href="{up}cast.html">Cast</a>
+<a href="{up}phrases.html">Phrases</a>
 <details class="nav-menu"><summary>Registry</summary><div class="nav-drop">
 <a href="{up}models.html">Models</a>
 <a href="{up}frontier.html">Frontier</a>
@@ -451,6 +454,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <li><a href="{up}recon.html">Recon</a></li></ul></div>
 <div><h4>Universe</h4><ul>
 <li><a href="{up}cast.html">Cast</a></li>
+<li><a href="{up}phrases.html">Phrases</a></li>
 <li><a href="{up}projects.html">Projects</a></li>
 <li><a href="{UNIVERSE_BASE}/">Music universe</a></li>
 <li><a href="{REPO_BASE}">Source (GitHub)</a></li></ul></div>
@@ -771,6 +775,11 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
         path.write_text(_page(note.meta.get("title", note.slug), body,
                               depth=1), encoding="utf-8")
         written.append(path)
+
+    # Merch phrase catalogue (poster_lines across the catalogue).
+    phrases_page = render_phrases(out_dir, notes, catalogue)
+    if phrases_page:
+        written.append(phrases_page)
 
     # Pipeline explainer.
     flow = "<div class='stage-flow'>" + "<span class='arrow'>&rarr;</span>".join(
@@ -1631,6 +1640,48 @@ FORMAT_KINDS = [
     ("loop", "Loops"), ("still", "Stills"), ("embed", "Web"),
     ("print", "Print and merch"),
 ]
+
+
+def render_phrases(out_dir: Path, notes: list, catalogue: dict) -> Path | None:
+    """A catalogue-wide wall of merch-ready lyric phrases (poster_lines from
+    the analysis), grouped by album, filterable by theme and mood. This is
+    the shortlist for lyric posters, metal prints and t-shirts."""
+    by_album: dict[str, list] = {}
+    for n in notes:
+        by_album.setdefault(n.meta.get("album", "Unfiled"), []).append(n)
+    all_themes = sorted({t for n in notes for t in (n.meta.get("themes") or [])})
+    all_moods = sorted({n.meta.get("mood") for n in notes if n.meta.get("mood")})
+    total = 0
+    groups = []
+    for album in catalogue.get("albums", []):
+        anotes = sorted(by_album.get(album["title"], []),
+                        key=lambda n: n.meta.get("track") or 0)
+        cards = []
+        for n in anotes:
+            themes = n.meta.get("themes") or []
+            mood = n.meta.get("mood") or ""
+            title = _esc(n.meta.get("title", n.slug))
+            for line in n.meta.get("poster_lines") or []:
+                total += 1
+                inner = (
+                    f'<div class="phrase-q">{_esc(line)}</div>'
+                    f'<div class="pc-meta">from <a href="songs/{n.slug}.html">'
+                    f'{title}</a></div>')
+                cards.append(({"theme": [str(t) for t in themes],
+                               "mood": [mood]}, inner))
+        if cards:
+            groups.append((album["title"], f"{len(cards)} phrases", cards))
+    if not total:
+        return None
+    facet_defs = [("Theme", "theme", all_themes), ("Mood", "mood", all_moods)]
+    return render_picker(
+        out_dir, filename="phrases.html", title="Phrases", noun="phrase",
+        lead=(f"{total} verbatim lyric lines that stand on their own, pulled "
+              "from the analysis across every song, the shortlist for lyric "
+              "posters, metal prints and t-shirts. Filter by theme or mood, "
+              "click through to the song for the full lyric and background-art "
+              "ideas. Print specs live on the Formats page."),
+        facet_defs=facet_defs, groups=groups)
 
 
 def render_formats(out_dir: Path) -> Path | None:
