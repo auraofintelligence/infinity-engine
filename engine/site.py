@@ -135,6 +135,21 @@ background:linear-gradient(150deg,rgba(124,77,255,.1),rgba(10,10,22,.55))}
 .line-ideas .li-idea{color:#dcd8ee;font-size:.94rem;line-height:1.45}
 @media(max-width:620px){.line-ideas .li{grid-template-columns:1fr;gap:.35rem}
 .line-ideas .li-lyric{color:var(--gold)}}
+/* poster/merch pull-quotes */
+.poster-lines{display:flex;flex-wrap:wrap;gap:.7rem;margin:.8rem 0 1rem}
+.poster-line{margin:0;padding:.7rem 1.1rem;border:1px solid var(--line);
+border-left:3px solid var(--gold);border-radius:0 10px 10px 0;
+background:rgba(255,207,110,.06);color:var(--gold-soft);
+font-family:var(--fd);font-size:1.05rem;font-weight:640;font-style:italic}
+/* full lyrics block */
+.lyrics{max-width:44rem;margin:.6rem 0 1rem;padding:1.2rem 1.4rem;
+border:1px solid var(--line);border-radius:var(--radius);
+background:rgba(3,4,10,.4);line-height:1.7}
+.lyrics .ly-sec{font-family:var(--fm);font-size:.68rem;text-transform:uppercase;
+letter-spacing:.12em;color:var(--gold);margin:1.1rem 0 .3rem}
+.lyrics .ly-sec:first-child{margin-top:0}
+.lyrics .ly-line{color:#e7e2f6}
+.lyrics .ly-gap{height:.7rem}
 .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
 gap:.7rem;margin:1.4rem 0}
 .legend div,.legend a{border:1px solid var(--line);border-radius:12px;
@@ -525,6 +540,26 @@ def _seam() -> str:
         '</svg></div>')
 
 
+_LY_MARKER = re.compile(
+    r"^\s*\[?\s*(intro|verse|pre[- ]?chorus|chorus|post[- ]?chorus|bridge"
+    r"|outro|refrain|hook|interlude)\b", re.I)
+
+
+def _lyrics_html(body: str) -> str:
+    """The full lyric, section markers styled, line breaks preserved. Shown
+    on song pages (Luke sells lyric posters, so lyrics are public here)."""
+    lines = []
+    for raw in body.splitlines():
+        s = raw.strip()
+        if not s:
+            lines.append('<div class="ly-gap"></div>')
+        elif _LY_MARKER.match(s):
+            lines.append(f'<div class="ly-sec">{_esc(s)}</div>')
+        else:
+            lines.append(f'<div class="ly-line">{_esc(s)}</div>')
+    return f'<div class="lyrics">{"".join(lines)}</div>'
+
+
 def _song_page(note, album_slug: str | None) -> str:
     """A per-song page: the LLM's director read (story seed, motifs and the
     line-by-line ideas) once analysed, else its status and section shape."""
@@ -554,6 +589,9 @@ def _song_page(note, album_slug: str | None) -> str:
     else:
         chips = "".join(f'<span class="motif">{_esc(x)}</span>' for x in motifs)
         arc = m.get("emotional_arc")
+        posters = m.get("poster_lines") or []
+        pl = "".join(f'<blockquote class="poster-line">{_esc(x)}</blockquote>'
+                     for x in posters)
         li = "".join(
             f'<div class="li"><div class="li-lyric">&ldquo;{_esc(x.get("lyric",""))}'
             f'&rdquo;</div><div class="li-idea">{_esc(x.get("idea",""))}</div></div>'
@@ -565,10 +603,15 @@ def _song_page(note, album_slug: str | None) -> str:
             + ("<h2>Images to shoot</h2>"
                f'<div class="song-struct" style="margin:.4rem 0 1rem">{chips}</div>'
                if chips else "")
+            + ("<h2>Phrases for posters and merch</h2>"
+               "<p class='muted' style='font-size:.85rem'>Verbatim lines that "
+               "stand alone, for lyric posters, metal prints and t-shirts.</p>"
+               f'<div class="poster-lines">{pl}</div>' if pl else "")
             + ("<h2>Line by line</h2>"
                f'<div class="line-ideas">{li}</div>' if li else ""))
+    lyrics = ("<h2>Lyrics</h2>" + _lyrics_html(note.body)) if note.body.strip() else ""
     back = ('<p style="margin-top:2rem">' + crumb + "</p>") if crumb else ""
-    return head + body + back
+    return head + body + _seam() + lyrics + back
 
 
 def _pipeline_flow() -> str:

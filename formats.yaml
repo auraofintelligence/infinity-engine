@@ -63,6 +63,43 @@ formats:
     kind: embed
     notes: Embed + compressed poster frame + SRT captions + lyrics + credits + provenance note.
 
+  # ---- print and merch (physical products, from the asset-guide merch family) ----
+  - key: print-master
+    label: Print master art
+    icon: "SRC"
+    size: 3000px+ / 300 DPI
+    aspect: flexible
+    kind: print
+    notes: The reusable high-res source (background art + set lyric typography) every print item derives from. sRGB, layered, lyrics as live text.
+  - key: poster-a2
+    label: Lyric poster A2
+    icon: "A2"
+    size: 420x594 mm @300 DPI
+    aspect: "1:1.41"
+    kind: print
+    notes: Full song lyric over background art; 3 mm bleed, CMYK, PDF/X. Also A3/A1 from the same master.
+  - key: metal-print
+    label: Metal print
+    icon: "MTL"
+    size: highest-res master, supplier sizes
+    aspect: flexible
+    kind: print
+    notes: HD aluminium print; supply the uncompressed master at the supplier's colour profile, no upscaling. Premium tier.
+  - key: tshirt
+    label: T-shirt / apparel
+    icon: "TEE"
+    size: 4500x5400 px @300 DPI
+    aspect: "5:6"
+    kind: print
+    notes: A best-phrase lyric line as art (poster_lines from the analysis); transparent PNG, DTG-safe colours, ~30x36 cm print area.
+  - key: sticker
+    label: Sticker / patch
+    icon: "STK"
+    size: 1500x1500 px @300 DPI
+    aspect: "1:1"
+    kind: print
+    notes: Motif or short phrase; die-cut path, 3 mm safe margin, transparent PNG.
+
 # Default render priority per lane (first undone wins "next up").
 priority:
   karaoke: [yt, shorts, canvas, ig-feed, site]
@@ -71,3 +108,4 @@ priority:
   micro-drama: [shorts, ig-feed, yt, site]
   comic: [site, ig-feed, ig-portrait]
   course: [yt, site, shorts]
+  merch: [print-master, poster-a2, tshirt, metal-print, sticker]

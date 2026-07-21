@@ -31,6 +31,7 @@ Hard rules:
   get the same idea, it is too generic; go deeper into the actual words.
 - It is fine to notice tension, contradiction, or subtext and shoot
   against the lyric, not only with it.
+- Never use em dashes (the long dash). Use commas, colons or full stops.
 
 Respond with ONLY a JSON object, no prose, using exactly these keys:
 
@@ -42,6 +43,10 @@ Respond with ONLY a JSON object, no prose, using exactly these keys:
                                // rooted in this song's actual images
   "visual_motifs": [..],       // 5-8 concrete images that ACTUALLY appear or
                                // are strongly implied in the lyric
+  "poster_lines": [..],        // 5-8 of the strongest STANDALONE phrases,
+                               // verbatim, that would work on a poster or a
+                               // t-shirt: short, punchy, quotable, no context
+                               // needed. These sell as merch.
   "line_ideas": [              // the heart of this: read line by line and
     {{                          // give 10-16 of the strongest moments
       "lyric": "..",           // the exact line or short phrase, verbatim
@@ -61,7 +66,7 @@ Full lyrics:
 """
 
 ANALYSIS_KEYS = ("themes", "mood", "emotional_arc", "story_seed",
-                 "visual_motifs", "line_ideas")
+                 "visual_motifs", "poster_lines", "line_ideas")
 
 
 def build_prompt(note: Note, ontology: dict) -> str:
@@ -87,7 +92,7 @@ def run_claude(prompt: str) -> str:
     """Run the packet through the local claude CLI (claude -p)."""
     result = subprocess.run(
         ["claude", "-p", prompt], capture_output=True, text=True,
-        timeout=600, shell=False)
+        encoding="utf-8", errors="replace", timeout=600, shell=False)
     if result.returncode != 0:
         raise RuntimeError(f"claude CLI failed: {result.stderr.strip()}")
     return result.stdout
