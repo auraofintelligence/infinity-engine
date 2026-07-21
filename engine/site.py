@@ -463,6 +463,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
     return f"""<!doctype html>
 <html lang="en-AU"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="{up}assets/favicon.svg">
 <title>{_esc(title)} - Infinity Engine</title>
 <script>document.documentElement.classList.add('js')</script>
 <style>{fonts}{CSS}</style></head><body>

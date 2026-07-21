@@ -147,7 +147,9 @@ line-height:1.5;background:rgba(43,227,194,.06);border:1px solid rgba(43,227,194
 """
 
 PAGE = """<!doctype html><html><head><meta charset="utf-8">
-<title>Infinity Engine control</title><style>__CSS__</style></head><body>
+<title>Infinity Engine control</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>__CSS__</style></head><body>
 <div class="wrap">
 <header><span class="mark"></span>
 <h1>Infinity Engine<small>your studio</small></h1>
@@ -446,7 +448,8 @@ def _options(values, sel=None):
 
 LOGIN_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 <title>Infinity Engine</title><meta name="viewport"
-content="width=device-width, initial-scale=1"><style>
+content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"><style>
 body{margin:0;min-height:100vh;display:grid;place-items:center;
 font-family:system-ui,Segoe UI,sans-serif;color:#eae6ff;
 background:radial-gradient(1000px 700px at 60% -10%,rgba(124,77,255,.18),transparent),#05070c}
@@ -546,6 +549,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         path, qs = parsed.path, parse_qs(parsed.query)
+        if path == "/favicon.svg":
+            p = self.cfg["_root"] / "docs" / "assets" / "favicon.svg"
+            data = p.read_bytes() if p.exists() else b""
+            return self._send(200 if data else 404, data, "image/svg+xml")
         if path == "/login":
             return self._login(qs)
         if not self._authed(qs):
