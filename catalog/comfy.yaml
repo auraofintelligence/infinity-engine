@@ -1,0 +1,50 @@
+# ComfyUI render recipes. The worker turns a job's shot direction into a
+# ComfyUI API graph using the recipe for the job's category + tier, then
+# submits it to a running ComfyUI server on the GPU box.
+#
+# This file is the seam between the model registry (providers.yaml, which
+# names models in human terms) and ComfyUI (which needs exact checkpoint
+# filenames and node params). Swap a model = edit ckpt_name here; the
+# worker code never changes.
+#
+# ckpt_name values are placeholders: set them to the weights actually
+# installed under ComfyUI/models/checkpoints on the pod. graph names a
+# builder in engine/comfy.py (sd_txt2img is the classic CheckpointLoader
+# graph; qwen/flux node graphs plug in as new builders).
+
+server: http://127.0.0.1:8188
+
+# Output dimensions by platform aspect. The worker picks square for
+# comic panels; video keyframes use the target delivery aspect.
+sizes:
+  square: [1024, 1024]
+  vertical: [768, 1344]   # 9:16 Shorts / TikTok / Reels
+  wide: [1344, 768]       # 16:9 YouTube
+  portrait: [896, 1152]   # poster-ish
+
+recipes:
+  image:
+    draft:
+      graph: sd_txt2img
+      ckpt_name: flux2-klein-4b.safetensors
+      steps: 20
+      cfg: 3.5
+      sampler_name: euler
+      scheduler: simple
+      negative: "text artefacts, watermark, blurry, deformed, extra limbs, low quality"
+    standard:
+      graph: sd_txt2img
+      ckpt_name: qwen-image.safetensors
+      steps: 28
+      cfg: 4.0
+      sampler_name: euler
+      scheduler: normal
+      negative: "text artefacts, watermark, blurry, deformed, extra limbs, low quality"
+    premium:
+      graph: sd_txt2img
+      ckpt_name: flux2-dev.safetensors
+      steps: 30
+      cfg: 3.5
+      sampler_name: dpmpp_2m
+      scheduler: sgm_uniform
+      negative: "text artefacts, watermark, blurry, deformed, extra limbs, low quality"

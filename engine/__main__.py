@@ -19,6 +19,10 @@
                                        KIND = panels|keyframes|video|tts|
                                        lipsync|avatar
   python -m engine advance SLUG STATUS move a song to a new pipeline stage
+  python -m engine work [JOB_ID] [--offline]
+                                       render queued jobs through ComfyUI on
+                                       the GPU box. --offline emits the graphs
+                                       it would submit, no GPU needed.
   python -m engine jobs                recent job log
   python -m engine dashboard           regenerate dashboard.html
 """
@@ -244,6 +248,45 @@ def cmd_advance(cfg, args):
         print(f"{args.slug}: {old} -> {args.status}")
 
 
+def cmd_work(cfg, args):
+    from . import worker
+    jobs_dir = resolve(cfg, "jobs_dir")
+    conn = jobs_mod.open_db(resolve(cfg, "db_path"))
+    if args.job_id:
+        ids = [args.job_id]
+    else:
+        ids = [r[0] for r in conn.execute(
+            "SELECT id FROM jobs WHERE status='queued' ORDER BY created_at"
+        ).fetchall()]
+    if not ids:
+        print("no queued jobs; make one with: engine make SLUG KIND")
+        return
+    for job_id in ids:
+        job_dir = jobs_dir / job_id
+        if not (job_dir / "spec.json").exists():
+            print(f"skip {job_id}: no spec.json")
+            continue
+        print(f"\n  {job_id}"
+              f"{'  [offline: emitting graphs]' if args.offline else ''}")
+        jobs_mod.set_status(conn, job_id, "running")
+        try:
+            manifest = worker.run_job(
+                cfg["_root"], job_dir, offline=args.offline,
+                on_status=lambda n, tot: print(f"    shot {n}/{tot}", end="\r"))
+        except Exception as exc:  # noqa: BLE001 - report and move on
+            jobs_mod.set_status(conn, job_id, "failed", notes=str(exc))
+            print(f"    failed: {exc}")
+            continue
+        done = sum(1 for s in manifest["shots"] if s.get("rendered"))
+        status = "done" if not args.offline else "queued"
+        jobs_mod.set_status(conn, job_id, status,
+                            notes=f"{len(manifest['shots'])} shots, "
+                            f"{done} rendered, offline={args.offline}")
+        rel = (job_dir / "results").relative_to(cfg["_root"])
+        print(f"    {len(manifest['shots'])} shots -> {rel}/  "
+              f"(manifest.json{', graphs/' if args.offline else ''})")
+
+
 def cmd_jobs(cfg, args):
     conn = jobs_mod.open_db(resolve(cfg, "db_path"))
     rows = jobs_mod.list_jobs(conn)
@@ -311,6 +354,11 @@ def main():
     p_adv = sub.add_parser("advance")
     p_adv.add_argument("slug")
     p_adv.add_argument("status")
+    p_work = sub.add_parser("work")
+    p_work.add_argument("job_id", nargs="?",
+                        help="a job id; omit to run all queued jobs")
+    p_work.add_argument("--offline", action="store_true",
+                        help="emit ComfyUI graphs without a GPU/server")
     sub.add_parser("jobs")
     sub.add_parser("dashboard")
     sub.add_parser("site")
@@ -322,7 +370,7 @@ def main():
     {"ingest": cmd_ingest, "status": cmd_status, "validate": cmd_validate,
      "brief": cmd_brief, "merge": cmd_merge, "review": cmd_review,
      "ingest-audio": cmd_ingest_audio, "make": cmd_make,
-     "advance": cmd_advance, "jobs": cmd_jobs,
+     "advance": cmd_advance, "work": cmd_work, "jobs": cmd_jobs,
      "dashboard": cmd_dashboard, "site": cmd_site}[args.command](cfg, args)
 
 
