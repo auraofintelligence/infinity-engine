@@ -1,0 +1,368 @@
+# Closed-source frontier models: the pay-to-play proprietary tools, for
+# occasional output comparison and for people with deeper pockets. The
+# Frontier page reads this. Kept separate from the open-weight registry
+# because the engine is open-first for ownership and cost.
+#
+# affiliate_status: yes (paid program) | referral (credits only) | no | unknown
+# affiliate_url is ONLY set where a real program was verified; join it and
+# swap in YOUR own referral link. Commission terms are the vendor's, often
+# USD-set, so left in their stated currency. Affiliate data verified
+# 2026-07-21; re-check before relying on a number.
+
+frontier:
+  # ---- video ----
+  - id: sora
+    name: Sora
+    vendor: OpenAI
+    category: video
+    access: web / app
+    pricing: ChatGPT Plus / Pro subscription
+    strength: Top prestige, strong coherence, native audio and cameo. The name everyone drops.
+    url: https://sora.com
+    affiliate_status: "no"
+  - id: veo-3
+    name: Veo 3
+    vendor: Google DeepMind
+    category: video
+    access: app / api
+    pricing: Gemini / Flow subscription
+    strength: Best native audio and dialogue, top physics realism.
+    url: https://deepmind.google/models/veo/
+    affiliate_status: "no"
+  - id: runway-gen4
+    name: Runway Gen-4
+    vendor: Runway
+    category: video
+    access: web
+    pricing: credits / subscription
+    strength: The prosumer benchmark; deepest editing toolset.
+    url: https://runwayml.com
+    affiliate_status: yes
+    affiliate_url: https://affiliates.runwayml.com/
+    affiliate_terms: "Portal live; terms behind login. Third-party sources cite ~20% recurring (unverified)."
+  - id: pixverse
+    name: PixVerse
+    vendor: PixVerse
+    category: video
+    access: web / app
+    pricing: credits / subscription
+    strength: Fast, stylised and anime-strong, mobile-first. Best affiliate terms here.
+    url: https://pixverse.ai
+    affiliate_status: yes
+    affiliate_url: https://pixverse.ai/en/affiliate
+    affiliate_terms: "30% recurring for 12 months (35% above US$5k/mo), 90-day cookie, via Impact. Plus referral credits."
+  - id: luma-ray
+    name: Dream Machine / Ray
+    vendor: Luma Labs
+    category: video
+    access: web / api
+    pricing: credits / subscription
+    strength: Fast, cinematic, strong image-to-video.
+    url: https://lumalabs.ai
+    affiliate_status: yes
+    affiliate_url: https://lumalabs.ai/affiliate
+    affiliate_terms: "PartnerStack; lifetime-of-account commission, 90-day cookie (rate shown after signup)."
+  - id: kling
+    name: Kling AI
+    vendor: Kuaishou
+    category: video
+    access: web / app
+    pricing: credits
+    strength: Leading motion and physics realism, cost-efficient.
+    url: https://app.klingai.com
+    affiliate_status: referral
+    affiliate_terms: "Referral only: 500 credits per invited friend; invitee gets 50% bonus credits."
+  - id: hailuo
+    name: Hailuo
+    vendor: MiniMax
+    category: video
+    access: web
+    pricing: credits
+    strength: Strong prompt adherence, cost-efficient.
+    url: https://hailuoai.video
+    affiliate_status: unknown
+  - id: firefly-video
+    name: Firefly Video
+    vendor: Adobe
+    category: video
+    access: web / Creative Cloud
+    pricing: Creative Cloud subscription
+    strength: Commercially safe and indemnified, integrated into Creative Cloud.
+    url: https://www.adobe.com/products/firefly
+    affiliate_status: yes
+    affiliate_url: https://www.adobe.com/affiliates.html
+    affiliate_terms: "Adobe umbrella via Partnerize; ~85% of one month (monthly) or 8.33% annual, 30-day cookie."
+
+  # ---- image ----
+  - id: midjourney
+    name: Midjourney
+    vendor: Midjourney
+    category: image
+    access: web / Discord
+    pricing: subscription
+    strength: The prestige aesthetic leader. No affiliate program exists.
+    url: https://midjourney.com
+    affiliate_status: "no"
+  - id: gemini-image
+    name: Nano Banana (Gemini image)
+    vendor: Google
+    category: image
+    access: app / api
+    pricing: subscription / credits
+    strength: Best in-image text and editing consistency.
+    url: https://gemini.google.com
+    affiliate_status: "no"
+  - id: firefly-image
+    name: Adobe Firefly
+    vendor: Adobe
+    category: image
+    access: web / Creative Cloud
+    pricing: Creative Cloud subscription
+    strength: Commercially safe, integrated; the corporate-safe choice.
+    url: https://firefly.adobe.com
+    affiliate_status: yes
+    affiliate_url: https://www.adobe.com/affiliates.html
+    affiliate_terms: "Adobe umbrella via Partnerize; 8-85% by product, 30-day cookie."
+  - id: ideogram
+    name: Ideogram
+    vendor: Ideogram
+    category: image
+    access: web
+    pricing: subscription
+    strength: Best-in-class legible text rendering.
+    url: https://ideogram.ai
+    affiliate_status: yes
+    affiliate_url: https://ideogram.ai/features/creators-club/
+    affiliate_terms: "Creators Club affiliate (application); exact terms not publicly disclosed."
+  - id: freepik
+    name: Freepik
+    vendor: Freepik
+    category: image
+    access: web
+    pricing: subscription
+    strength: Huge stock plus AI suite aggregating many models.
+    url: https://www.freepik.com
+    affiliate_status: yes
+    affiliate_url: https://www.freepik.com/affiliates
+    affiliate_terms: "Via Impact; 30% one-time on first payment, 60-day cookie."
+  - id: recraft
+    name: Recraft
+    vendor: Recraft
+    category: image
+    access: web
+    pricing: subscription
+    strength: Vector/SVG and brand-style consistency.
+    url: https://www.recraft.ai
+    affiliate_status: referral
+    affiliate_terms: "Referral: 200 credits per referral (cap 4,000); invitee gets 200 bonus."
+
+  # ---- voice ----
+  - id: elevenlabs
+    name: ElevenLabs
+    vendor: ElevenLabs
+    category: voice
+    access: web / api
+    pricing: subscription / credits
+    strength: The voice-quality leader; most prestige for expressive TTS and cloning.
+    url: https://elevenlabs.io
+    affiliate_status: yes
+    affiliate_url: https://elevenlabs.io/affiliates
+    affiliate_terms: "22% for first 12 months (11% Business), 90-day cookie, US$5 min, via PartnerStack."
+  - id: hume
+    name: Hume (EVI)
+    vendor: Hume AI
+    category: voice
+    access: web / api
+    pricing: subscription / usage
+    strength: Emotionally expressive, empathic voice.
+    url: https://hume.ai
+    affiliate_status: yes
+    affiliate_url: https://market.partnerstack.com/page/humeai
+    affiliate_terms: "25% on each subscription for first 12 months, via PartnerStack."
+  - id: murf
+    name: Murf AI
+    vendor: Murf
+    category: voice
+    access: web / api
+    pricing: subscription
+    strength: Polished studio voiceover for video and e-learning.
+    url: https://murf.ai
+    affiliate_status: yes
+    affiliate_url: https://murf.ai/partner-with-us/affiliate
+    affiliate_terms: "20% recurring for up to 24 months, 90-day cookie."
+  - id: wellsaid
+    name: WellSaid Labs
+    vendor: WellSaid
+    category: voice
+    access: web
+    pricing: subscription
+    strength: Enterprise narration, brand-safe studio voices.
+    url: https://wellsaid.io
+    affiliate_status: yes
+    affiliate_url: https://friends.wellsaidlabs.com
+    affiliate_terms: "30% on a new customer's first 3 payments, 60-day cookie."
+  - id: cartesia
+    name: Cartesia (Sonic)
+    vendor: Cartesia
+    category: voice
+    access: api
+    pricing: usage
+    strength: Fastest real-time TTS (~40-90ms), developer and voice-agent focus. No affiliate program.
+    url: https://cartesia.ai
+    affiliate_status: "no"
+
+  # ---- avatar ----
+  - id: heygen
+    name: HeyGen
+    vendor: HeyGen
+    category: avatar
+    access: web
+    pricing: subscription
+    strength: Market-leading realistic avatars and video translation; strongest brand.
+    url: https://www.heygen.com
+    affiliate_status: yes
+    affiliate_url: https://www.heygen.com/affiliate-program
+    affiliate_terms: "35% recurring for first 3 months, 30-day cookie (payout threshold varies by track)."
+  - id: synthesia
+    name: Synthesia
+    vendor: Synthesia
+    category: avatar
+    access: web
+    pricing: subscription
+    strength: The enterprise / L&D standard; 230+ avatars, 140+ languages.
+    url: https://www.synthesia.io
+    affiliate_status: yes
+    affiliate_url: https://www.synthesia.io/partners/affiliates
+    affiliate_terms: "25% for first 12 months, 60-day cookie, via Rewardful; plus a separate Creator Program."
+  - id: argil
+    name: Argil
+    vendor: Argil
+    category: avatar
+    access: web
+    pricing: subscription
+    strength: AI clones/avatars for social talking-head clips.
+    url: https://www.argil.ai
+    affiliate_status: yes
+    affiliate_url: https://www.argil.ai/affiliation
+    affiliate_terms: "30% of referred revenue for 12 months (doubled if >1M views), US$50 min."
+  - id: colossyan
+    name: Colossyan
+    vendor: Colossyan
+    category: avatar
+    access: web
+    pricing: subscription
+    strength: L&D / corporate training avatars with branching scenarios.
+    url: https://www.colossyan.com
+    affiliate_status: yes
+    affiliate_url: https://www.colossyan.com/affiliate-program
+    affiliate_terms: "25% recurring, rising to 35% at 10 sales and 50% at 100, 90-day cookie, via Rewardful."
+  - id: hedra
+    name: Hedra (Character-3)
+    vendor: Hedra
+    category: avatar
+    access: web / api
+    pricing: subscription
+    strength: Expressive talking-character generation and lip-sync.
+    url: https://www.hedra.com
+    affiliate_status: yes
+    affiliate_url: https://partners.dub.co/hedra
+    affiliate_terms: "15% per paid subscription for up to 12 months, via Dub."
+  - id: d-id
+    name: D-ID
+    vendor: D-ID
+    category: avatar
+    access: web / api
+    pricing: subscription
+    strength: Real-time streaming avatars and talking photos; strong API play.
+    url: https://www.d-id.com
+    affiliate_status: referral
+    affiliate_terms: "Invite-only affiliate, no public signup (contact support). Do not expect a self-serve link."
+
+  # ---- music ----
+  - id: suno
+    name: Suno
+    vendor: Suno
+    category: music
+    access: web / app
+    pricing: subscription / credits
+    strength: Leading prompt-to-full-song; the consumer-prestige leader.
+    url: https://suno.com
+    affiliate_status: referral
+    affiliate_terms: "Referral only: refer a friend who makes 10 songs = both get 250 credits (up to 2,500)."
+  - id: udio
+    name: Udio
+    vendor: Udio
+    category: music
+    access: web
+    pricing: subscription / credits
+    strength: High-fidelity music generation; Suno's main rival. No affiliate program.
+    url: https://www.udio.com
+    affiliate_status: "no"
+  - id: mubert
+    name: Mubert
+    vendor: Mubert
+    category: music
+    access: web / api
+    pricing: subscription
+    strength: API-first, streaming royalty-free music.
+    url: https://mubert.com
+    affiliate_status: yes
+    affiliate_url: https://mubert.getrewardful.com/signup
+    affiliate_terms: "30% recurring, 60-day cookie, via Rewardful."
+  - id: soundraw
+    name: Soundraw
+    vendor: Soundraw
+    category: music
+    access: web
+    pricing: subscription
+    strength: Royalty-free, customisable AI music for creators.
+    url: https://soundraw.io
+    affiliate_status: yes
+    affiliate_url: https://discover.soundraw.io/affiliate
+    affiliate_terms: "US$50 per annual signup, US$10 per monthly; free lifetime licence at 3 annual refs."
+
+  # ---- upscale and enhance ----
+  - id: topaz
+    name: Topaz Labs
+    vendor: Topaz Labs
+    category: upscale
+    access: app
+    pricing: one-off / subscription
+    strength: Industry-standard Photo AI, Gigapixel and Video AI; the detail-upscale leader.
+    url: https://www.topazlabs.com
+    affiliate_status: yes
+    affiliate_url: https://topazlabs.com/affiliates/
+    affiliate_terms: "Reported 20-30% (unconfirmed on one page), 30-day cookie, US$50 min."
+  - id: magnific
+    name: Magnific
+    vendor: Freepik
+    category: upscale
+    access: web
+    pricing: subscription / credits
+    strength: Premium AI upscaler and creative "reimagine" enhancer; high prestige.
+    url: https://www.magnific.com
+    affiliate_status: yes
+    affiliate_url: https://www.magnific.com/affiliates
+    affiliate_terms: "30% recurring/lifetime plus 20% upfront on annual, 90-day cookie, via Rewardful. Also a no-approval referral."
+  - id: pixelcut
+    name: Pixelcut
+    vendor: Pixelcut
+    category: upscale
+    access: web / app
+    pricing: subscription
+    strength: Mobile-first background remover, upscaler and product-photo tool.
+    url: https://www.pixelcut.ai
+    affiliate_status: yes
+    affiliate_url: https://www.pixelcut.ai/affiliate
+    affiliate_terms: "30% of revenue per referral, 30-day hold, US$20 min, no approval."
+  - id: krea
+    name: Krea
+    vendor: Krea
+    category: upscale
+    access: web
+    pricing: subscription
+    strength: Real-time canvas and enhance to 8K+, aggregates many models.
+    url: https://www.krea.ai
+    affiliate_status: unknown
+    affiliate_url: https://www.krea.ai/cpp
+    affiliate_terms: "Creative Partners Program exists; terms not publicly confirmed."

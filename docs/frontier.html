@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frontier models - Infinity Engine</title>
+<script>document.documentElement.classList.add('js')</script>
+<style>@font-face{font-family:"Archivo Var";src:url("assets/fonts/archivo-var.woff2") format("woff2-variations");font-weight:100 900;font-display:swap}@font-face{font-family:"JetBrains Mono Var";src:url("assets/fonts/jetbrains-mono-var.woff2") format("woff2-variations");font-weight:100 800;font-display:swap}
+:root{--void:#05070c;--deep:#0a1420;--panel:rgba(124,77,255,.08);
+--violet:#7c4dff;--amethyst:#c9a6ff;--gold:#ffcf6e;--gold-soft:#ffe6b0;
+--teal:#2be3c2;--plasma:#ff5fd1;--text:#f6f4ff;--mut:#b9c3d6;
+--line:rgba(124,77,255,.28);--max:1120px;--radius:16px;
+--fd:"Archivo Var",ui-sans-serif,system-ui,sans-serif;
+--fm:"JetBrains Mono Var",Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;color:var(--text);font-family:var(--fd);font-weight:440;
+line-height:1.6;background:
+radial-gradient(ellipse 60rem 34rem at 14% -6%,rgba(124,77,255,.22),transparent),
+radial-gradient(ellipse 64rem 38rem at 90% 2%,rgba(43,227,194,.1),transparent),
+radial-gradient(ellipse 78rem 50rem at 50% 116%,rgba(42,20,88,.55),transparent),
+linear-gradient(180deg,#0c1220,#080c16 42%,var(--void));
+background-attachment:fixed;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+background:linear-gradient(90deg,rgba(201,166,255,.045) 1px,transparent 1px),
+linear-gradient(0deg,rgba(201,166,255,.045) 1px,transparent 1px);
+background-size:56px 56px;
+mask-image:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.03) 72%)}
+::selection{background:var(--gold);color:#201200}
+a{color:var(--amethyst);text-decoration:none}a:hover{color:#fff}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 clamp(1rem,4vw,2rem)}
+.site-header{position:sticky;top:0;z-index:50;
+border-bottom:1px solid var(--line);
+background:rgba(8,10,18,.82);backdrop-filter:blur(20px) saturate(1.3)}
+.site-header .wrap{display:flex;gap:.8rem 1.4rem;align-items:center;
+flex-wrap:wrap;padding:.7rem clamp(1rem,4vw,2rem)}
+.brand{display:inline-flex;align-items:center;gap:.65rem;text-decoration:none;
+margin-right:auto}
+.brand-mark{width:2.3rem;height:2.3rem;border-radius:50%;flex:none;
+border:1px solid rgba(255,207,110,.55);
+background:radial-gradient(circle at 38% 30%,var(--gold-soft),var(--violet) 46%,#2a1458 82%);
+box-shadow:0 0 26px rgba(124,77,255,.5),inset 0 0 12px rgba(255,255,255,.25)}
+.brand-text{display:grid;font-family:var(--fm);font-size:.66rem;
+text-transform:uppercase;letter-spacing:.06em;color:var(--mut);line-height:1.3}
+.brand-text strong{font-family:var(--fd);font-size:.95rem;color:#fff;
+text-transform:none;letter-spacing:0}
+nav{display:flex;gap:.1rem;flex-wrap:wrap;font-size:.83rem;font-weight:620}
+nav a{padding:.42rem .62rem;border-radius:999px;white-space:nowrap;
+color:var(--mut);transition:.2s}
+nav a:hover{color:#fff;background:rgba(124,77,255,.2)}
+h1,h2,h3{font-family:var(--fd);letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:clamp(2.1rem,5vw,3.1rem);font-weight:860;line-height:1;
+margin:2.2rem 0 .5rem;text-shadow:0 0 40px rgba(124,77,255,.35)}
+h2{font-size:clamp(1.4rem,3vw,1.9rem);font-weight:820;margin-top:2.6rem}
+h3{font-size:1.05rem;font-weight:740;margin:0 0 .4rem}
+.lead{color:var(--mut);max-width:52rem;font-size:1.05rem}
+.muted{color:var(--mut);font-size:.85rem}
+.bar{display:flex;height:16px;border-radius:999px;overflow:hidden;
+background:rgba(255,255,255,.05);margin:1.3rem 0;border:1px solid var(--line)}
+.s-ingested{background:#3a3358}.s-analysed{background:#2f5f8a}
+.s-briefed{background:#b08a1e}.s-panels{background:#7c4dff}
+.s-keyframes{background:var(--plasma)}.s-video{background:#1f9e7a}
+.s-published{background:var(--teal)}
+.pill{display:inline-block;padding:.12rem .6rem;border-radius:999px;
+font-size:.72rem;font-family:var(--fm);text-transform:uppercase;
+letter-spacing:.04em;border:1px solid var(--line);background:rgba(255,255,255,.05)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.card{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+background:linear-gradient(150deg,rgba(124,77,255,.16),rgba(10,10,22,.72));
+box-shadow:0 20px 50px rgba(0,0,0,.32);text-decoration:none;
+transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:rgba(43,227,194,.5)}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.card .pad{padding:.85rem .95rem 1.05rem}.card h3{margin:.1rem 0 .25rem;color:#fff}
+.card .bar{height:8px;margin:.7rem 0 0}
+table{border-collapse:collapse;width:100%;margin:1.2rem 0 2.5rem}
+th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);
+vertical-align:top}
+th{color:var(--gold);font-family:var(--fm);font-size:.72rem;
+text-transform:uppercase;letter-spacing:.08em}
+.theme{color:var(--amethyst);font-size:.8rem;margin-right:.45rem;white-space:nowrap}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:.7rem;margin:1.4rem 0}
+.legend div{border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;
+font-size:.9rem;background:rgba(255,255,255,.03)}
+.site-footer{border-top:1px solid var(--line);margin-top:3.5rem;
+background:rgba(6,8,14,.6)}
+.site-footer .wrap{padding:1.8rem clamp(1rem,4vw,2rem) 2.4rem;
+color:var(--mut);font-size:.88rem}
+.stage-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.4rem 0}
+.stage-flow .pill{font-size:.78rem;padding:.28rem .7rem}
+.stage-flow span.arrow{color:var(--gold)}
+.doc{max-width:52rem}
+.doc h1{margin-top:1.6rem}.doc h2{padding-top:1.5rem;border-top:1px solid var(--line)}
+.doc h3{margin-top:1.7rem}.doc p,.doc li{color:#dcd8ee}.doc li{margin:.2rem 0}
+.doc code{border:1px solid var(--line);border-radius:5px;padding:.05rem .35rem;
+font-family:var(--fm);font-size:.84em;background:rgba(124,77,255,.12)}
+.doc pre{border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem;
+overflow-x:auto;background:rgba(3,4,10,.6)}
+.doc pre code{background:none;border:none;padding:0;font-size:.8rem;
+line-height:1.5;color:#cdc8e6}
+.doc blockquote{border-left:3px solid var(--gold);margin:1.2rem 0;
+padding:.3rem 1rem;color:var(--mut);background:rgba(255,255,255,.03);
+border-radius:0 8px 8px 0}
+.doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.doc table{margin:1.2rem 0}.doc td{color:#dcd8ee}
+/* faceted picker + pattern chooser */
+.pc-facets{display:flex;flex-direction:column;gap:.6rem;margin:1.5rem 0 1.4rem;
+padding:1rem 1.1rem;border:1px solid var(--line);border-radius:var(--radius);
+background:rgba(255,255,255,.03)}
+.pc-frow{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.pc-flabel{color:var(--gold);font-family:var(--fm);font-size:.68rem;
+text-transform:uppercase;letter-spacing:.1em;width:5.4rem;flex:none}
+.pc-chip{cursor:pointer;user-select:none;border:1px solid var(--line);
+background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;
+padding:.28rem .8rem;font-size:.83rem;transition:.15s}
+.pc-chip:hover{border-color:var(--teal)}
+.pc-chip.on{background:var(--violet);border-color:var(--violet);color:#fff;
+font-weight:640;box-shadow:0 0 18px rgba(124,77,255,.4)}
+.pc-chip.lane-recon.on{background:var(--teal);border-color:var(--teal);color:#062f28}
+.pc-chip.lane-release.on{background:var(--gold);border-color:var(--gold);color:#241700}
+.pc-chip.lane-hero.on{background:var(--plasma);border-color:var(--plasma);color:#2a0620}
+.pc-clear{margin-left:auto;color:var(--mut);cursor:pointer;font-size:.82rem;
+background:none;border:none;text-decoration:underline}
+.pc-count{color:var(--mut);font-family:var(--fm);font-size:.82rem;margin:.2rem 0 1rem}
+.pc-group{margin:0 0 2.2rem}
+.pc-group-head{display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap;
+margin:1.8rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+.pc-group-head h2{margin:0;font-size:1.3rem}
+.pc-group-head span{color:var(--mut);font-size:.9rem}
+.pc-group.hidden{display:none}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+gap:1rem}
+.pc-card{border:1px solid var(--line);border-radius:var(--radius);
+padding:1.05rem 1.1rem;display:flex;flex-direction:column;gap:.55rem;
+background:linear-gradient(155deg,rgba(124,77,255,.14),rgba(10,10,22,.66));
+transition:transform .18s,border-color .18s}
+.pc-card:hover{transform:translateY(-2px);border-color:rgba(43,227,194,.45)}
+.pc-card.hidden{display:none}
+.pc-card h3{margin:0;font-size:1.08rem;line-height:1.2;color:#fff}
+.pc-kicker{font-family:var(--fm);font-size:.68rem;text-transform:uppercase;
+letter-spacing:.12em;color:var(--gold)}
+.pc-best{font-size:.96rem;color:#efeaff;margin:0;font-weight:600;line-height:1.35}
+.pc-task{display:inline-flex;align-self:flex-start;font-family:var(--fm);
+font-size:.75rem;padding:.2rem .6rem;border-radius:8px;color:#062f28;
+background:var(--teal);font-weight:700}
+.pc-badges{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.pc-b{font-family:var(--fm);font-size:.66rem;text-transform:uppercase;
+letter-spacing:.05em;border-radius:999px;padding:.1rem .55rem;
+border:1px solid transparent}
+.pc-b.recon{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.pc-b.release{background:rgba(255,207,110,.16);color:var(--gold-soft);border-color:rgba(255,207,110,.4)}
+.pc-b.hero{background:rgba(255,95,209,.16);color:#ffc7ec;border-color:rgba(255,95,209,.4)}
+.pc-b.tier{background:rgba(255,255,255,.06);color:#cfc9e6}
+.pc-b.built{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.pc-b.designed{background:rgba(255,255,255,.06);color:#c9c3e0}
+.pc-b.planned{background:rgba(201,166,255,.16);color:var(--amethyst);border-color:rgba(201,166,255,.4)}
+.pc-sum{color:#d6d1ea;font-size:.9rem;margin:0}
+.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.pc-tag{font-family:var(--fm);font-size:.7rem;color:var(--amethyst);
+background:rgba(124,77,255,.14);border-radius:5px;padding:.06rem .4rem}
+.pc-meta{font-size:.82rem;color:var(--mut);line-height:1.5}
+.pc-meta b{color:#d7d1ea;font-weight:600}
+.pc-more{border:none;background:none;color:var(--teal);cursor:pointer;
+font-size:.82rem;text-align:left;padding:0}
+.pc-detail{display:none;font-size:.85rem;color:#d3cee6;
+border-top:1px solid var(--line);padding-top:.6rem;margin-top:.2rem}
+.pc-detail.open{display:block}.pc-detail p{margin:.25rem 0}
+.pc-add{margin-top:.2rem;border:1px solid var(--teal);background:none;
+color:var(--teal);border-radius:8px;padding:.4rem;cursor:pointer;
+font-size:.85rem;font-weight:640}
+.pc-add.added{background:var(--teal);color:#062f28}
+.pc-tray{position:sticky;top:.6rem;z-index:5;
+border:1px solid var(--line);border-radius:var(--radius);padding:.85rem 1.05rem;
+margin:0 0 1.4rem;background:rgba(12,12,26,.9);backdrop-filter:blur(12px)}
+.pc-tray h2{margin:.1rem 0 .5rem;font-size:1.05rem}
+.pc-tray-empty{color:var(--mut);font-size:.88rem}
+.pc-tray ol{margin:.3rem 0 0;padding-left:1.2rem}
+.pc-tray li{margin:.15rem 0;font-size:.9rem}
+.pc-tray li button{border:none;background:none;color:var(--plasma);cursor:pointer;
+font-size:.9rem;margin-left:.3rem}
+@media(max-width:560px){.pc-flabel{width:100%}.brand-text{display:none}}
+/* ---- fancy bits: motion + promo ---- */
+@view-transition{navigation:auto}
+.scroll-progress{position:fixed;top:0;left:0;right:0;z-index:60;height:2px;
+pointer-events:none}
+.scroll-progress i{display:block;height:100%;width:100%;transform-origin:left;
+transform:scaleX(0);background:linear-gradient(90deg,var(--gold),var(--violet),var(--teal))}
+.site-header{transition:padding .2s,background .2s,border-color .2s}
+.site-header.is-condensed .site-header{padding:.4rem clamp(1rem,4vw,2rem)}
+.site-header.is-condensed{box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.eyebrow{margin:0 0 .7rem;color:var(--gold);font-family:var(--fm);font-size:.76rem;
+font-weight:640;letter-spacing:.2em;text-transform:uppercase}
+.eyebrow::before{content:"// ";color:rgba(255,207,110,.55)}
+.button{display:inline-flex;align-items:center;gap:.5rem;min-height:2.7rem;
+padding:.65rem 1.3rem;border-radius:999px;text-decoration:none;font-weight:720;
+border:1px solid transparent;cursor:pointer;transition:transform .2s,box-shadow .2s,
+background .2s,border-color .2s}
+.button:hover{transform:translateY(-2px)}
+.button-primary{background:linear-gradient(135deg,var(--gold),var(--plasma) 60%,var(--violet));
+color:#1a0e05;box-shadow:0 8px 30px rgba(255,207,110,.28)}
+.button-secondary{border-color:var(--line);background:rgba(255,255,255,.06);color:#fff}
+.button-secondary:hover{border-color:rgba(43,227,194,.6);background:rgba(43,227,194,.1)}
+.promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.promo-card{position:relative;display:flex;flex-direction:column;gap:.6rem;
+padding:1.3rem 1.35rem;border:1px solid var(--line);border-radius:var(--radius);
+background:linear-gradient(155deg,rgba(124,77,255,.16),rgba(10,10,22,.72));
+box-shadow:0 20px 50px rgba(0,0,0,.32);text-decoration:none;
+transition:transform .2s,border-color .2s}
+.promo-card:hover{transform:translateY(-4px);border-color:rgba(43,227,194,.5)}
+.promo-card h3{font-size:1.25rem;color:#fff;margin:0}
+.promo-card .tagline{color:var(--gold-soft);font-size:.92rem;margin:0}
+.promo-card p{color:var(--mut);font-size:.92rem;margin:0}
+.promo-card .promo-foot{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+margin-top:auto;padding-top:.5rem}
+.promo-card .go{color:var(--teal);font-weight:640;font-size:.9rem}
+.st{font-family:var(--fm);font-size:.66rem;text-transform:uppercase;
+letter-spacing:.06em;border-radius:999px;padding:.12rem .6rem;border:1px solid transparent}
+.st-live{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.st-development{background:rgba(255,207,110,.16);color:var(--gold-soft);border-color:rgba(255,207,110,.4)}
+.st-design{background:rgba(201,166,255,.16);color:var(--amethyst);border-color:rgba(201,166,255,.4)}
+.st-concept{background:rgba(255,255,255,.06);color:#c9c3e0}
+/* Reveal-on-scroll. Gated on html.js (set synchronously in <head>) so
+   there is no first-paint flash. The is-visible resting state is fully
+   visible, and a JS fallback timer adds it to everything shortly after
+   load, so content can never be stranded invisible if the observer or a
+   paused animation misbehaves. */
+html.js .pc-card,html.js .card,html.js .reveal{opacity:0;
+transform:translateY(18px);
+transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+html.js .pc-card.is-visible,html.js .card.is-visible,html.js .reveal.is-visible{
+opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+html.js .pc-card,html.js .card,html.js .reveal{opacity:1;transform:none;transition:none}
+.scroll-progress{display:none}}
+</style></head><body>
+<div class="scroll-progress"><i></i></div>
+<header class="site-header"><div class="wrap">
+<a class="brand" href="index.html">
+<span class="brand-mark"></span>
+<span class="brand-text"><strong>Infinity Engine</strong>
+<span>i C. infinity</span></span></a>
+<nav><a href="index.html">Progress</a>
+<a href="patterns.html">Patterns</a>
+<a href="cast.html">Cast</a>
+<a href="models.html">Models</a>
+<a href="frontier.html">Frontier</a>
+<a href="loras.html">LoRAs</a>
+<a href="compute.html">Compute</a>
+<a href="recon.html">Recon</a>
+<a href="projects.html">Projects</a>
+<a href="pipeline.html">How it works</a>
+<a href="workflow.html">Operator guide</a>
+<a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
+</div></header>
+<main class="wrap">
+<h1>Frontier models</h1><p class='lead'>Closed, pay-to-play frontier models: the ones with the deepest pockets behind them, worth an occasional output comparison, and the names people drop. The engine stays open-source first for ownership and cost; this is the other end of the shelf. Some links are affiliate or referral: sign up through one and the project may earn a small commission at no extra cost to you. An <b>affiliate</b> badge means a paid program exists; join it and swap in your own referral link where the card points.</p><div class="pc-facets"><div class="pc-frow"><span class="pc-flabel">Category</span><button class="pc-chip " data-group="category" data-value="video" onclick="pcToggle(this)">video</button><button class="pc-chip " data-group="category" data-value="image" onclick="pcToggle(this)">image</button><button class="pc-chip " data-group="category" data-value="voice" onclick="pcToggle(this)">voice</button><button class="pc-chip " data-group="category" data-value="avatar" onclick="pcToggle(this)">avatar</button><button class="pc-chip " data-group="category" data-value="music" onclick="pcToggle(this)">music</button><button class="pc-chip " data-group="category" data-value="upscale" onclick="pcToggle(this)">upscale</button></div><div class="pc-frow"><span class="pc-flabel">Affiliate</span><button class="pc-chip " data-group="affiliate" data-value="yes" onclick="pcToggle(this)">yes</button><button class="pc-chip " data-group="affiliate" data-value="referral" onclick="pcToggle(this)">referral</button><button class="pc-chip " data-group="affiliate" data-value="no" onclick="pcToggle(this)">no</button></div><div class="pc-frow"><button class="pc-clear" onclick="pcClear()">clear all filters</button></div></div><div class="pc-count" id="pcCount"></div><section class="pc-group"><div class="pc-group-head"><h2>Video</h2><span>Text and image to video</span></div><div class="pc-grid"><div class="pc-card" data-category="video" data-access="web" data-affiliate="no"><span class="pc-kicker">OpenAI</span><h3>Sora</h3><span class="pc-task">video</span><p class="pc-best">Top prestige, strong coherence, native audio and cameo. The name everyone drops.</p><div class="pc-badges"><span class="pc-b designed">no program</span></div><div class="pc-meta"><b>Access:</b> web / app &middot; <b>Price:</b> ChatGPT Plus / Pro subscription</div><a class="pc-more" href="https://sora.com" target="_blank" rel="noopener">Visit &rarr;</a></div><div class="pc-card" data-category="video" data-access="app" data-affiliate="no"><span class="pc-kicker">Google DeepMind</span><h3>Veo 3</h3><span class="pc-task">video</span><p class="pc-best">Best native audio and dialogue, top physics realism.</p><div class="pc-badges"><span class="pc-b designed">no program</span></div><div class="pc-meta"><b>Access:</b> app / api &middot; <b>Price:</b> Gemini / Flow subscription</div><a class="pc-more" href="https://deepmind.google/models/veo/" target="_blank" rel="noopener">Visit &rarr;</a></div><div class="pc-card" data-category="video" data-access="web" data-affiliate="yes"><span class="pc-kicker">Runway</span><h3>Runway Gen-4</h3><span class="pc-task">video</span><p class="pc-best">The prosumer benchmark; deepest editing toolset.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> credits / subscription<br><b>Affiliate:</b> Portal live; terms behind login. Third-party sources cite ~20% recurring (unverified).</div><a class="pc-more" href="https://runwayml.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://affiliates.runwayml.com/" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="video" data-access="web" data-affiliate="yes"><span class="pc-kicker">PixVerse</span><h3>PixVerse</h3><span class="pc-task">video</span><p class="pc-best">Fast, stylised and anime-strong, mobile-first. Best affiliate terms here.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / app &middot; <b>Price:</b> credits / subscription<br><b>Affiliate:</b> 30% recurring for 12 months (35% above US$5k/mo), 90-day cookie, via Impact. Plus referral credits.</div><a class="pc-more" href="https://pixverse.ai" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://pixverse.ai/en/affiliate" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="video" data-access="web" data-affiliate="yes"><span class="pc-kicker">Luma Labs</span><h3>Dream Machine / Ray</h3><span class="pc-task">video</span><p class="pc-best">Fast, cinematic, strong image-to-video.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / api &middot; <b>Price:</b> credits / subscription<br><b>Affiliate:</b> PartnerStack; lifetime-of-account commission, 90-day cookie (rate shown after signup).</div><a class="pc-more" href="https://lumalabs.ai" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://lumalabs.ai/affiliate" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="video" data-access="web" data-affiliate="referral"><span class="pc-kicker">Kuaishou</span><h3>Kling AI</h3><span class="pc-task">video</span><p class="pc-best">Leading motion and physics realism, cost-efficient.</p><div class="pc-badges"><span class="pc-b release">referral only</span></div><div class="pc-meta"><b>Access:</b> web / app &middot; <b>Price:</b> credits<br><b>Affiliate:</b> Referral only: 500 credits per invited friend; invitee gets 50% bonus credits.</div><a class="pc-more" href="https://app.klingai.com" target="_blank" rel="noopener">Visit &rarr;</a></div><div class="pc-card" data-category="video" data-access="web" data-affiliate="unknown"><span class="pc-kicker">MiniMax</span><h3>Hailuo</h3><span class="pc-task">video</span><p class="pc-best">Strong prompt adherence, cost-efficient.</p><div class="pc-badges"><span class="pc-b designed">checking</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> credits</div><a class="pc-more" href="https://hailuoai.video" target="_blank" rel="noopener">Visit &rarr;</a></div><div class="pc-card" data-category="video" data-access="web" data-affiliate="yes"><span class="pc-kicker">Adobe</span><h3>Firefly Video</h3><span class="pc-task">video</span><p class="pc-best">Commercially safe and indemnified, integrated into Creative Cloud.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / Creative Cloud &middot; <b>Price:</b> Creative Cloud subscription<br><b>Affiliate:</b> Adobe umbrella via Partnerize; ~85% of one month (monthly) or 8.33% annual, 30-day cookie.</div><a class="pc-more" href="https://www.adobe.com/products/firefly" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.adobe.com/affiliates.html" target="_blank" rel="noopener">Affiliate program &rarr;</a></div></div></section><section class="pc-group"><div class="pc-group-head"><h2>Image</h2><span>Stills, keyframes and art</span></div><div class="pc-grid"><div class="pc-card" data-category="image" data-access="web" data-affiliate="no"><span class="pc-kicker">Midjourney</span><h3>Midjourney</h3><span class="pc-task">image</span><p class="pc-best">The prestige aesthetic leader. No affiliate program exists.</p><div class="pc-badges"><span class="pc-b designed">no program</span></div><div class="pc-meta"><b>Access:</b> web / Discord &middot; <b>Price:</b> subscription</div><a class="pc-more" href="https://midjourney.com" target="_blank" rel="noopener">Visit &rarr;</a></div><div class="pc-card" data-category="image" data-access="app" data-affiliate="no"><span class="pc-kicker">Google</span><h3>Nano Banana (Gemini image)</h3><span class="pc-task">image</span><p class="pc-best">Best in-image text and editing consistency.</p><div class="pc-badges"><span class="pc-b designed">no program</span></div><div class="pc-meta"><b>Access:</b> app / api &middot; <b>Price:</b> subscription / credits</div><a class="pc-more" href="https://gemini.google.com" target="_blank" rel="noopener">Visit &rarr;</a></div><div class="pc-card" data-category="image" data-access="web" data-affiliate="yes"><span class="pc-kicker">Adobe</span><h3>Adobe Firefly</h3><span class="pc-task">image</span><p class="pc-best">Commercially safe, integrated; the corporate-safe choice.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / Creative Cloud &middot; <b>Price:</b> Creative Cloud subscription<br><b>Affiliate:</b> Adobe umbrella via Partnerize; 8-85% by product, 30-day cookie.</div><a class="pc-more" href="https://firefly.adobe.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.adobe.com/affiliates.html" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="image" data-access="web" data-affiliate="yes"><span class="pc-kicker">Ideogram</span><h3>Ideogram</h3><span class="pc-task">image</span><p class="pc-best">Best-in-class legible text rendering.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> Creators Club affiliate (application); exact terms not publicly disclosed.</div><a class="pc-more" href="https://ideogram.ai" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://ideogram.ai/features/creators-club/" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="image" data-access="web" data-affiliate="yes"><span class="pc-kicker">Freepik</span><h3>Freepik</h3><span class="pc-task">image</span><p class="pc-best">Huge stock plus AI suite aggregating many models.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> Via Impact; 30% one-time on first payment, 60-day cookie.</div><a class="pc-more" href="https://www.freepik.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.freepik.com/affiliates" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="image" data-access="web" data-affiliate="referral"><span class="pc-kicker">Recraft</span><h3>Recraft</h3><span class="pc-task">image</span><p class="pc-best">Vector/SVG and brand-style consistency.</p><div class="pc-badges"><span class="pc-b release">referral only</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> Referral: 200 credits per referral (cap 4,000); invitee gets 200 bonus.</div><a class="pc-more" href="https://www.recraft.ai" target="_blank" rel="noopener">Visit &rarr;</a></div></div></section><section class="pc-group"><div class="pc-group-head"><h2>Voice</h2><span>Text to speech and cloning</span></div><div class="pc-grid"><div class="pc-card" data-category="voice" data-access="web" data-affiliate="yes"><span class="pc-kicker">ElevenLabs</span><h3>ElevenLabs</h3><span class="pc-task">voice</span><p class="pc-best">The voice-quality leader; most prestige for expressive TTS and cloning.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / api &middot; <b>Price:</b> subscription / credits<br><b>Affiliate:</b> 22% for first 12 months (11% Business), 90-day cookie, US$5 min, via PartnerStack.</div><a class="pc-more" href="https://elevenlabs.io" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://elevenlabs.io/affiliates" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="voice" data-access="web" data-affiliate="yes"><span class="pc-kicker">Hume AI</span><h3>Hume (EVI)</h3><span class="pc-task">voice</span><p class="pc-best">Emotionally expressive, empathic voice.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / api &middot; <b>Price:</b> subscription / usage<br><b>Affiliate:</b> 25% on each subscription for first 12 months, via PartnerStack.</div><a class="pc-more" href="https://hume.ai" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://market.partnerstack.com/page/humeai" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="voice" data-access="web" data-affiliate="yes"><span class="pc-kicker">Murf</span><h3>Murf AI</h3><span class="pc-task">voice</span><p class="pc-best">Polished studio voiceover for video and e-learning.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / api &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 20% recurring for up to 24 months, 90-day cookie.</div><a class="pc-more" href="https://murf.ai" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://murf.ai/partner-with-us/affiliate" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="voice" data-access="web" data-affiliate="yes"><span class="pc-kicker">WellSaid</span><h3>WellSaid Labs</h3><span class="pc-task">voice</span><p class="pc-best">Enterprise narration, brand-safe studio voices.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 30% on a new customer&#x27;s first 3 payments, 60-day cookie.</div><a class="pc-more" href="https://wellsaid.io" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://friends.wellsaidlabs.com" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="voice" data-access="api" data-affiliate="no"><span class="pc-kicker">Cartesia</span><h3>Cartesia (Sonic)</h3><span class="pc-task">voice</span><p class="pc-best">Fastest real-time TTS (~40-90ms), developer and voice-agent focus. No affiliate program.</p><div class="pc-badges"><span class="pc-b designed">no program</span></div><div class="pc-meta"><b>Access:</b> api &middot; <b>Price:</b> usage</div><a class="pc-more" href="https://cartesia.ai" target="_blank" rel="noopener">Visit &rarr;</a></div></div></section><section class="pc-group"><div class="pc-group-head"><h2>Avatar</h2><span>Talking-head and presenter</span></div><div class="pc-grid"><div class="pc-card" data-category="avatar" data-access="web" data-affiliate="yes"><span class="pc-kicker">HeyGen</span><h3>HeyGen</h3><span class="pc-task">avatar</span><p class="pc-best">Market-leading realistic avatars and video translation; strongest brand.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 35% recurring for first 3 months, 30-day cookie (payout threshold varies by track).</div><a class="pc-more" href="https://www.heygen.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.heygen.com/affiliate-program" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="avatar" data-access="web" data-affiliate="yes"><span class="pc-kicker">Synthesia</span><h3>Synthesia</h3><span class="pc-task">avatar</span><p class="pc-best">The enterprise / L&amp;D standard; 230+ avatars, 140+ languages.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 25% for first 12 months, 60-day cookie, via Rewardful; plus a separate Creator Program.</div><a class="pc-more" href="https://www.synthesia.io" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.synthesia.io/partners/affiliates" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="avatar" data-access="web" data-affiliate="yes"><span class="pc-kicker">Argil</span><h3>Argil</h3><span class="pc-task">avatar</span><p class="pc-best">AI clones/avatars for social talking-head clips.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 30% of referred revenue for 12 months (doubled if &gt;1M views), US$50 min.</div><a class="pc-more" href="https://www.argil.ai" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.argil.ai/affiliation" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="avatar" data-access="web" data-affiliate="yes"><span class="pc-kicker">Colossyan</span><h3>Colossyan</h3><span class="pc-task">avatar</span><p class="pc-best">L&amp;D / corporate training avatars with branching scenarios.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 25% recurring, rising to 35% at 10 sales and 50% at 100, 90-day cookie, via Rewardful.</div><a class="pc-more" href="https://www.colossyan.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.colossyan.com/affiliate-program" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="avatar" data-access="web" data-affiliate="yes"><span class="pc-kicker">Hedra</span><h3>Hedra (Character-3)</h3><span class="pc-task">avatar</span><p class="pc-best">Expressive talking-character generation and lip-sync.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / api &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 15% per paid subscription for up to 12 months, via Dub.</div><a class="pc-more" href="https://www.hedra.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://partners.dub.co/hedra" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="avatar" data-access="web" data-affiliate="referral"><span class="pc-kicker">D-ID</span><h3>D-ID</h3><span class="pc-task">avatar</span><p class="pc-best">Real-time streaming avatars and talking photos; strong API play.</p><div class="pc-badges"><span class="pc-b release">referral only</span></div><div class="pc-meta"><b>Access:</b> web / api &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> Invite-only affiliate, no public signup (contact support). Do not expect a self-serve link.</div><a class="pc-more" href="https://www.d-id.com" target="_blank" rel="noopener">Visit &rarr;</a></div></div></section><section class="pc-group"><div class="pc-group-head"><h2>Music</h2><span>Song generation</span></div><div class="pc-grid"><div class="pc-card" data-category="music" data-access="web" data-affiliate="referral"><span class="pc-kicker">Suno</span><h3>Suno</h3><span class="pc-task">music</span><p class="pc-best">Leading prompt-to-full-song; the consumer-prestige leader.</p><div class="pc-badges"><span class="pc-b release">referral only</span></div><div class="pc-meta"><b>Access:</b> web / app &middot; <b>Price:</b> subscription / credits<br><b>Affiliate:</b> Referral only: refer a friend who makes 10 songs = both get 250 credits (up to 2,500).</div><a class="pc-more" href="https://suno.com" target="_blank" rel="noopener">Visit &rarr;</a></div><div class="pc-card" data-category="music" data-access="web" data-affiliate="no"><span class="pc-kicker">Udio</span><h3>Udio</h3><span class="pc-task">music</span><p class="pc-best">High-fidelity music generation; Suno&#x27;s main rival. No affiliate program.</p><div class="pc-badges"><span class="pc-b designed">no program</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription / credits</div><a class="pc-more" href="https://www.udio.com" target="_blank" rel="noopener">Visit &rarr;</a></div><div class="pc-card" data-category="music" data-access="web" data-affiliate="yes"><span class="pc-kicker">Mubert</span><h3>Mubert</h3><span class="pc-task">music</span><p class="pc-best">API-first, streaming royalty-free music.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / api &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 30% recurring, 60-day cookie, via Rewardful.</div><a class="pc-more" href="https://mubert.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://mubert.getrewardful.com/signup" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="music" data-access="web" data-affiliate="yes"><span class="pc-kicker">Soundraw</span><h3>Soundraw</h3><span class="pc-task">music</span><p class="pc-best">Royalty-free, customisable AI music for creators.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> US$50 per annual signup, US$10 per monthly; free lifetime licence at 3 annual refs.</div><a class="pc-more" href="https://soundraw.io" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://discover.soundraw.io/affiliate" target="_blank" rel="noopener">Affiliate program &rarr;</a></div></div></section><section class="pc-group"><div class="pc-group-head"><h2>Upscale and enhance</h2><span>Finishing and resolution</span></div><div class="pc-grid"><div class="pc-card" data-category="upscale" data-access="app" data-affiliate="yes"><span class="pc-kicker">Topaz Labs</span><h3>Topaz Labs</h3><span class="pc-task">upscale</span><p class="pc-best">Industry-standard Photo AI, Gigapixel and Video AI; the detail-upscale leader.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> app &middot; <b>Price:</b> one-off / subscription<br><b>Affiliate:</b> Reported 20-30% (unconfirmed on one page), 30-day cookie, US$50 min.</div><a class="pc-more" href="https://www.topazlabs.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://topazlabs.com/affiliates/" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="upscale" data-access="web" data-affiliate="yes"><span class="pc-kicker">Freepik</span><h3>Magnific</h3><span class="pc-task">upscale</span><p class="pc-best">Premium AI upscaler and creative &quot;reimagine&quot; enhancer; high prestige.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription / credits<br><b>Affiliate:</b> 30% recurring/lifetime plus 20% upfront on annual, 90-day cookie, via Rewardful. Also a no-approval referral.</div><a class="pc-more" href="https://www.magnific.com" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.magnific.com/affiliates" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="upscale" data-access="web" data-affiliate="yes"><span class="pc-kicker">Pixelcut</span><h3>Pixelcut</h3><span class="pc-task">upscale</span><p class="pc-best">Mobile-first background remover, upscaler and product-photo tool.</p><div class="pc-badges"><span class="pc-b built">affiliate</span></div><div class="pc-meta"><b>Access:</b> web / app &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> 30% of revenue per referral, 30-day hold, US$20 min, no approval.</div><a class="pc-more" href="https://www.pixelcut.ai" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.pixelcut.ai/affiliate" target="_blank" rel="noopener">Affiliate program &rarr;</a></div><div class="pc-card" data-category="upscale" data-access="web" data-affiliate="unknown"><span class="pc-kicker">Krea</span><h3>Krea</h3><span class="pc-task">upscale</span><p class="pc-best">Real-time canvas and enhance to 8K+, aggregates many models.</p><div class="pc-badges"><span class="pc-b designed">checking</span></div><div class="pc-meta"><b>Access:</b> web &middot; <b>Price:</b> subscription<br><b>Affiliate:</b> Creative Partners Program exists; terms not publicly confirmed.</div><a class="pc-more" href="https://www.krea.ai" target="_blank" rel="noopener">Visit &rarr;</a> &middot; <a class="pc-more" href="https://www.krea.ai/cpp" target="_blank" rel="noopener">Affiliate program &rarr;</a></div></div></section><script>const PC_NOUN="model";
+const pcState={};
+document.querySelectorAll('.pc-chip[data-group]').forEach(c=>{
+  pcState[c.dataset.group]=pcState[c.dataset.group]||new Set()});
+function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
+  const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
+  else{s.add(v);el.classList.add('on')}pcFilter()}
+function pcClear(){for(const g in pcState)pcState[g].clear();
+  document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
+  pcFilter()}
+function pcMatch(card){for(const g in pcState){const sel=pcState[g];
+  if(!sel.size)continue;
+  const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
+  if(![...sel].some(v=>vals.includes(v)))return false}return true}
+function pcFilter(){let n=0;document.querySelectorAll('.pc-card').forEach(c=>{
+  const ok=pcMatch(c);c.classList.toggle('hidden',!ok);if(ok)n++});
+  document.querySelectorAll('.pc-group').forEach(g=>{
+    const any=[...g.querySelectorAll('.pc-card')].some(c=>!c.classList.contains('hidden'));
+    g.classList.toggle('hidden',!any)});
+  document.getElementById('pcCount').textContent=
+    n+' '+PC_NOUN+(n===1?'':'s')+' shown'}
+function pcMore(b){b.nextElementSibling.classList.toggle('open')}
+</script>
+</main>
+<footer class="site-footer"><div class="wrap">A live monitor of the i C.
+infinity visual pipeline. Regenerated from the song vault as pieces
+complete. Lyrics live with the music, not here.<br>Luke &times; Claude.</div>
+</footer>
+<script>
+(function(){var h=document.querySelector('.site-header'),
+p=document.querySelector('.scroll-progress i');
+function s(){var y=scrollY||0,d=document.body.scrollHeight-innerHeight;
+if(p)p.style.transform='scaleX('+(d>0?Math.min(y/d,1):0)+')';
+if(h)h.classList.toggle('is-condensed',y>24)}
+addEventListener('scroll',s,{passive:true});s();
+var els=document.querySelectorAll('.pc-card,.card,.reveal');
+var io=new IntersectionObserver(function(es){es.forEach(function(e){
+if(e.isIntersecting){e.target.classList.add('is-visible');io.unobserve(e.target)}})},
+{rootMargin:'0px 0px -6% 0px'});
+els.forEach(function(el){io.observe(el)});
+// safety net: nothing stays hidden, even if the observer never fires or
+// a transition is frozen. Snap instantly (transition:none) so opacity
+// can't be stranded mid-interpolation.
+setTimeout(function(){els.forEach(function(el){
+if(!el.classList.contains('is-visible')){el.style.transition='none';
+el.classList.add('is-visible')}})},1400);})();
+</script>
+</body></html>

@@ -290,6 +290,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <a href="{up}patterns.html">Patterns</a>
 <a href="{up}cast.html">Cast</a>
 <a href="{up}models.html">Models</a>
+<a href="{up}frontier.html">Frontier</a>
 <a href="{up}loras.html">LoRAs</a>
 <a href="{up}compute.html">Compute</a>
 <a href="{up}recon.html">Recon</a>
@@ -473,7 +474,8 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
 
     # Pattern chooser, registry pickers and promo (data-driven).
     for builder in (render_patterns, render_cast, render_models, render_loras,
-                    render_compute, render_recon, render_projects):
+                    render_frontier, render_compute, render_recon,
+                    render_projects):
         page = builder(out_dir)
         if page:
             written.append(page)
@@ -998,6 +1000,84 @@ def render_cast(out_dir: Path) -> Path | None:
               "role. Filter by troupe to focus, or by visibility to find what "
               "stays private."),
         facet_defs=facet_defs, groups=groups)
+
+
+FRONTIER_CATEGORIES = {
+    "video": ("Video", "Text and image to video"),
+    "image": ("Image", "Stills, keyframes and art"),
+    "voice": ("Voice", "Text to speech and cloning"),
+    "avatar": ("Avatar", "Talking-head and presenter"),
+    "music": ("Music", "Song generation"),
+    "upscale": ("Upscale and enhance", "Finishing and resolution"),
+    "language": ("Language", "Scripting and ideation"),
+}
+
+_AFFIL = {
+    "yes": ("built", "affiliate"),
+    "referral": ("release", "referral only"),
+    "no": ("designed", "no program"),
+    "unknown": ("designed", "checking"),
+}
+
+
+def _frontier_card(m: dict) -> tuple:
+    # YAML turns bare yes/no into booleans; normalise back to strings.
+    raw = m.get("affiliate_status", "unknown")
+    aff = {True: "yes", False: "no"}.get(raw, str(raw))
+    aff_class, aff_label = _AFFIL.get(aff, _AFFIL["unknown"])
+    links = (f'<a class="pc-more" href="{_esc(m.get("url","#"))}" '
+             'target="_blank" rel="noopener">Visit &rarr;</a>')
+    if m.get("affiliate_url"):
+        links += (f' &middot; <a class="pc-more" href="'
+                  f'{_esc(m["affiliate_url"])}" target="_blank" '
+                  'rel="noopener">Affiliate program &rarr;</a>')
+    terms = (f'<br><b>Affiliate:</b> {_esc(m.get("affiliate_terms",""))}'
+             if m.get("affiliate_terms") else "")
+    inner = (
+        f'<span class="pc-kicker">{_esc(m.get("vendor",""))}</span>'
+        f'<h3>{_esc(m.get("name", m["id"]))}</h3>'
+        f'<span class="pc-task">{_esc(m.get("category",""))}</span>'
+        f'<p class="pc-best">{_esc(m.get("strength",""))}</p>'
+        '<div class="pc-badges">'
+        f'<span class="pc-b {aff_class}">{aff_label}</span></div>'
+        f'<div class="pc-meta"><b>Access:</b> {_esc(m.get("access",""))} '
+        f'&middot; <b>Price:</b> {_esc(m.get("pricing","?"))}{terms}</div>'
+        f'{links}')
+    attrs = {
+        "category": [str(m.get("category", ""))],
+        "access": [str(m.get("access", "")).split("/")[0].strip().lower()],
+        "affiliate": [aff],
+    }
+    return attrs, inner
+
+
+def render_frontier(out_dir: Path) -> Path | None:
+    models = _load_catalog(out_dir, "catalog/frontier.yaml", "frontier")
+    if not models:
+        return None
+    groups = []
+    for cat, (label, blurb) in FRONTIER_CATEGORIES.items():
+        gcards = [_frontier_card(m) for m in models
+                  if m.get("category") == cat]
+        groups.append((label, blurb, gcards))
+    facet_defs = [
+        ("Category", "category", [c for c in FRONTIER_CATEGORIES
+                                  if any(m.get("category") == c
+                                         for m in models)]),
+        ("Affiliate", "affiliate", ["yes", "referral", "no"]),
+    ]
+    disclosure = (
+        "Closed, pay-to-play frontier models: the ones with the deepest "
+        "pockets behind them, worth an occasional output comparison, and the "
+        "names people drop. The engine stays open-source first for ownership "
+        "and cost; this is the other end of the shelf. Some links are "
+        "affiliate or referral: sign up through one and the project may earn "
+        "a small commission at no extra cost to you. An <b>affiliate</b> badge "
+        "means a paid program exists; join it and swap in your own referral "
+        "link where the card points.")
+    return render_picker(
+        out_dir, filename="frontier.html", title="Frontier models",
+        noun="model", lead=disclosure, facet_defs=facet_defs, groups=groups)
 
 
 PROJECT_STATUS = {"live": "st-live", "development": "st-development",
