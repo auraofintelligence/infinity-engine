@@ -1,13 +1,134 @@
 # Compute registry: where to rent the metal, for the compute comparer.
-# Prices in AUD, converted from provider USD at AUD/USD 0.70 (2026-07-20).
-# Marketplace rates (Vast/Salad) drift; treat as a snapshot, re-verify
-# before a big batch. The manual quarterly price scan updates this file.
+# Prices in AUD, converted from provider USD at AUD/USD 0.70 (2026-07-21).
+# Marketplace rates drift; treat as a snapshot, re-verify before a big
+# batch. The manual quarterly price scan updates this file.
 #
-# best_for:  immediate  fast spin-up, interactive / small bursts
-#            batch       cheapest per hour, restartable overnight work
-# spinup:    fast (seconds, warm pool) | medium (minutes) | slow (image pull)
+# location:  au-owned   Australian-owned AND operated (sovereign)
+#            au-region  data stays in Australia, but a foreign parent
+#            global     runs who-knows-where; cheapest, least sovereign
+# self_serve: yes  sign up and rent by the hour yourself
+#             no   enterprise / commitment, talk to sales first
+# best_for:  immediate fast spin-up | batch cheapest per hour restartable
+# spinup:    fast (seconds) | medium (minutes) | slow (image pull)
+#
+# Reality for a solo creator: the Australian-OWNED clouds are sovereign
+# and often greener, but built for enterprise/government and priced by
+# quote. The practical self-serve Australian path today is a hyperscaler
+# Australian region, or filtering a global marketplace (Vast/RunPod) to
+# Australian hosts / the Sydney region.
 
 compute:
+  # --- Australian-owned and operated (sovereign) ---
+  - id: smc-firmus-h100
+    provider: Sustainable Metal Cloud (Firmus)
+    offering: immersion-cooled bare metal
+    card: H100 / A100 clusters
+    price_aud_hr: 3.00
+    billing: committed
+    interruptible: no
+    spinup: slow
+    best_for: batch
+    location: au-owned
+    self_serve: no
+    region: Sydney (also Singapore, India)
+    link: https://smc.co/
+    notes: Sovereign and about half the carbon of air-cooled clouds; ranked
+      by SemiAnalysis alongside the hyperscalers. Built for clusters, so
+      contact sales; H100 around A$3/hr at commitment.
+  - id: sharon-ai
+    provider: Sharon AI
+    offering: sovereign neocloud
+    card: H100 / H200 / B200
+    price_aud_hr: quote
+    billing: contract
+    interruptible: no
+    spinup: medium
+    best_for: immediate
+    location: au-owned
+    self_serve: no
+    region: Sydney and Melbourne (NEXTDC)
+    link: https://sharonai.com/cloud-gpu-hosting-in-australia/
+    notes: Australia's largest sovereign AI cloud buildout, NVIDIA and Cisco
+      partnered. Enterprise scale; talk to them for access and pricing.
+  - id: micron21-mcloud
+    provider: Micron21 (mCloud)
+    offering: sovereign GPU cloud
+    card: A100 / H100 / H200
+    price_aud_hr: quote
+    billing: quote
+    interruptible: no
+    spinup: medium
+    best_for: immediate
+    location: au-owned
+    self_serve: no
+    region: Melbourne (Tier IV)
+    link: https://www.micron21.com/enterprise/mcloud-gpu-nvidia-h100
+    notes: 100% Australian owned, Tier IV data centre, IRAP-assessed and
+      ISO/PCI certified. GPU passthrough or time-sliced. Contact for a quote.
+  - id: dug-hpc
+    provider: DUG Technology
+    offering: HPC-as-a-service
+    card: HPC GPU nodes
+    price_aud_hr: quote
+    billing: quote
+    interruptible: no
+    spinup: slow
+    best_for: batch
+    location: au-owned
+    self_serve: no
+    region: Perth
+    link: https://dug.com/dug-cool/
+    notes: Perth-based, immersion-cooled (DUG Cool), scientific HPC heritage.
+      Best when you have a big batch and want an Australian HPC partner.
+
+  # --- Australian data region (foreign-owned hyperscalers) ---
+  - id: aws-sydney-h100
+    provider: AWS (ap-southeast-2)
+    offering: on-demand / spot
+    card: H100 (p5)
+    price_aud_hr: 17.6
+    billing: per-second
+    interruptible: spot option
+    spinup: medium
+    best_for: immediate
+    location: au-region
+    self_serve: yes
+    region: Sydney
+    link: https://aws.amazon.com/ec2/instance-types/p5/
+    notes: Data stays in Sydney, but AWS is US-owned. On-demand list is dear;
+      spot and savings plans cut it a lot. Self-serve if you know AWS.
+  - id: gcp-sydney-h100
+    provider: Google Cloud (australia-southeast1)
+    offering: on-demand / spot
+    card: H100
+    price_aud_hr: 17.8
+    billing: per-second
+    interruptible: spot option
+    spinup: medium
+    best_for: immediate
+    location: au-region
+    self_serve: yes
+    region: Sydney
+    link: https://cloud.google.com/compute/docs/gpus
+    notes: Sydney region, US-owned. Similar list price to AWS; spot is much
+      cheaper for restartable work.
+  - id: azure-sydney-h100
+    provider: Azure (Australia East)
+    offering: on-demand / spot
+    card: ND H100 v4
+    price_aud_hr: 20.0
+    billing: per-second
+    interruptible: spot option
+    spinup: medium
+    best_for: immediate
+    location: au-region
+    self_serve: yes
+    region: Sydney
+    link: https://azure.microsoft.com/en-au/products/virtual-machines/gpu
+    notes: Sydney region, US-owned; deepest government and finance adoption.
+      Priciest list of the three, strong compliance story.
+
+  # --- Global marketplaces and serverless (cheapest, least sovereign) ---
   - id: vast-4090-int
     provider: Vast.ai
     offering: interruptible
@@ -17,19 +138,12 @@ compute:
     interruptible: yes
     spinup: medium
     best_for: batch
-    region: marketplace (AU sometimes)
-    notes: Best $/VRAM-hour for restartable draft batches; script checkpoint-and-resume.
-  - id: salad-5090-batch
-    provider: Salad
-    offering: batch priority
-    card: RTX 5090
-    price_aud_hr: 0.40
-    billing: per-second
-    interruptible: yes
-    spinup: slow
-    best_for: batch
-    region: distributed consumer nodes
-    notes: Cheapest anywhere, but no persistent volumes; needs external checkpointing.
+    location: global
+    self_serve: yes
+    region: marketplace (filter to Australian hosts)
+    link: https://vast.ai/
+    notes: Best $/VRAM-hour for restartable draft batches. You can filter to
+      Australian hosts for a semi-local, cheap, self-serve option.
   - id: runpod-4090-comm
     provider: RunPod
     offering: community cloud
@@ -39,8 +153,12 @@ compute:
     interruptible: spot option
     spinup: medium
     best_for: batch
-    region: many (Sydney sometimes)
-    notes: Reliability step up from Vast, with real network volumes so weights persist.
+    location: global
+    self_serve: yes
+    region: many (Sydney region exists)
+    link: https://www.runpod.io/
+    notes: Reliability step up from Vast, real network volumes so weights
+      persist. Has a Sydney region; pick it for closer, self-serve compute.
   - id: runpod-a100-secure
     provider: RunPod
     offering: secure cloud
@@ -50,8 +168,11 @@ compute:
     interruptible: spot option
     spinup: medium
     best_for: immediate
-    region: many (Sydney sometimes)
-    notes: All-round hero tier; network volumes for 40GB+ model weights.
+    location: global
+    self_serve: yes
+    region: many (Sydney region exists)
+    link: https://www.runpod.io/
+    notes: All-round hero tier; network volumes for 40GB+ weights.
   - id: runpod-h100-secure
     provider: RunPod
     offering: secure cloud
@@ -61,8 +182,26 @@ compute:
     interruptible: spot option
     spinup: medium
     best_for: immediate
+    location: global
+    self_serve: yes
     region: many
-    notes: Top self-hosted tier for the heaviest video + control stacks.
+    link: https://www.runpod.io/
+    notes: Top self-hosted tier for the heaviest video and control stacks.
+  - id: salad-5090-batch
+    provider: Salad
+    offering: batch priority
+    card: RTX 5090
+    price_aud_hr: 0.40
+    billing: per-second
+    interruptible: yes
+    spinup: slow
+    best_for: batch
+    location: global
+    self_serve: yes
+    region: distributed consumer nodes
+    link: https://salad.com/
+    notes: Cheapest anywhere, but no persistent volumes; needs external
+      checkpointing. Nodes are strangers' PCs, so least sovereign of all.
   - id: modal-h100
     provider: Modal
     offering: serverless
@@ -72,8 +211,12 @@ compute:
     interruptible: no
     spinup: fast
     best_for: immediate
+    location: global
+    self_serve: yes
     region: US/EU
-    notes: Excellent cold starts (container snapshots); A$43/mo free credits. Best for bursty runs.
+    link: https://modal.com/
+    notes: Excellent cold starts (container snapshots); free monthly credits.
+      Best for bursty runs.
   - id: modal-a100
     provider: Modal
     offering: serverless
@@ -83,7 +226,10 @@ compute:
     interruptible: no
     spinup: fast
     best_for: immediate
+    location: global
+    self_serve: yes
     region: US/EU
+    link: https://modal.com/
     notes: Scale-to-zero; great for the embeddings/TTS/image side jobs.
   - id: fal-video
     provider: fal.ai
@@ -94,7 +240,10 @@ compute:
     interruptible: n/a
     spinup: fast
     best_for: immediate
+    location: global
+    self_serve: yes
     region: US/EU
+    link: https://fal.ai/
     notes: Zero-ops hero shots where a hosted model beats self-hosting.
   - id: lambda-a100
     provider: Lambda
@@ -105,5 +254,8 @@ compute:
     interruptible: no
     spinup: medium
     best_for: immediate
+    location: global
+    self_serve: yes
     region: US
+    link: https://lambda.ai/
     notes: Simple VMs, no spot; steady rather than cheap.

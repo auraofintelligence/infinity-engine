@@ -270,7 +270,9 @@ background:rgba(124,77,255,.14);border-radius:5px;padding:.06rem .4rem}
 .pc-meta{font-size:.82rem;color:var(--mut);line-height:1.5}
 .pc-meta b{color:#d7d1ea;font-weight:600}
 .pc-more{border:none;background:none;color:var(--teal);cursor:pointer;
-font-size:.82rem;text-align:left;padding:0}
+font-size:.82rem;text-align:left;padding:0;display:inline-block;
+margin-top:.6rem;text-decoration:none;font-weight:600}
+.pc-more:hover{text-decoration:underline}
 .pc-detail{display:none;font-size:.85rem;color:#d3cee6;
 border-top:1px solid var(--line);padding-top:.6rem;margin-top:.2rem}
 .pc-detail.open{display:block}.pc-detail p{margin:.25rem 0}
@@ -1514,34 +1516,52 @@ def render_compute(out_dir: Path) -> Path | None:
     rows = _load_catalog(out_dir, "catalog/compute.yaml", "compute")
     if not rows:
         return None
+    # Sovereignty lane -> (facet value, badge label, badge class)
+    loc_meta = {
+        "au-owned": ("au-owned", "AU owned", "recon"),
+        "au-region": ("au-region", "AU data", "release"),
+        "global": ("global", "global", "tier"),
+    }
     cards = []
     for c in rows:
         best = c.get("best_for", "")
+        loc = str(c.get("location", "global"))
+        lval, llabel, lclass = loc_meta.get(loc, loc_meta["global"])
+        self_serve = str(c.get("self_serve", "")).lower() == "yes"
+        price = c.get("price_aud_hr", "?")
+        price_html = (f'<b>A${_esc(price)}</b>/hr'
+                      if isinstance(price, (int, float))
+                      else (f'<b>{_esc(price)}</b>' if str(price) == "quote"
+                            else f'<b>{_esc(price)}</b>'))
+        link = c.get("link", "")
         inner = (
             '<div class="pc-badges">'
+            f'<span class="pc-b {lclass}">{_esc(llabel)}</span>'
             f'<span class="pc-b tier">{_esc(c.get("provider",""))}</span>'
             + (f'<span class="pc-b {"recon" if best=="batch" else "hero"}">'
                f'{_esc(best)}</span>' if best else "")
-            + (f'<span class="pc-b release">spot</span>'
-               if str(c.get("interruptible","")).startswith(("yes","spot"))
-               else "") + '</div>'
+            + ('<span class="pc-b release">self-serve</span>' if self_serve
+               else '<span class="pc-b designed">contact sales</span>')
+            + '</div>'
             f'<h3>{_esc(c.get("card", c["id"]))}</h3>'
             f'<div class="pc-meta" style="font-size:1.1rem;color:#cdd6df">'
-            f'<b>A${_esc(c.get("price_aud_hr","?"))}</b>'
-            + ("/hr" if isinstance(c.get("price_aud_hr"), (int, float))
-               else "") + '</div>'
+            f'{price_html}</div>'
             f'<p class="pc-sum">{_esc(c.get("notes",""))}</p>'
             f'<div class="pc-meta"><b>Offering:</b> {_esc(c.get("offering",""))} '
             f'&middot; <b>Billing:</b> {_esc(c.get("billing",""))}<br>'
             f'<b>Spin-up:</b> {_esc(c.get("spinup",""))} '
-            f'&middot; <b>Region:</b> {_esc(c.get("region",""))}</div>')
+            f'&middot; <b>Region:</b> {_esc(c.get("region",""))}</div>'
+            + (f'<a class="pc-more" href="{_esc(link)}" target="_blank" '
+               'rel="noopener">visit provider &rarr;</a>' if link else ""))
         attrs = {
+            "location": [lval],
             "provider": [str(c.get("provider", "")).lower().replace(".", "")],
             "bestfor": [str(best)] if best else [],
             "spinup": [str(c.get("spinup", ""))],
         }
         cards.append((attrs, inner))
     facet_defs = [
+        ("Location", "location", ["au-owned", "au-region", "global"]),
         ("Best for", "bestfor", ["immediate", "batch"]),
         ("Spin-up", "spinup", ["fast", "medium", "slow"]),
         ("Provider", "provider", _sorted_uniq(
@@ -1551,11 +1571,15 @@ def render_compute(out_dir: Path) -> Path | None:
     return render_picker(
         out_dir, filename="compute.html", title="Compute comparer",
         noun="option",
-        lead=("Where to rent GPUs, compared on what actually matters: fast "
-              "spin-up for interactive and hero runs, or cheapest per hour for "
-              "off-peak batch. Prices in AUD (converted at AUD/USD 0.70, "
-              "2026-07-20); marketplace rates drift, so re-verify before a big "
-              "batch."),
+        lead=("Where to rent GPUs. Three lanes: Australian-owned and operated "
+              "(sovereign), Australian data region (foreign-owned but data "
+              "stays here), and global marketplaces (cheapest, least "
+              "sovereign). Filter by Location to keep it local. Prices in AUD "
+              "(converted at AUD/USD 0.70, 2026-07-21); the Australian-owned "
+              "clouds are enterprise-scale and priced by quote, so a solo "
+              "creator's practical self-serve local path is a hyperscaler "
+              "Australian region or a global marketplace filtered to Sydney. "
+              "Rates drift, so re-verify before a big batch."),
         facet_defs=facet_defs, cards=cards)
 
 
