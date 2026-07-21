@@ -1,0 +1,240 @@
+# The pattern library: tried-and-tested recipes the pattern chooser
+# filters. Each pattern is one preset that routes a piece of work to a
+# known-good workflow. Edit here, run `python -m engine site`, and the
+# chooser page regenerates.
+#
+# Fields:
+#   lane      recon | release | hero   (may list several)
+#   stage     analyse | cast | panels | motion | scene | video | assemble
+#   tier      draft | standard | premium
+#   status    built | designed | planned  (honest state, shown as a badge)
+#   tags      capability chips, also filterable
+#   models    which providers.yaml families this leans on (provisional
+#             until the next dated control-stack research pass)
+#   cost      rough AUD (AUD/USD 0.70, 2026-07-20); "-" when negligible
+#   inputs / outputs / risk   shown when a card is expanded
+
+patterns:
+  - id: lyric-analysis
+    name: Lyric analysis pass
+    lane: [recon]
+    stage: analyse
+    tier: draft
+    status: built
+    tags: [text-only, gate]
+    summary: Turn lyrics into themes, mood, story seed and 8-12 panel beats before any spend.
+    models: [claude CLI or local Qwen]
+    cost: "-"
+    inputs: A vault note at status ingested.
+    outputs: Analysis merged into the note; status becomes analysed.
+    risk: Cheap to redo. Read the story seed and beats and fix by hand.
+
+  - id: recon-draft-clip
+    name: Recon draft clip
+    lane: [recon]
+    stage: video
+    tier: draft
+    status: designed
+    tags: [batch, harvest-lora-data]
+    summary: Fast image-to-video test on the cheapest tier; keep the good frames as LoRA training data.
+    models: [HunyuanVideo 1.5]
+    cost: "≈A$0.03-0.10 per 6s clip"
+    inputs: A keyframe or panel plus a short motion prompt.
+    outputs: A rough clip; salvaged stills feed the cast foundry.
+    risk: Accept jank. Batch overnight on interruptible GPUs; cap spend per song.
+
+  - id: model-bakeoff
+    name: Model bake-off
+    lane: [recon]
+    stage: video
+    tier: draft
+    status: designed
+    tags: [batch, evaluation]
+    summary: Run the same shot across several models to see which wins on your own material.
+    models: [HunyuanVideo 1.5, Wan 2.2, LTX-2.3]
+    cost: "≈A$0.10-0.30 per shot per model"
+    inputs: One fixed shot spec.
+    outputs: A side-by-side sheet; the winner gets promoted for that use.
+    risk: Only promote a new model to Hero after it beats the incumbent here.
+
+  - id: character-lora
+    name: Character LoRA foundry
+    lane: [recon, hero]
+    stage: cast
+    tier: premium
+    status: designed
+    tags: [char-lora, one-off, asset]
+    summary: Train a reusable LoRA for a hero recurring character; validate before it's allowed downstream.
+    models: [FLUX.1-dev or Qwen-Image base]
+    cost: "≈A$2-7 per character (30-60 min A100)"
+    inputs: A curated reference set, ideally seeded from your own art and photos.
+    outputs: A versioned .safetensors in the asset registry, with trigger word and sample grid.
+    risk: A bad LoRA poisons every downstream job. Test-sheet it before use; version it.
+
+  - id: singer-band-lora
+    name: Singer / band likeness LoRA
+    lane: [recon, hero]
+    stage: cast
+    tier: premium
+    status: designed
+    tags: [char-lora, likeness, asset]
+    summary: Same foundry, aimed at real people (singers, band, supports) for on-model performance shots.
+    models: [FLUX.1-dev or Qwen-Image base]
+    cost: "≈A$2-7 per person"
+    inputs: Consented reference photos of the person.
+    outputs: A versioned likeness LoRA in the registry.
+    risk: Keep consent and any private likenesses local; mark the asset private.
+
+  - id: reference-character
+    name: Reference-image character
+    lane: [recon, release]
+    stage: cast
+    tier: standard
+    status: designed
+    tags: [char-ref, no-training]
+    summary: Hold a character across shots with multi-reference, no training. Good for occasional cast.
+    models: [FLUX.2 multi-ref, Qwen-Image-Edit]
+    cost: "generation cost only"
+    inputs: 1-10 reference images of the character.
+    outputs: On-model frames without a trained LoRA.
+    risk: Weaker lock than a LoRA under heavy motion; fine for lighter appearances.
+
+  - id: comic-panels
+    name: Comic pre-viz panels
+    lane: [recon, release, hero]
+    stage: panels
+    tier: draft
+    status: designed
+    tags: [stills, cheap-gate]
+    summary: Render 8-12 stills from the panel beats. The second cheap gate before any video spend.
+    models: [Qwen-Image, FLUX.2 Klein]
+    cost: "≈A$0.01-0.05 per panel"
+    inputs: A briefed note with panel beats and its cast.
+    outputs: A panel set; status becomes panels. Approve the strongest.
+    risk: Stills are cheap to re-roll; do the visual arguing here, not in video.
+
+  - id: keyframe-select
+    name: Keyframe selection
+    lane: [release, hero]
+    stage: panels
+    tier: draft
+    status: planned
+    tags: [selection]
+    summary: Promote the approved panels to start and end frames for video shots.
+    models: []
+    cost: "-"
+    inputs: Approved panels.
+    outputs: Keyframe pairs that bookend each motion.
+    risk: Pick pairs that imply believable motion between them.
+
+  - id: pose-capture
+    name: Pose capture + retarget
+    lane: [release, hero]
+    stage: motion
+    tier: standard
+    status: designed
+    tags: [pose-capture, control]
+    summary: Capture a move from any footage and retarget it onto your character.
+    models: [DWPose, AnimateAnyone/UniAnimate-class]
+    cost: "capture is local and cheap; drive is video-gen cost"
+    inputs: A reference clip (phone footage, a performance) plus a target character.
+    outputs: A pose-driven clip of your character performing the move.
+    risk: Capture and pose maps run local; only the driven render costs GPU.
+
+  - id: beat-sync-motion
+    name: Beat-synced motion
+    lane: [release, hero]
+    stage: motion
+    tier: standard
+    status: designed
+    tags: [beat-sync, control]
+    summary: Snap a captured pose track to the song's beat grid so the movement lands on the music.
+    models: [librosa, Demucs]
+    cost: "-"
+    inputs: A pose track and the song's audio.
+    outputs: A beat-aligned motion track ready to drive generation.
+    risk: Runs local on audio analysis; no GPU cost until render.
+
+  - id: choreo-ops
+    name: Duplicate / mirror choreography
+    lane: [release, hero]
+    stage: motion
+    tier: standard
+    status: planned
+    tags: [control]
+    summary: Apply one captured motion to several cast members, or mirror it, before rendering.
+    models: []
+    cost: "-"
+    inputs: A captured motion track and target cast.
+    outputs: Group or symmetric choreography as data.
+    risk: Pure data manipulation; free until it hits the generator.
+
+  - id: controlled-hero-shot
+    name: Controlled hero shot
+    lane: [hero]
+    stage: video
+    tier: premium
+    status: designed
+    tags: [control, continuity-lock, pose-capture]
+    summary: Pose, depth and reference conditioned video for a deliberately blocked hero shot.
+    models: [Wan-VACE-class controllable video]
+    cost: "≈A$0.30-1.50 per shot"
+    inputs: Keyframes, a pose or depth map, cast and location assets.
+    outputs: A directed shot with intended blocking and continuity.
+    risk: The most demanding path; prove the shot at draft before rendering premium.
+
+  - id: location-plate
+    name: Location plate + lock
+    lane: [release, hero]
+    stage: scene
+    tier: standard
+    status: designed
+    tags: [continuity-lock, asset]
+    summary: Establish a consistent environment and reuse it across every shot in a scene.
+    models: [Qwen-Image, SAM 2]
+    cost: "generation cost only"
+    inputs: A location description or plate image.
+    outputs: A registered location asset shots can pull by name.
+    risk: Lock it once; reuse buys both consistency and cheaper shots.
+
+  - id: object-transfer
+    name: Object / prop transfer
+    lane: [release, hero]
+    stage: scene
+    tier: standard
+    status: designed
+    tags: [continuity-lock, control]
+    summary: Detect, lift and place a consistent object or prop across shots.
+    models: [SAM 2, Grounding DINO, inpaint]
+    cost: "generation cost only"
+    inputs: A reference of the object and the target frames.
+    outputs: The prop held consistent through the scene.
+    risk: Detection and matting run local; only the placement render costs GPU.
+
+  - id: beat-montage
+    name: Beat-synced lyric montage
+    lane: [release]
+    stage: assemble
+    tier: standard
+    status: planned
+    tags: [beat-sync, assemble, multi-platform]
+    summary: Cut approved clips to the beat and render for each platform. The forgiving, shareable lane.
+    models: [librosa, ffmpeg]
+    cost: "-"
+    inputs: Approved clips and the song audio.
+    outputs: A cut, rendered at 9:16, 1:1 and 16:9.
+    risk: Local assembly; the cheapest way to a publishable, community-shareable piece.
+
+  - id: micro-drama-cut
+    name: Vertical micro-drama cut
+    lane: [release, hero]
+    stage: assemble
+    tier: premium
+    status: planned
+    tags: [tts-lipsync, assemble, vertical]
+    summary: A short vertical story with dialogue voice and lip-sync, cut for phone-first viewing.
+    models: [Qwen3-TTS, LatentSync/InfiniteTalk, ffmpeg]
+    cost: "voice + lipsync + assembly"
+    inputs: A story seed, cast, and approved shots.
+    outputs: A 9:16 micro-drama.
+    risk: Lip-sync is a real gate; vet on a Recon pass first.

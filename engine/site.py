@@ -81,6 +81,58 @@ line-height:1.45;color:#c8c8dc}
 color:var(--mut);background:var(--panel);border-radius:0 8px 8px 0}
 .doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
 .doc table{margin:1.2rem 0}.doc td{color:#d6d6e4}
+/* pattern chooser */
+.pc-facets{display:flex;flex-direction:column;gap:.7rem;margin:1.4rem 0 1.8rem}
+.pc-frow{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.pc-flabel{color:var(--mut);font-size:.72rem;text-transform:uppercase;
+letter-spacing:.06em;width:5.2rem;flex:none}
+.pc-chip{cursor:pointer;user-select:none;border:1px solid var(--line);
+background:var(--panel);color:var(--ink);border-radius:999px;
+padding:.28rem .8rem;font-size:.85rem;transition:.15s}
+.pc-chip:hover{border-color:var(--a)}
+.pc-chip.on{background:var(--a);border-color:var(--a);color:#08131f;font-weight:600}
+.pc-chip.lane-recon.on{background:#5aa0d8;border-color:#5aa0d8}
+.pc-chip.lane-release.on{background:#d0a23a;border-color:#d0a23a}
+.pc-chip.lane-hero.on{background:#c86aa6;border-color:#c86aa6}
+.pc-clear{margin-left:auto;color:var(--mut);cursor:pointer;font-size:.82rem;
+background:none;border:none;text-decoration:underline}
+.pc-count{color:var(--mut);font-size:.9rem;margin:.4rem 0 1rem}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+gap:1rem}
+.pc-card{background:var(--panel);border:1px solid var(--line);border-radius:13px;
+padding:1rem 1.05rem;display:flex;flex-direction:column;gap:.5rem}
+.pc-card.hidden{display:none}
+.pc-card h3{margin:0;font-size:1.02rem;line-height:1.25}
+.pc-badges{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.pc-b{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;
+border-radius:999px;padding:.08rem .5rem}
+.pc-b.recon{background:#1d3a52;color:#bfe0ff}.pc-b.release{background:#4d3d0f;color:#ffe6a6}
+.pc-b.hero{background:#4d2340;color:#ffc7ec}
+.pc-b.tier{background:#2a2a40;color:#c9c9e6}
+.pc-b.built{background:#123f2e;color:#8ff0c4}.pc-b.designed{background:#2a2a40;color:#b7b7d6}
+.pc-b.planned{background:#3a2440;color:#e0b7f0}
+.pc-sum{color:#d3d3e2;font-size:.9rem;margin:0}
+.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.pc-tag{font-size:.72rem;color:#9ad;background:#182a3a;border-radius:5px;
+padding:.05rem .4rem}
+.pc-meta{font-size:.82rem;color:var(--mut)}.pc-meta b{color:#cdd6df;font-weight:600}
+.pc-more{border:none;background:none;color:var(--a);cursor:pointer;font-size:.82rem;
+text-align:left;padding:0}
+.pc-detail{display:none;font-size:.85rem;color:#cdd0dc;border-top:1px solid var(--line);
+padding-top:.6rem;margin-top:.2rem}
+.pc-detail.open{display:block}.pc-detail p{margin:.25rem 0}
+.pc-add{margin-top:.2rem;border:1px solid var(--a);background:none;color:var(--a);
+border-radius:8px;padding:.35rem;cursor:pointer;font-size:.85rem;font-weight:600}
+.pc-add.added{background:var(--a);color:#08131f}
+.pc-tray{position:sticky;top:.6rem;z-index:5;background:#12121e;
+border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;margin:0 0 1.4rem}
+.pc-tray h2{margin:.1rem 0 .5rem;font-size:1rem}
+.pc-tray-empty{color:var(--mut);font-size:.88rem}
+.pc-tray ol{margin:.3rem 0 0;padding-left:1.2rem}
+.pc-tray li{margin:.15rem 0;font-size:.9rem}
+.pc-tray li button{border:none;background:none;color:#e2758f;cursor:pointer;
+font-size:.9rem;margin-left:.3rem}
+@media(max-width:560px){.pc-flabel{width:100%}}
 """
 
 
@@ -98,6 +150,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <header><div class="wrap">
 <strong>Infinity Engine</strong>
 <nav><a href="{up}index.html">Progress</a>
+<a href="{up}patterns.html">Patterns</a>
 <a href="{up}pipeline.html">How it works</a>
 <a href="{up}workflow.html">Operator guide</a>
 <a href="{UNIVERSE_BASE}/">Music universe</a></nav>
@@ -255,6 +308,11 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
                         encoding="utf-8")
         written.append(path)
 
+    # Pattern chooser (data-driven from patterns.yaml).
+    pattern_page = render_patterns(out_dir)
+    if pattern_page:
+        written.append(pattern_page)
+
     # Prune stale album pages: if an album drops out of the allowlist,
     # its old page must not linger on the live site.
     kept = {p.name for p in written if p.parent.name == "albums"}
@@ -268,3 +326,131 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
 def load_catalogue(pack_dir: Path) -> dict:
     return json.loads(
         (pack_dir / "data" / "catalogue.json").read_text(encoding="utf-8"))
+
+
+LANES = ["recon", "release", "hero"]
+STAGES = ["analyse", "cast", "panels", "motion", "scene", "video", "assemble"]
+TIERS = ["draft", "standard", "premium"]
+
+
+def _chip(group: str, value: str, extra: str = "") -> str:
+    return (f'<button class="pc-chip {extra}" data-group="{group}" '
+            f'data-value="{value}" onclick="pcToggle(this)">'
+            f'{_esc(value)}</button>')
+
+
+def _pattern_card(p: dict) -> str:
+    lanes = p.get("lane") or []
+    tags = p.get("tags") or []
+    status = p.get("status", "designed")
+    models = ", ".join(p.get("models") or []) or "-"
+    badges = "".join(f'<span class="pc-b {ln}">{ln}</span>' for ln in lanes)
+    badges += f'<span class="pc-b tier">{_esc(p.get("tier", ""))}</span>'
+    badges += f'<span class="pc-b {status}">{status}</span>'
+    tag_html = "".join(f'<span class="pc-tag">{_esc(t)}</span>' for t in tags)
+    detail = (
+        f"<p><b>Models:</b> {_esc(models)}</p>"
+        f"<p><b>Inputs:</b> {_esc(p.get('inputs', ''))}</p>"
+        f"<p><b>Outputs:</b> {_esc(p.get('outputs', ''))}</p>"
+        f"<p><b>Risk:</b> {_esc(p.get('risk', ''))}</p>")
+    return (
+        f'<div class="pc-card" data-lane="{" ".join(lanes)}" '
+        f'data-stage="{_esc(p.get("stage", ""))}" '
+        f'data-tier="{_esc(p.get("tier", ""))}" '
+        f'data-tags="{" ".join(tags)}">'
+        f'<div class="pc-badges">{badges}</div>'
+        f'<h3>{_esc(p.get("name", p["id"]))}</h3>'
+        f'<p class="pc-sum">{_esc(p.get("summary", ""))}</p>'
+        f'<div class="pc-tags">{tag_html}</div>'
+        f'<div class="pc-meta"><b>Cost:</b> {_esc(p.get("cost", "-"))} '
+        f'&middot; <b>Stage:</b> {_esc(p.get("stage", ""))}</div>'
+        '<button class="pc-more" onclick="pcMore(this)">Details</button>'
+        f'<div class="pc-detail">{detail}</div>'
+        f'<button class="pc-add" data-id="{p["id"]}" '
+        f'data-name="{_esc(p.get("name", p["id"]))}" '
+        'onclick="pcAdd(this)">Add to plan</button>'
+        '</div>')
+
+
+def render_patterns(out_dir: Path) -> Path | None:
+    import yaml
+    src = out_dir.parent / "patterns.yaml"
+    if not src.exists():
+        return None
+    patterns = (yaml.safe_load(src.read_text(encoding="utf-8")) or {}
+                ).get("patterns", [])
+    all_tags = sorted({t for p in patterns for t in (p.get("tags") or [])})
+
+    def frow(label, group, values, laned=False):
+        chips = "".join(
+            _chip(group, v, extra=(f"lane-{v}" if laned else ""))
+            for v in values)
+        return (f'<div class="pc-frow"><span class="pc-flabel">{label}</span>'
+                f'{chips}</div>')
+
+    facets = (
+        '<div class="pc-facets">'
+        + frow("Lane", "lane", LANES, laned=True)
+        + frow("Stage", "stage", STAGES)
+        + frow("Tier", "tier", TIERS)
+        + frow("Capability", "tags", all_tags)
+        + '<div class="pc-frow"><button class="pc-clear" '
+          'onclick="pcClear()">clear all filters</button></div>'
+        + '</div>')
+    cards = "".join(_pattern_card(p) for p in patterns)
+    id_names = json.dumps({p["id"]: p.get("name", p["id"]) for p in patterns})
+
+    body = (
+        "<h1>Pattern chooser</h1>"
+        "<p class='lead'>Every tried-and-tested recipe in the engine, as a "
+        "card. Filter by lane, stage, tier or capability to find the path "
+        "for the work in front of you, then add the ones you want to your "
+        "plan. Jump in at any stage; nothing here is a fixed order.</p>"
+        '<div class="pc-tray" id="pcTray"></div>'
+        + facets
+        + '<div class="pc-count" id="pcCount"></div>'
+        + f'<div class="pc-grid" id="pcGrid">{cards}</div>'
+        + f"<script>const PC_NAMES={id_names};{_PATTERNS_JS}</script>")
+    path = out_dir / "patterns.html"
+    path.write_text(_page("Patterns", body), encoding="utf-8")
+    return path
+
+
+_PATTERNS_JS = r"""
+const pcState={lane:new Set(),stage:new Set(),tier:new Set(),tags:new Set()};
+let pcPlan=[];
+try{pcPlan=JSON.parse(localStorage.getItem('pcPlan')||'[]')}catch(e){pcPlan=[]}
+function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
+  const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
+  else{s.add(v);el.classList.add('on')}pcFilter()}
+function pcClear(){for(const g in pcState)pcState[g].clear();
+  document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
+  pcFilter()}
+function pcMatch(card){for(const g of ['lane','stage','tier','tags']){
+  const sel=pcState[g];if(!sel.size)continue;
+  const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
+  if(![...sel].some(v=>vals.includes(v)))return false}return true}
+function pcFilter(){let n=0;document.querySelectorAll('.pc-card').forEach(c=>{
+  const ok=pcMatch(c);c.classList.toggle('hidden',!ok);if(ok)n++});
+  document.getElementById('pcCount').textContent=
+    n+' pattern'+(n===1?'':'s')+' shown'}
+function pcMore(b){b.nextElementSibling.classList.toggle('open')}
+function pcAdd(b){const id=b.dataset.id;
+  if(pcPlan.includes(id)){pcPlan=pcPlan.filter(x=>x!==id)}
+  else{pcPlan.push(id)}pcSave();pcRenderTray();pcSyncAdd()}
+function pcRemove(id){pcPlan=pcPlan.filter(x=>x!==id);pcSave();
+  pcRenderTray();pcSyncAdd()}
+function pcSave(){localStorage.setItem('pcPlan',JSON.stringify(pcPlan))}
+function pcSyncAdd(){document.querySelectorAll('.pc-add').forEach(b=>{
+  const on=pcPlan.includes(b.dataset.id);b.classList.toggle('added',on);
+  b.textContent=on?'In your plan':'Add to plan'})}
+function pcRenderTray(){const t=document.getElementById('pcTray');
+  if(!pcPlan.length){t.innerHTML='<h2>Your plan</h2>'
+    +'<div class="pc-tray-empty">No patterns chosen yet. '
+    +'Add cards below to build a sequence.</div>';return}
+  const items=pcPlan.map(id=>'<li>'+(PC_NAMES[id]||id)
+    +'<button title="remove" onclick="pcRemove(\''+id+'\')">&times;</button>'
+    +'</li>').join('');
+  t.innerHTML='<h2>Your plan ('+pcPlan.length+')</h2><ol>'+items+'</ol>'}
+pcRenderTray();pcSyncAdd();pcFilter();
+"""

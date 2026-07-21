@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patterns - Infinity Engine</title>
+<style>
+:root{--bg:#0e0e16;--panel:#171725;--line:#262640;--ink:#e9e9f2;--mut:#8d8da6;
+--a:#7fb4e6}
+*{box-sizing:border-box}body{font-family:system-ui,sans-serif;margin:0;
+background:var(--bg);color:var(--ink);line-height:1.55}
+a{color:var(--a);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1060px;margin:0 auto;padding:0 1.2rem}
+header{border-bottom:1px solid var(--line);padding:.9rem 0}
+header .wrap{display:flex;gap:1.4rem;align-items:baseline;flex-wrap:wrap}
+header strong{font-size:1.05rem}nav{display:flex;gap:1.1rem;flex-wrap:wrap}
+h1{font-size:2rem;font-weight:800;margin:2.2rem 0 .4rem}
+h2{margin-top:2.4rem}.lead{color:var(--mut);max-width:46rem}
+.bar{display:flex;height:16px;border-radius:8px;overflow:hidden;
+background:var(--panel);margin:1.2rem 0}
+.s-ingested{background:#3a3a58}.s-analysed{background:#1d5573}.s-briefed{background:#7a6600}
+.s-panels{background:#63419a}.s-keyframes{background:#8a4477}.s-video{background:#2f7a42}
+.s-published{background:#0f8a68}
+.pill{display:inline-block;padding:.08rem .6rem;border-radius:999px;
+font-size:.78rem;background:var(--panel)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+overflow:hidden}.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.card .pad{padding:.8rem .9rem 1rem}.card h3{margin:.1rem 0 .2rem;font-size:1rem}
+.card .muted,.muted{color:var(--mut);font-size:.85rem}
+.card .bar{height:8px;margin:.7rem 0 0}
+table{border-collapse:collapse;width:100%;margin:1.2rem 0 2.5rem}
+th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line);
+vertical-align:top}
+th{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+.theme{color:#9ad;font-size:.8rem;margin-right:.45rem;white-space:nowrap}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+gap:.7rem;margin:1.4rem 0}
+.legend div{background:var(--panel);border:1px solid var(--line);
+border-radius:10px;padding:.7rem .9rem;font-size:.9rem}
+footer{border-top:1px solid var(--line);margin-top:3.5rem;padding:1.6rem 0 2.4rem;
+color:var(--mut);font-size:.9rem}
+.stage-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.4rem 0}
+.stage-flow .pill{font-size:.85rem;padding:.3rem .8rem}
+.stage-flow span.arrow{color:var(--mut)}
+.doc{max-width:52rem}
+.doc h1{margin-top:1.6rem}.doc h2{margin-top:2.4rem;padding-top:1.4rem;
+border-top:1px solid var(--line)}.doc h3{margin-top:1.7rem}
+.doc p,.doc li{color:#d6d6e4}.doc li{margin:.2rem 0}
+.doc code{background:#20203300;background:var(--panel);border:1px solid var(--line);
+border-radius:5px;padding:.05rem .35rem;font-size:.88em}
+.doc pre{background:#0a0a12;border:1px solid var(--line);border-radius:10px;
+padding:1rem 1.1rem;overflow-x:auto}
+.doc pre code{background:none;border:none;padding:0;font-size:.82rem;
+line-height:1.45;color:#c8c8dc}
+.doc blockquote{border-left:3px solid var(--a);margin:1.2rem 0;padding:.3rem 1rem;
+color:var(--mut);background:var(--panel);border-radius:0 8px 8px 0}
+.doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.doc table{margin:1.2rem 0}.doc td{color:#d6d6e4}
+/* pattern chooser */
+.pc-facets{display:flex;flex-direction:column;gap:.7rem;margin:1.4rem 0 1.8rem}
+.pc-frow{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.pc-flabel{color:var(--mut);font-size:.72rem;text-transform:uppercase;
+letter-spacing:.06em;width:5.2rem;flex:none}
+.pc-chip{cursor:pointer;user-select:none;border:1px solid var(--line);
+background:var(--panel);color:var(--ink);border-radius:999px;
+padding:.28rem .8rem;font-size:.85rem;transition:.15s}
+.pc-chip:hover{border-color:var(--a)}
+.pc-chip.on{background:var(--a);border-color:var(--a);color:#08131f;font-weight:600}
+.pc-chip.lane-recon.on{background:#5aa0d8;border-color:#5aa0d8}
+.pc-chip.lane-release.on{background:#d0a23a;border-color:#d0a23a}
+.pc-chip.lane-hero.on{background:#c86aa6;border-color:#c86aa6}
+.pc-clear{margin-left:auto;color:var(--mut);cursor:pointer;font-size:.82rem;
+background:none;border:none;text-decoration:underline}
+.pc-count{color:var(--mut);font-size:.9rem;margin:.4rem 0 1rem}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+gap:1rem}
+.pc-card{background:var(--panel);border:1px solid var(--line);border-radius:13px;
+padding:1rem 1.05rem;display:flex;flex-direction:column;gap:.5rem}
+.pc-card.hidden{display:none}
+.pc-card h3{margin:0;font-size:1.02rem;line-height:1.25}
+.pc-badges{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.pc-b{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;
+border-radius:999px;padding:.08rem .5rem}
+.pc-b.recon{background:#1d3a52;color:#bfe0ff}.pc-b.release{background:#4d3d0f;color:#ffe6a6}
+.pc-b.hero{background:#4d2340;color:#ffc7ec}
+.pc-b.tier{background:#2a2a40;color:#c9c9e6}
+.pc-b.built{background:#123f2e;color:#8ff0c4}.pc-b.designed{background:#2a2a40;color:#b7b7d6}
+.pc-b.planned{background:#3a2440;color:#e0b7f0}
+.pc-sum{color:#d3d3e2;font-size:.9rem;margin:0}
+.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.pc-tag{font-size:.72rem;color:#9ad;background:#182a3a;border-radius:5px;
+padding:.05rem .4rem}
+.pc-meta{font-size:.82rem;color:var(--mut)}.pc-meta b{color:#cdd6df;font-weight:600}
+.pc-more{border:none;background:none;color:var(--a);cursor:pointer;font-size:.82rem;
+text-align:left;padding:0}
+.pc-detail{display:none;font-size:.85rem;color:#cdd0dc;border-top:1px solid var(--line);
+padding-top:.6rem;margin-top:.2rem}
+.pc-detail.open{display:block}.pc-detail p{margin:.25rem 0}
+.pc-add{margin-top:.2rem;border:1px solid var(--a);background:none;color:var(--a);
+border-radius:8px;padding:.35rem;cursor:pointer;font-size:.85rem;font-weight:600}
+.pc-add.added{background:var(--a);color:#08131f}
+.pc-tray{position:sticky;top:.6rem;z-index:5;background:#12121e;
+border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;margin:0 0 1.4rem}
+.pc-tray h2{margin:.1rem 0 .5rem;font-size:1rem}
+.pc-tray-empty{color:var(--mut);font-size:.88rem}
+.pc-tray ol{margin:.3rem 0 0;padding-left:1.2rem}
+.pc-tray li{margin:.15rem 0;font-size:.9rem}
+.pc-tray li button{border:none;background:none;color:#e2758f;cursor:pointer;
+font-size:.9rem;margin-left:.3rem}
+@media(max-width:560px){.pc-flabel{width:100%}}
+</style></head><body>
+<header><div class="wrap">
+<strong>Infinity Engine</strong>
+<nav><a href="index.html">Progress</a>
+<a href="patterns.html">Patterns</a>
+<a href="pipeline.html">How it works</a>
+<a href="workflow.html">Operator guide</a>
+<a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
+</div></header>
+<main class="wrap">
+<h1>Pattern chooser</h1><p class='lead'>Every tried-and-tested recipe in the engine, as a card. Filter by lane, stage, tier or capability to find the path for the work in front of you, then add the ones you want to your plan. Jump in at any stage; nothing here is a fixed order.</p><div class="pc-tray" id="pcTray"></div><div class="pc-facets"><div class="pc-frow"><span class="pc-flabel">Lane</span><button class="pc-chip lane-recon" data-group="lane" data-value="recon" onclick="pcToggle(this)">recon</button><button class="pc-chip lane-release" data-group="lane" data-value="release" onclick="pcToggle(this)">release</button><button class="pc-chip lane-hero" data-group="lane" data-value="hero" onclick="pcToggle(this)">hero</button></div><div class="pc-frow"><span class="pc-flabel">Stage</span><button class="pc-chip " data-group="stage" data-value="analyse" onclick="pcToggle(this)">analyse</button><button class="pc-chip " data-group="stage" data-value="cast" onclick="pcToggle(this)">cast</button><button class="pc-chip " data-group="stage" data-value="panels" onclick="pcToggle(this)">panels</button><button class="pc-chip " data-group="stage" data-value="motion" onclick="pcToggle(this)">motion</button><button class="pc-chip " data-group="stage" data-value="scene" onclick="pcToggle(this)">scene</button><button class="pc-chip " data-group="stage" data-value="video" onclick="pcToggle(this)">video</button><button class="pc-chip " data-group="stage" data-value="assemble" onclick="pcToggle(this)">assemble</button></div><div class="pc-frow"><span class="pc-flabel">Tier</span><button class="pc-chip " data-group="tier" data-value="draft" onclick="pcToggle(this)">draft</button><button class="pc-chip " data-group="tier" data-value="standard" onclick="pcToggle(this)">standard</button><button class="pc-chip " data-group="tier" data-value="premium" onclick="pcToggle(this)">premium</button></div><div class="pc-frow"><span class="pc-flabel">Capability</span><button class="pc-chip " data-group="tags" data-value="assemble" onclick="pcToggle(this)">assemble</button><button class="pc-chip " data-group="tags" data-value="asset" onclick="pcToggle(this)">asset</button><button class="pc-chip " data-group="tags" data-value="batch" onclick="pcToggle(this)">batch</button><button class="pc-chip " data-group="tags" data-value="beat-sync" onclick="pcToggle(this)">beat-sync</button><button class="pc-chip " data-group="tags" data-value="char-lora" onclick="pcToggle(this)">char-lora</button><button class="pc-chip " data-group="tags" data-value="char-ref" onclick="pcToggle(this)">char-ref</button><button class="pc-chip " data-group="tags" data-value="cheap-gate" onclick="pcToggle(this)">cheap-gate</button><button class="pc-chip " data-group="tags" data-value="continuity-lock" onclick="pcToggle(this)">continuity-lock</button><button class="pc-chip " data-group="tags" data-value="control" onclick="pcToggle(this)">control</button><button class="pc-chip " data-group="tags" data-value="evaluation" onclick="pcToggle(this)">evaluation</button><button class="pc-chip " data-group="tags" data-value="gate" onclick="pcToggle(this)">gate</button><button class="pc-chip " data-group="tags" data-value="harvest-lora-data" onclick="pcToggle(this)">harvest-lora-data</button><button class="pc-chip " data-group="tags" data-value="likeness" onclick="pcToggle(this)">likeness</button><button class="pc-chip " data-group="tags" data-value="multi-platform" onclick="pcToggle(this)">multi-platform</button><button class="pc-chip " data-group="tags" data-value="no-training" onclick="pcToggle(this)">no-training</button><button class="pc-chip " data-group="tags" data-value="one-off" onclick="pcToggle(this)">one-off</button><button class="pc-chip " data-group="tags" data-value="pose-capture" onclick="pcToggle(this)">pose-capture</button><button class="pc-chip " data-group="tags" data-value="selection" onclick="pcToggle(this)">selection</button><button class="pc-chip " data-group="tags" data-value="stills" onclick="pcToggle(this)">stills</button><button class="pc-chip " data-group="tags" data-value="text-only" onclick="pcToggle(this)">text-only</button><button class="pc-chip " data-group="tags" data-value="tts-lipsync" onclick="pcToggle(this)">tts-lipsync</button><button class="pc-chip " data-group="tags" data-value="vertical" onclick="pcToggle(this)">vertical</button></div><div class="pc-frow"><button class="pc-clear" onclick="pcClear()">clear all filters</button></div></div><div class="pc-count" id="pcCount"></div><div class="pc-grid" id="pcGrid"><div class="pc-card" data-lane="recon" data-stage="analyse" data-tier="draft" data-tags="text-only gate"><div class="pc-badges"><span class="pc-b recon">recon</span><span class="pc-b tier">draft</span><span class="pc-b built">built</span></div><h3>Lyric analysis pass</h3><p class="pc-sum">Turn lyrics into themes, mood, story seed and 8-12 panel beats before any spend.</p><div class="pc-tags"><span class="pc-tag">text-only</span><span class="pc-tag">gate</span></div><div class="pc-meta"><b>Cost:</b> - &middot; <b>Stage:</b> analyse</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> claude CLI or local Qwen</p><p><b>Inputs:</b> A vault note at status ingested.</p><p><b>Outputs:</b> Analysis merged into the note; status becomes analysed.</p><p><b>Risk:</b> Cheap to redo. Read the story seed and beats and fix by hand.</p></div><button class="pc-add" data-id="lyric-analysis" data-name="Lyric analysis pass" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="recon" data-stage="video" data-tier="draft" data-tags="batch harvest-lora-data"><div class="pc-badges"><span class="pc-b recon">recon</span><span class="pc-b tier">draft</span><span class="pc-b designed">designed</span></div><h3>Recon draft clip</h3><p class="pc-sum">Fast image-to-video test on the cheapest tier; keep the good frames as LoRA training data.</p><div class="pc-tags"><span class="pc-tag">batch</span><span class="pc-tag">harvest-lora-data</span></div><div class="pc-meta"><b>Cost:</b> ≈A$0.03-0.10 per 6s clip &middot; <b>Stage:</b> video</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> HunyuanVideo 1.5</p><p><b>Inputs:</b> A keyframe or panel plus a short motion prompt.</p><p><b>Outputs:</b> A rough clip; salvaged stills feed the cast foundry.</p><p><b>Risk:</b> Accept jank. Batch overnight on interruptible GPUs; cap spend per song.</p></div><button class="pc-add" data-id="recon-draft-clip" data-name="Recon draft clip" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="recon" data-stage="video" data-tier="draft" data-tags="batch evaluation"><div class="pc-badges"><span class="pc-b recon">recon</span><span class="pc-b tier">draft</span><span class="pc-b designed">designed</span></div><h3>Model bake-off</h3><p class="pc-sum">Run the same shot across several models to see which wins on your own material.</p><div class="pc-tags"><span class="pc-tag">batch</span><span class="pc-tag">evaluation</span></div><div class="pc-meta"><b>Cost:</b> ≈A$0.10-0.30 per shot per model &middot; <b>Stage:</b> video</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> HunyuanVideo 1.5, Wan 2.2, LTX-2.3</p><p><b>Inputs:</b> One fixed shot spec.</p><p><b>Outputs:</b> A side-by-side sheet; the winner gets promoted for that use.</p><p><b>Risk:</b> Only promote a new model to Hero after it beats the incumbent here.</p></div><button class="pc-add" data-id="model-bakeoff" data-name="Model bake-off" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="recon hero" data-stage="cast" data-tier="premium" data-tags="char-lora one-off asset"><div class="pc-badges"><span class="pc-b recon">recon</span><span class="pc-b hero">hero</span><span class="pc-b tier">premium</span><span class="pc-b designed">designed</span></div><h3>Character LoRA foundry</h3><p class="pc-sum">Train a reusable LoRA for a hero recurring character; validate before it&#x27;s allowed downstream.</p><div class="pc-tags"><span class="pc-tag">char-lora</span><span class="pc-tag">one-off</span><span class="pc-tag">asset</span></div><div class="pc-meta"><b>Cost:</b> ≈A$2-7 per character (30-60 min A100) &middot; <b>Stage:</b> cast</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> FLUX.1-dev or Qwen-Image base</p><p><b>Inputs:</b> A curated reference set, ideally seeded from your own art and photos.</p><p><b>Outputs:</b> A versioned .safetensors in the asset registry, with trigger word and sample grid.</p><p><b>Risk:</b> A bad LoRA poisons every downstream job. Test-sheet it before use; version it.</p></div><button class="pc-add" data-id="character-lora" data-name="Character LoRA foundry" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="recon hero" data-stage="cast" data-tier="premium" data-tags="char-lora likeness asset"><div class="pc-badges"><span class="pc-b recon">recon</span><span class="pc-b hero">hero</span><span class="pc-b tier">premium</span><span class="pc-b designed">designed</span></div><h3>Singer / band likeness LoRA</h3><p class="pc-sum">Same foundry, aimed at real people (singers, band, supports) for on-model performance shots.</p><div class="pc-tags"><span class="pc-tag">char-lora</span><span class="pc-tag">likeness</span><span class="pc-tag">asset</span></div><div class="pc-meta"><b>Cost:</b> ≈A$2-7 per person &middot; <b>Stage:</b> cast</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> FLUX.1-dev or Qwen-Image base</p><p><b>Inputs:</b> Consented reference photos of the person.</p><p><b>Outputs:</b> A versioned likeness LoRA in the registry.</p><p><b>Risk:</b> Keep consent and any private likenesses local; mark the asset private.</p></div><button class="pc-add" data-id="singer-band-lora" data-name="Singer / band likeness LoRA" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="recon release" data-stage="cast" data-tier="standard" data-tags="char-ref no-training"><div class="pc-badges"><span class="pc-b recon">recon</span><span class="pc-b release">release</span><span class="pc-b tier">standard</span><span class="pc-b designed">designed</span></div><h3>Reference-image character</h3><p class="pc-sum">Hold a character across shots with multi-reference, no training. Good for occasional cast.</p><div class="pc-tags"><span class="pc-tag">char-ref</span><span class="pc-tag">no-training</span></div><div class="pc-meta"><b>Cost:</b> generation cost only &middot; <b>Stage:</b> cast</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> FLUX.2 multi-ref, Qwen-Image-Edit</p><p><b>Inputs:</b> 1-10 reference images of the character.</p><p><b>Outputs:</b> On-model frames without a trained LoRA.</p><p><b>Risk:</b> Weaker lock than a LoRA under heavy motion; fine for lighter appearances.</p></div><button class="pc-add" data-id="reference-character" data-name="Reference-image character" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="recon release hero" data-stage="panels" data-tier="draft" data-tags="stills cheap-gate"><div class="pc-badges"><span class="pc-b recon">recon</span><span class="pc-b release">release</span><span class="pc-b hero">hero</span><span class="pc-b tier">draft</span><span class="pc-b designed">designed</span></div><h3>Comic pre-viz panels</h3><p class="pc-sum">Render 8-12 stills from the panel beats. The second cheap gate before any video spend.</p><div class="pc-tags"><span class="pc-tag">stills</span><span class="pc-tag">cheap-gate</span></div><div class="pc-meta"><b>Cost:</b> ≈A$0.01-0.05 per panel &middot; <b>Stage:</b> panels</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> Qwen-Image, FLUX.2 Klein</p><p><b>Inputs:</b> A briefed note with panel beats and its cast.</p><p><b>Outputs:</b> A panel set; status becomes panels. Approve the strongest.</p><p><b>Risk:</b> Stills are cheap to re-roll; do the visual arguing here, not in video.</p></div><button class="pc-add" data-id="comic-panels" data-name="Comic pre-viz panels" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="release hero" data-stage="panels" data-tier="draft" data-tags="selection"><div class="pc-badges"><span class="pc-b release">release</span><span class="pc-b hero">hero</span><span class="pc-b tier">draft</span><span class="pc-b planned">planned</span></div><h3>Keyframe selection</h3><p class="pc-sum">Promote the approved panels to start and end frames for video shots.</p><div class="pc-tags"><span class="pc-tag">selection</span></div><div class="pc-meta"><b>Cost:</b> - &middot; <b>Stage:</b> panels</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> -</p><p><b>Inputs:</b> Approved panels.</p><p><b>Outputs:</b> Keyframe pairs that bookend each motion.</p><p><b>Risk:</b> Pick pairs that imply believable motion between them.</p></div><button class="pc-add" data-id="keyframe-select" data-name="Keyframe selection" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="release hero" data-stage="motion" data-tier="standard" data-tags="pose-capture control"><div class="pc-badges"><span class="pc-b release">release</span><span class="pc-b hero">hero</span><span class="pc-b tier">standard</span><span class="pc-b designed">designed</span></div><h3>Pose capture + retarget</h3><p class="pc-sum">Capture a move from any footage and retarget it onto your character.</p><div class="pc-tags"><span class="pc-tag">pose-capture</span><span class="pc-tag">control</span></div><div class="pc-meta"><b>Cost:</b> capture is local and cheap; drive is video-gen cost &middot; <b>Stage:</b> motion</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> DWPose, AnimateAnyone/UniAnimate-class</p><p><b>Inputs:</b> A reference clip (phone footage, a performance) plus a target character.</p><p><b>Outputs:</b> A pose-driven clip of your character performing the move.</p><p><b>Risk:</b> Capture and pose maps run local; only the driven render costs GPU.</p></div><button class="pc-add" data-id="pose-capture" data-name="Pose capture + retarget" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="release hero" data-stage="motion" data-tier="standard" data-tags="beat-sync control"><div class="pc-badges"><span class="pc-b release">release</span><span class="pc-b hero">hero</span><span class="pc-b tier">standard</span><span class="pc-b designed">designed</span></div><h3>Beat-synced motion</h3><p class="pc-sum">Snap a captured pose track to the song&#x27;s beat grid so the movement lands on the music.</p><div class="pc-tags"><span class="pc-tag">beat-sync</span><span class="pc-tag">control</span></div><div class="pc-meta"><b>Cost:</b> - &middot; <b>Stage:</b> motion</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> librosa, Demucs</p><p><b>Inputs:</b> A pose track and the song&#x27;s audio.</p><p><b>Outputs:</b> A beat-aligned motion track ready to drive generation.</p><p><b>Risk:</b> Runs local on audio analysis; no GPU cost until render.</p></div><button class="pc-add" data-id="beat-sync-motion" data-name="Beat-synced motion" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="release hero" data-stage="motion" data-tier="standard" data-tags="control"><div class="pc-badges"><span class="pc-b release">release</span><span class="pc-b hero">hero</span><span class="pc-b tier">standard</span><span class="pc-b planned">planned</span></div><h3>Duplicate / mirror choreography</h3><p class="pc-sum">Apply one captured motion to several cast members, or mirror it, before rendering.</p><div class="pc-tags"><span class="pc-tag">control</span></div><div class="pc-meta"><b>Cost:</b> - &middot; <b>Stage:</b> motion</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> -</p><p><b>Inputs:</b> A captured motion track and target cast.</p><p><b>Outputs:</b> Group or symmetric choreography as data.</p><p><b>Risk:</b> Pure data manipulation; free until it hits the generator.</p></div><button class="pc-add" data-id="choreo-ops" data-name="Duplicate / mirror choreography" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="hero" data-stage="video" data-tier="premium" data-tags="control continuity-lock pose-capture"><div class="pc-badges"><span class="pc-b hero">hero</span><span class="pc-b tier">premium</span><span class="pc-b designed">designed</span></div><h3>Controlled hero shot</h3><p class="pc-sum">Pose, depth and reference conditioned video for a deliberately blocked hero shot.</p><div class="pc-tags"><span class="pc-tag">control</span><span class="pc-tag">continuity-lock</span><span class="pc-tag">pose-capture</span></div><div class="pc-meta"><b>Cost:</b> ≈A$0.30-1.50 per shot &middot; <b>Stage:</b> video</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> Wan-VACE-class controllable video</p><p><b>Inputs:</b> Keyframes, a pose or depth map, cast and location assets.</p><p><b>Outputs:</b> A directed shot with intended blocking and continuity.</p><p><b>Risk:</b> The most demanding path; prove the shot at draft before rendering premium.</p></div><button class="pc-add" data-id="controlled-hero-shot" data-name="Controlled hero shot" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="release hero" data-stage="scene" data-tier="standard" data-tags="continuity-lock asset"><div class="pc-badges"><span class="pc-b release">release</span><span class="pc-b hero">hero</span><span class="pc-b tier">standard</span><span class="pc-b designed">designed</span></div><h3>Location plate + lock</h3><p class="pc-sum">Establish a consistent environment and reuse it across every shot in a scene.</p><div class="pc-tags"><span class="pc-tag">continuity-lock</span><span class="pc-tag">asset</span></div><div class="pc-meta"><b>Cost:</b> generation cost only &middot; <b>Stage:</b> scene</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> Qwen-Image, SAM 2</p><p><b>Inputs:</b> A location description or plate image.</p><p><b>Outputs:</b> A registered location asset shots can pull by name.</p><p><b>Risk:</b> Lock it once; reuse buys both consistency and cheaper shots.</p></div><button class="pc-add" data-id="location-plate" data-name="Location plate + lock" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="release hero" data-stage="scene" data-tier="standard" data-tags="continuity-lock control"><div class="pc-badges"><span class="pc-b release">release</span><span class="pc-b hero">hero</span><span class="pc-b tier">standard</span><span class="pc-b designed">designed</span></div><h3>Object / prop transfer</h3><p class="pc-sum">Detect, lift and place a consistent object or prop across shots.</p><div class="pc-tags"><span class="pc-tag">continuity-lock</span><span class="pc-tag">control</span></div><div class="pc-meta"><b>Cost:</b> generation cost only &middot; <b>Stage:</b> scene</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> SAM 2, Grounding DINO, inpaint</p><p><b>Inputs:</b> A reference of the object and the target frames.</p><p><b>Outputs:</b> The prop held consistent through the scene.</p><p><b>Risk:</b> Detection and matting run local; only the placement render costs GPU.</p></div><button class="pc-add" data-id="object-transfer" data-name="Object / prop transfer" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="release" data-stage="assemble" data-tier="standard" data-tags="beat-sync assemble multi-platform"><div class="pc-badges"><span class="pc-b release">release</span><span class="pc-b tier">standard</span><span class="pc-b planned">planned</span></div><h3>Beat-synced lyric montage</h3><p class="pc-sum">Cut approved clips to the beat and render for each platform. The forgiving, shareable lane.</p><div class="pc-tags"><span class="pc-tag">beat-sync</span><span class="pc-tag">assemble</span><span class="pc-tag">multi-platform</span></div><div class="pc-meta"><b>Cost:</b> - &middot; <b>Stage:</b> assemble</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> librosa, ffmpeg</p><p><b>Inputs:</b> Approved clips and the song audio.</p><p><b>Outputs:</b> A cut, rendered at 9:16, 1:1 and 16:9.</p><p><b>Risk:</b> Local assembly; the cheapest way to a publishable, community-shareable piece.</p></div><button class="pc-add" data-id="beat-montage" data-name="Beat-synced lyric montage" onclick="pcAdd(this)">Add to plan</button></div><div class="pc-card" data-lane="release hero" data-stage="assemble" data-tier="premium" data-tags="tts-lipsync assemble vertical"><div class="pc-badges"><span class="pc-b release">release</span><span class="pc-b hero">hero</span><span class="pc-b tier">premium</span><span class="pc-b planned">planned</span></div><h3>Vertical micro-drama cut</h3><p class="pc-sum">A short vertical story with dialogue voice and lip-sync, cut for phone-first viewing.</p><div class="pc-tags"><span class="pc-tag">tts-lipsync</span><span class="pc-tag">assemble</span><span class="pc-tag">vertical</span></div><div class="pc-meta"><b>Cost:</b> voice + lipsync + assembly &middot; <b>Stage:</b> assemble</div><button class="pc-more" onclick="pcMore(this)">Details</button><div class="pc-detail"><p><b>Models:</b> Qwen3-TTS, LatentSync/InfiniteTalk, ffmpeg</p><p><b>Inputs:</b> A story seed, cast, and approved shots.</p><p><b>Outputs:</b> A 9:16 micro-drama.</p><p><b>Risk:</b> Lip-sync is a real gate; vet on a Recon pass first.</p></div><button class="pc-add" data-id="micro-drama-cut" data-name="Vertical micro-drama cut" onclick="pcAdd(this)">Add to plan</button></div></div><script>const PC_NAMES={"lyric-analysis": "Lyric analysis pass", "recon-draft-clip": "Recon draft clip", "model-bakeoff": "Model bake-off", "character-lora": "Character LoRA foundry", "singer-band-lora": "Singer / band likeness LoRA", "reference-character": "Reference-image character", "comic-panels": "Comic pre-viz panels", "keyframe-select": "Keyframe selection", "pose-capture": "Pose capture + retarget", "beat-sync-motion": "Beat-synced motion", "choreo-ops": "Duplicate / mirror choreography", "controlled-hero-shot": "Controlled hero shot", "location-plate": "Location plate + lock", "object-transfer": "Object / prop transfer", "beat-montage": "Beat-synced lyric montage", "micro-drama-cut": "Vertical micro-drama cut"};
+const pcState={lane:new Set(),stage:new Set(),tier:new Set(),tags:new Set()};
+let pcPlan=[];
+try{pcPlan=JSON.parse(localStorage.getItem('pcPlan')||'[]')}catch(e){pcPlan=[]}
+function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
+  const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
+  else{s.add(v);el.classList.add('on')}pcFilter()}
+function pcClear(){for(const g in pcState)pcState[g].clear();
+  document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
+  pcFilter()}
+function pcMatch(card){for(const g of ['lane','stage','tier','tags']){
+  const sel=pcState[g];if(!sel.size)continue;
+  const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
+  if(![...sel].some(v=>vals.includes(v)))return false}return true}
+function pcFilter(){let n=0;document.querySelectorAll('.pc-card').forEach(c=>{
+  const ok=pcMatch(c);c.classList.toggle('hidden',!ok);if(ok)n++});
+  document.getElementById('pcCount').textContent=
+    n+' pattern'+(n===1?'':'s')+' shown'}
+function pcMore(b){b.nextElementSibling.classList.toggle('open')}
+function pcAdd(b){const id=b.dataset.id;
+  if(pcPlan.includes(id)){pcPlan=pcPlan.filter(x=>x!==id)}
+  else{pcPlan.push(id)}pcSave();pcRenderTray();pcSyncAdd()}
+function pcRemove(id){pcPlan=pcPlan.filter(x=>x!==id);pcSave();
+  pcRenderTray();pcSyncAdd()}
+function pcSave(){localStorage.setItem('pcPlan',JSON.stringify(pcPlan))}
+function pcSyncAdd(){document.querySelectorAll('.pc-add').forEach(b=>{
+  const on=pcPlan.includes(b.dataset.id);b.classList.toggle('added',on);
+  b.textContent=on?'In your plan':'Add to plan'})}
+function pcRenderTray(){const t=document.getElementById('pcTray');
+  if(!pcPlan.length){t.innerHTML='<h2>Your plan</h2>'
+    +'<div class="pc-tray-empty">No patterns chosen yet. '
+    +'Add cards below to build a sequence.</div>';return}
+  const items=pcPlan.map(id=>'<li>'+(PC_NAMES[id]||id)
+    +'<button title="remove" onclick="pcRemove(\''+id+'\')">&times;</button>'
+    +'</li>').join('');
+  t.innerHTML='<h2>Your plan ('+pcPlan.length+')</h2><ol>'+items+'</ol>'}
+pcRenderTray();pcSyncAdd();pcFilter();
+</script>
+</main>
+<footer><div class="wrap">A live monitor of the i C. infinity visual
+pipeline. Regenerated from the song vault as pieces complete.
+Lyrics live with the music, not here.<br>Luke &times; Claude.</div></footer>
+</body></html>

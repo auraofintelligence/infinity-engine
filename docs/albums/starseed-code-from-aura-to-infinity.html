@@ -56,10 +56,63 @@ line-height:1.45;color:#c8c8dc}
 color:var(--mut);background:var(--panel);border-radius:0 8px 8px 0}
 .doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
 .doc table{margin:1.2rem 0}.doc td{color:#d6d6e4}
+/* pattern chooser */
+.pc-facets{display:flex;flex-direction:column;gap:.7rem;margin:1.4rem 0 1.8rem}
+.pc-frow{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.pc-flabel{color:var(--mut);font-size:.72rem;text-transform:uppercase;
+letter-spacing:.06em;width:5.2rem;flex:none}
+.pc-chip{cursor:pointer;user-select:none;border:1px solid var(--line);
+background:var(--panel);color:var(--ink);border-radius:999px;
+padding:.28rem .8rem;font-size:.85rem;transition:.15s}
+.pc-chip:hover{border-color:var(--a)}
+.pc-chip.on{background:var(--a);border-color:var(--a);color:#08131f;font-weight:600}
+.pc-chip.lane-recon.on{background:#5aa0d8;border-color:#5aa0d8}
+.pc-chip.lane-release.on{background:#d0a23a;border-color:#d0a23a}
+.pc-chip.lane-hero.on{background:#c86aa6;border-color:#c86aa6}
+.pc-clear{margin-left:auto;color:var(--mut);cursor:pointer;font-size:.82rem;
+background:none;border:none;text-decoration:underline}
+.pc-count{color:var(--mut);font-size:.9rem;margin:.4rem 0 1rem}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+gap:1rem}
+.pc-card{background:var(--panel);border:1px solid var(--line);border-radius:13px;
+padding:1rem 1.05rem;display:flex;flex-direction:column;gap:.5rem}
+.pc-card.hidden{display:none}
+.pc-card h3{margin:0;font-size:1.02rem;line-height:1.25}
+.pc-badges{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.pc-b{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;
+border-radius:999px;padding:.08rem .5rem}
+.pc-b.recon{background:#1d3a52;color:#bfe0ff}.pc-b.release{background:#4d3d0f;color:#ffe6a6}
+.pc-b.hero{background:#4d2340;color:#ffc7ec}
+.pc-b.tier{background:#2a2a40;color:#c9c9e6}
+.pc-b.built{background:#123f2e;color:#8ff0c4}.pc-b.designed{background:#2a2a40;color:#b7b7d6}
+.pc-b.planned{background:#3a2440;color:#e0b7f0}
+.pc-sum{color:#d3d3e2;font-size:.9rem;margin:0}
+.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.pc-tag{font-size:.72rem;color:#9ad;background:#182a3a;border-radius:5px;
+padding:.05rem .4rem}
+.pc-meta{font-size:.82rem;color:var(--mut)}.pc-meta b{color:#cdd6df;font-weight:600}
+.pc-more{border:none;background:none;color:var(--a);cursor:pointer;font-size:.82rem;
+text-align:left;padding:0}
+.pc-detail{display:none;font-size:.85rem;color:#cdd0dc;border-top:1px solid var(--line);
+padding-top:.6rem;margin-top:.2rem}
+.pc-detail.open{display:block}.pc-detail p{margin:.25rem 0}
+.pc-add{margin-top:.2rem;border:1px solid var(--a);background:none;color:var(--a);
+border-radius:8px;padding:.35rem;cursor:pointer;font-size:.85rem;font-weight:600}
+.pc-add.added{background:var(--a);color:#08131f}
+.pc-tray{position:sticky;top:.6rem;z-index:5;background:#12121e;
+border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;margin:0 0 1.4rem}
+.pc-tray h2{margin:.1rem 0 .5rem;font-size:1rem}
+.pc-tray-empty{color:var(--mut);font-size:.88rem}
+.pc-tray ol{margin:.3rem 0 0;padding-left:1.2rem}
+.pc-tray li{margin:.15rem 0;font-size:.9rem}
+.pc-tray li button{border:none;background:none;color:#e2758f;cursor:pointer;
+font-size:.9rem;margin-left:.3rem}
+@media(max-width:560px){.pc-flabel{width:100%}}
 </style></head><body>
 <header><div class="wrap">
 <strong>Infinity Engine</strong>
 <nav><a href="../index.html">Progress</a>
+<a href="../patterns.html">Patterns</a>
 <a href="../pipeline.html">How it works</a>
 <a href="../workflow.html">Operator guide</a>
 <a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
