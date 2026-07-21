@@ -17,9 +17,13 @@ cast:
     name: The Goddess
     troupe: music-universe
     role: mythic lead
-    represents: Straddie and Starseed arc
+    represents: Gaia / Mother Earth (Straddie and Starseed arc)
     status: planned
-    summary: Recurring mythic lead; a load-bearing cast LoRA.
+    summary: >
+      Recurring mythic lead who stands for Gaia, Mother Earth. "Born of the
+      Goddess" means born of Earth, a personification of the living planet
+      and the source of care, not a deity to idolise. A load-bearing cast
+      LoRA.
   - id: aura
     name: Aura
     troupe: music-universe
