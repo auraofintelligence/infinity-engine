@@ -11,6 +11,8 @@ import json
 import re
 from pathlib import Path
 
+from .textclean import clean as _clean
+
 STATUS_ORDER = ["ingested", "analysed", "briefed", "panels", "keyframes",
                 "video", "published"]
 
@@ -386,7 +388,7 @@ _FONT_FACES = (
 
 
 def _esc(value) -> str:
-    return html.escape(str(value)) if value is not None else ""
+    return html.escape(_clean(str(value))) if value is not None else ""
 
 
 def _prose(value) -> str:
@@ -394,7 +396,7 @@ def _prose(value) -> str:
     and verbatim quotes keep their dashes; only generated prose is cleaned)."""
     if value is None:
         return ""
-    s = str(value).replace(" — ", ", ").replace("—", ", ")
+    s = _clean(str(value)).replace(" — ", ", ").replace("—", ", ")
     s = s.replace("–", "-")
     return html.escape(s)
 

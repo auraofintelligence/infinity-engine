@@ -17,6 +17,7 @@ import re
 from pathlib import Path
 
 from .structure import parse_structure
+from .textclean import clean as clean_text
 from .vault import INGEST_OWNED, Note, note_path, read_note, write_note
 
 LYRICS_RE = re.compile(r'<pre class="lyrics">(.*?)</pre>', re.DOTALL)
@@ -50,6 +51,7 @@ def guess_themes(lyrics: str) -> list[str]:
 def _merge(vault_dir: Path, slug: str, fresh_meta: dict, lyrics: str,
            default_lane: str = "lyric-video") -> str:
     """Create or update a note. Returns 'created' or 'updated'."""
+    lyrics = clean_text(lyrics)          # strip escapes, fix confirmed spellings
     struct = parse_structure(lyrics)
     path = note_path(vault_dir, slug)
     if path.exists():

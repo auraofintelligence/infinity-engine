@@ -150,6 +150,23 @@ def cmd_ingest_audio(cfg, args):
         print("\n  (no --slug given; not attached to a note)")
 
 
+def cmd_review(cfg, args):
+    from .textclean import scan
+    notes = vault.all_notes(resolve(cfg, "vault_dir"))
+    flagged = 0
+    for note in sorted(notes, key=lambda n: n.slug):
+        rows = []
+        for i, line in enumerate(note.body.splitlines(), 1):
+            for reason, tok in scan(line):
+                rows.append(f"    L{i:<3} {reason:24} {tok}")
+        if rows:
+            flagged += 1
+            print(f"\n{note.slug}")
+            print("\n".join(rows))
+    print(f"\n{flagged} song(s) with phrases to double-check. Confirmed fixes "
+          "go into CORRECTIONS in engine/textclean.py; re-ingest to apply.")
+
+
 def cmd_jobs(cfg, args):
     conn = jobs_mod.open_db(resolve(cfg, "db_path"))
     rows = jobs_mod.list_jobs(conn)
@@ -201,6 +218,7 @@ def main():
     p_merge = sub.add_parser("merge")
     p_merge.add_argument("slug")
     p_merge.add_argument("file")
+    sub.add_parser("review")
     p_audio = sub.add_parser("ingest-audio")
     p_audio.add_argument("path", help="folder or .zip of Suno WAV stems")
     p_audio.add_argument("--slug", help="vault note to attach the audio block to")
@@ -214,9 +232,9 @@ def main():
         parser.error("brief needs song slugs or --all")
     cfg = load_config()
     {"ingest": cmd_ingest, "status": cmd_status, "validate": cmd_validate,
-     "brief": cmd_brief, "merge": cmd_merge, "ingest-audio": cmd_ingest_audio,
-     "jobs": cmd_jobs, "dashboard": cmd_dashboard,
-     "site": cmd_site}[args.command](cfg, args)
+     "brief": cmd_brief, "merge": cmd_merge, "review": cmd_review,
+     "ingest-audio": cmd_ingest_audio, "jobs": cmd_jobs,
+     "dashboard": cmd_dashboard, "site": cmd_site}[args.command](cfg, args)
 
 
 if __name__ == "__main__":
