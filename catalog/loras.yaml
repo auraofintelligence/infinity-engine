@@ -30,16 +30,10 @@ loras:
     status: planned
     trigger: ohwx_aura
     why: The Aura figure across the Starseed arc.
-  - id: gajra-v1
-    name: G.A.J.R.A.
-    kind: character
-    base: Qwen-Image
-    source: own (foundry)
-    licence: reserved
-    private: false
-    status: planned
-    trigger: ohwx_gajra
-    why: The G.A.J.R.A. figure; recurring in the cosmic-tech chapter.
+  # Note: GAJRA is not a character. Global Association for Joyful Responsible
+  # Abundance on Earth (Gajra = an Asian flower garland, chosen for the
+  # acronym): Luke's anticipated association for AI alignment and Protopia.
+  # It belongs to the universe's lore, not the cast; kept out of the LoRA list.
   - id: he-lead-v1
     name: He-lead (paired vocals)
     kind: character

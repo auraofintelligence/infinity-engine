@@ -1,0 +1,75 @@
+# Projects in development: the creative-universe work this engine feeds
+# or sits beside. The Projects page promotes these. Honest tense: status
+# says where each really is; descriptions stay plain and conditional, no
+# overstating unbuilt work as finished.
+#
+# status:  live | development | design | concept
+# Edit freely; add a project as a new block.
+
+projects:
+  - id: protopian-gambit
+    name: A Protopian Gambit
+    tagline: The fourth album, and the showcase this pipeline builds toward
+    status: development
+    blurb: >
+      The next i C. infinity album. Earlier albums run fast and rough
+      through the engine to test models and train the cast; this one is
+      where the matured rig and the recurring cast come together as the
+      hero work.
+    link: https://auraofintelligence.github.io/i-C-infinity-music-universe/
+    cta: Music universe
+
+  - id: infinity-engine
+    name: Infinity Engine
+    tagline: The model-agnostic pipeline turning songs into visuals
+    status: live
+    blurb: >
+      This site. Lyric videos, comics, vertical micro-dramas and film,
+      cheap thinking first, human gates, expensive generation last.
+      A living monitor of the whole catalogue.
+    link: index.html
+    cta: Open the monitor
+
+  - id: queens-venture
+    name: Queens Venture
+    tagline: The Council of Aura, heritage archetypes and mentors
+    status: development
+    blurb: >
+      Twenty-four Queens across civilisation pillars and cultural anchors.
+      In the film universe they double as templates for culturally
+      translated music and story.
+    link: https://auraofintelligence.github.io/Queens_Venture/#queens
+    cta: Meet the Queens
+
+  - id: amity-point
+    name: Amity Point AI Film Crew
+    tagline: A team of Australian-animal spirits assisting the filmmaking
+    status: development
+    blurb: >
+      The Amity take on Sandy Sports and Cinema: an AI crew, each an
+      animal spirit, covering direction, camera, art, sound and community
+      for making film with AI on Minjerribah.
+    link: https://auraofintelligence.github.io/amity-point/#aicrew
+    cta: Meet the crew
+
+  - id: two-dogs
+    name: Two Dogs Podcast
+    tagline: Two heeler hosts turning deep ideas into a simple yarn
+    status: development
+    blurb: >
+      Red Dog and Blue Dog talk island experiments, AI, care and Protopia
+      in plain language. Guests bring their own spirit animal. A backend
+      of builders and episode tooling supports it.
+    link: https://auraofintelligence.github.io/two-dogs-podcast-backend/
+    cta: Listen in
+
+  - id: aura-mothership
+    name: Aura of Intelligence
+    tagline: "The mothership: the wider vision this all belongs to"
+    status: development
+    blurb: >
+      The umbrella site for the Aura vision, sovereignty of self and data,
+      Protopia, and the ecosystem of projects the film universe is one
+      part of.
+    link: https://auraofintelligence.github.io/
+    cta: The wider vision

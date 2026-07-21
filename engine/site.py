@@ -202,6 +202,60 @@ margin:0 0 1.4rem;background:rgba(12,12,26,.9);backdrop-filter:blur(12px)}
 .pc-tray li button{border:none;background:none;color:var(--plasma);cursor:pointer;
 font-size:.9rem;margin-left:.3rem}
 @media(max-width:560px){.pc-flabel{width:100%}.brand-text{display:none}}
+/* ---- fancy bits: motion + promo ---- */
+@view-transition{navigation:auto}
+.scroll-progress{position:fixed;top:0;left:0;right:0;z-index:60;height:2px;
+pointer-events:none}
+.scroll-progress i{display:block;height:100%;width:100%;transform-origin:left;
+transform:scaleX(0);background:linear-gradient(90deg,var(--gold),var(--violet),var(--teal))}
+.site-header{transition:padding .2s,background .2s,border-color .2s}
+.site-header.is-condensed .site-header{padding:.4rem clamp(1rem,4vw,2rem)}
+.site-header.is-condensed{box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.eyebrow{margin:0 0 .7rem;color:var(--gold);font-family:var(--fm);font-size:.76rem;
+font-weight:640;letter-spacing:.2em;text-transform:uppercase}
+.eyebrow::before{content:"// ";color:rgba(255,207,110,.55)}
+.button{display:inline-flex;align-items:center;gap:.5rem;min-height:2.7rem;
+padding:.65rem 1.3rem;border-radius:999px;text-decoration:none;font-weight:720;
+border:1px solid transparent;cursor:pointer;transition:transform .2s,box-shadow .2s,
+background .2s,border-color .2s}
+.button:hover{transform:translateY(-2px)}
+.button-primary{background:linear-gradient(135deg,var(--gold),var(--plasma) 60%,var(--violet));
+color:#1a0e05;box-shadow:0 8px 30px rgba(255,207,110,.28)}
+.button-secondary{border-color:var(--line);background:rgba(255,255,255,.06);color:#fff}
+.button-secondary:hover{border-color:rgba(43,227,194,.6);background:rgba(43,227,194,.1)}
+.promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.promo-card{position:relative;display:flex;flex-direction:column;gap:.6rem;
+padding:1.3rem 1.35rem;border:1px solid var(--line);border-radius:var(--radius);
+background:linear-gradient(155deg,rgba(124,77,255,.16),rgba(10,10,22,.72));
+box-shadow:0 20px 50px rgba(0,0,0,.32);text-decoration:none;
+transition:transform .2s,border-color .2s}
+.promo-card:hover{transform:translateY(-4px);border-color:rgba(43,227,194,.5)}
+.promo-card h3{font-size:1.25rem;color:#fff;margin:0}
+.promo-card .tagline{color:var(--gold-soft);font-size:.92rem;margin:0}
+.promo-card p{color:var(--mut);font-size:.92rem;margin:0}
+.promo-card .promo-foot{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+margin-top:auto;padding-top:.5rem}
+.promo-card .go{color:var(--teal);font-weight:640;font-size:.9rem}
+.st{font-family:var(--fm);font-size:.66rem;text-transform:uppercase;
+letter-spacing:.06em;border-radius:999px;padding:.12rem .6rem;border:1px solid transparent}
+.st-live{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.st-development{background:rgba(255,207,110,.16);color:var(--gold-soft);border-color:rgba(255,207,110,.4)}
+.st-design{background:rgba(201,166,255,.16);color:var(--amethyst);border-color:rgba(201,166,255,.4)}
+.st-concept{background:rgba(255,255,255,.06);color:#c9c3e0}
+html.js .pc-card,html.js .promo-card,html.js .card{animation:rise .55s cubic-bezier(.16,1,.3,1) both}
+.pc-grid .pc-card:nth-child(2){animation-delay:.05s}
+.pc-grid .pc-card:nth-child(3){animation-delay:.1s}
+.pc-grid .pc-card:nth-child(4){animation-delay:.15s}
+.pc-grid .pc-card:nth-child(n+5){animation-delay:.2s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+html.js .reveal{opacity:0;transform:translateY(24px);filter:blur(4px);
+transition:opacity .8s var(--ease,cubic-bezier(.16,1,.3,1)),transform .8s cubic-bezier(.16,1,.3,1),filter .8s}
+.reveal.is-visible{opacity:1;transform:none;filter:none}
+@media(prefers-reduced-motion:reduce){
+html.js .pc-card,html.js .promo-card,html.js .card{animation:none}
+html.js .reveal{opacity:1;transform:none;filter:none;transition:none}
+.scroll-progress{display:none}}
 """
 
 _FONT_FACES = (
@@ -224,7 +278,9 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <html lang="en-AU"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{_esc(title)} - Infinity Engine</title>
+<script>document.documentElement.classList.add('js')</script>
 <style>{fonts}{CSS}</style></head><body>
+<div class="scroll-progress"><i></i></div>
 <header class="site-header"><div class="wrap">
 <a class="brand" href="{up}index.html">
 <span class="brand-mark"></span>
@@ -232,10 +288,12 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <span>i C. infinity</span></span></a>
 <nav><a href="{up}index.html">Progress</a>
 <a href="{up}patterns.html">Patterns</a>
+<a href="{up}cast.html">Cast</a>
 <a href="{up}models.html">Models</a>
 <a href="{up}loras.html">LoRAs</a>
 <a href="{up}compute.html">Compute</a>
 <a href="{up}recon.html">Recon</a>
+<a href="{up}projects.html">Projects</a>
 <a href="{up}pipeline.html">How it works</a>
 <a href="{up}workflow.html">Operator guide</a>
 <a href="{UNIVERSE_BASE}/">Music universe</a></nav>
@@ -247,6 +305,18 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 infinity visual pipeline. Regenerated from the song vault as pieces
 complete. Lyrics live with the music, not here.<br>Luke &times; Claude.</div>
 </footer>
+<script>
+(function(){{var h=document.querySelector('.site-header'),
+p=document.querySelector('.scroll-progress i');
+function s(){{var y=scrollY||0,d=document.body.scrollHeight-innerHeight;
+if(p)p.style.transform='scaleX('+(d>0?Math.min(y/d,1):0)+')';
+if(h)h.classList.toggle('is-condensed',y>24)}}
+addEventListener('scroll',s,{{passive:true}});s();
+var io=new IntersectionObserver(function(es){{es.forEach(function(e){{
+if(e.isIntersecting){{e.target.classList.add('is-visible');io.unobserve(e.target)}}}})}},
+{{rootMargin:'0px 0px -8% 0px'}});
+document.querySelectorAll('.reveal').forEach(function(el){{io.observe(el)}});}})();
+</script>
 </body></html>"""
 
 
@@ -394,9 +464,9 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
                         encoding="utf-8")
         written.append(path)
 
-    # Pattern chooser and the registry pickers (data-driven).
-    for builder in (render_patterns, render_models, render_loras,
-                    render_compute, render_recon):
+    # Pattern chooser, registry pickers and promo (data-driven).
+    for builder in (render_patterns, render_cast, render_models, render_loras,
+                    render_compute, render_recon, render_projects):
         page = builder(out_dir)
         if page:
             written.append(page)
@@ -828,3 +898,97 @@ def render_recon(out_dir: Path) -> Path | None:
     return render_picker(
         out_dir, filename="recon.html", title="Recon area", noun="candidate",
         lead=intro, facet_defs=facet_defs, cards=cards)
+
+
+CAST_TROUPES = {
+    "music-universe": ("Music universe cast",
+                       "The recurring leads of the i C. infinity songs"),
+    "queens": ("The Queens: Council of Aura",
+               "24 heritage archetypes; also templates for culturally "
+               "translated music"),
+    "amity-crew": ("Amity AI film crew",
+                   "The AI filmmaking assistants, each an Australian animal spirit"),
+    "two-dogs": ("Two Dogs podcast",
+                 "Spirit-animal hosts; guests bring their own animal"),
+}
+
+
+def _cast_card(c: dict) -> tuple:
+    status = c.get("status", "concept")
+    st_class = {"active": "built", "planned": "designed",
+                "concept": "planned"}.get(status, "planned")
+    priv = c.get("private", False)
+    inner = (
+        f'<span class="pc-kicker">{_esc(c.get("represents",""))}</span>'
+        f'<h3>{_esc(c.get("name", c["id"]))}</h3>'
+        f'<span class="pc-task">{_esc(c.get("role",""))}</span>'
+        f'<p class="pc-best">{_esc(c.get("summary",""))}</p>'
+        '<div class="pc-badges">'
+        f'<span class="pc-b {st_class}">{_esc(status)}</span>'
+        + ('<span class="pc-b hero">private</span>' if priv else "") + '</div>')
+    attrs = {
+        "troupe": [str(c.get("troupe", ""))],
+        "status": [status],
+        "visibility": ["private" if priv else "shareable"],
+    }
+    return attrs, inner
+
+
+def render_cast(out_dir: Path) -> Path | None:
+    cast = _load_catalog(out_dir, "catalog/cast.yaml", "cast")
+    if not cast:
+        return None
+    groups = []
+    for troupe, (label, blurb) in CAST_TROUPES.items():
+        gcards = [_cast_card(c) for c in cast if c.get("troupe") == troupe]
+        groups.append((label, blurb, gcards))
+    n = len(cast)
+    facet_defs = [
+        ("Troupe", "troupe", list(CAST_TROUPES)),
+        ("Status", "status", ["active", "planned", "concept"]),
+        ("Visibility", "visibility", ["shareable", "private"]),
+    ]
+    return render_picker(
+        out_dir, filename="cast.html", title="Cast", noun="character",
+        lead=(f"The {n} characters of the universe, across troupes. A "
+              "character is who is in frame; a LoRA on the LoRAs page is the "
+              "fine-tune that locks their look. The teal chip is each one's "
+              "role. Filter by troupe to focus, or by visibility to find what "
+              "stays private."),
+        facet_defs=facet_defs, groups=groups)
+
+
+PROJECT_STATUS = {"live": "st-live", "development": "st-development",
+                  "design": "st-design", "concept": "st-concept"}
+
+
+def render_projects(out_dir: Path) -> Path | None:
+    projects = _load_catalog(out_dir, "projects.yaml", "projects")
+    if not projects:
+        return None
+    cards = []
+    for p in projects:
+        status = p.get("status", "development")
+        st_class = PROJECT_STATUS.get(status, "st-development")
+        link = p.get("link", "#")
+        external = link.startswith("http")
+        target = ' target="_blank" rel="noopener"' if external else ""
+        cards.append(
+            f'<a class="promo-card reveal" href="{_esc(link)}"{target}>'
+            f'<span class="st {st_class}">{_esc(status)}</span>'
+            f'<h3>{_esc(p.get("name", p["id"]))}</h3>'
+            f'<p class="tagline">{_esc(p.get("tagline",""))}</p>'
+            f'<p>{_esc(p.get("blurb","").strip())}</p>'
+            f'<div class="promo-foot"><span class="go">'
+            f'{_esc(p.get("cta","Open"))} &rarr;</span></div></a>')
+    body = (
+        "<p class='eyebrow'>The universe</p>"
+        "<h1>Projects in development</h1>"
+        "<p class='lead'>The creative-universe work this engine feeds or sits "
+        "beside. Some are live, most are in development or design; the tag on "
+        "each says where it really is. Nothing here is finished being "
+        "imagined.</p>"
+        f'<div class="promo-grid">{"".join(cards)}</div>')
+    path = out_dir / "projects.html"
+    path.write_text(_page("Projects", body), encoding="utf-8")
+    return path

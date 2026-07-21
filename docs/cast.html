@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cast - Infinity Engine</title>
+<script>document.documentElement.classList.add('js')</script>
+<style>@font-face{font-family:"Archivo Var";src:url("assets/fonts/archivo-var.woff2") format("woff2-variations");font-weight:100 900;font-display:swap}@font-face{font-family:"JetBrains Mono Var";src:url("assets/fonts/jetbrains-mono-var.woff2") format("woff2-variations");font-weight:100 800;font-display:swap}
+:root{--void:#05070c;--deep:#0a1420;--panel:rgba(124,77,255,.08);
+--violet:#7c4dff;--amethyst:#c9a6ff;--gold:#ffcf6e;--gold-soft:#ffe6b0;
+--teal:#2be3c2;--plasma:#ff5fd1;--text:#f6f4ff;--mut:#b9c3d6;
+--line:rgba(124,77,255,.28);--max:1120px;--radius:16px;
+--fd:"Archivo Var",ui-sans-serif,system-ui,sans-serif;
+--fm:"JetBrains Mono Var",Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;color:var(--text);font-family:var(--fd);font-weight:440;
+line-height:1.6;background:
+radial-gradient(ellipse 60rem 34rem at 14% -6%,rgba(124,77,255,.22),transparent),
+radial-gradient(ellipse 64rem 38rem at 90% 2%,rgba(43,227,194,.1),transparent),
+radial-gradient(ellipse 78rem 50rem at 50% 116%,rgba(42,20,88,.55),transparent),
+linear-gradient(180deg,#0c1220,#080c16 42%,var(--void));
+background-attachment:fixed;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+background:linear-gradient(90deg,rgba(201,166,255,.045) 1px,transparent 1px),
+linear-gradient(0deg,rgba(201,166,255,.045) 1px,transparent 1px);
+background-size:56px 56px;
+mask-image:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.03) 72%)}
+::selection{background:var(--gold);color:#201200}
+a{color:var(--amethyst);text-decoration:none}a:hover{color:#fff}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 clamp(1rem,4vw,2rem)}
+.site-header{position:sticky;top:0;z-index:50;
+border-bottom:1px solid var(--line);
+background:rgba(8,10,18,.82);backdrop-filter:blur(20px) saturate(1.3)}
+.site-header .wrap{display:flex;gap:.8rem 1.4rem;align-items:center;
+flex-wrap:wrap;padding:.7rem clamp(1rem,4vw,2rem)}
+.brand{display:inline-flex;align-items:center;gap:.65rem;text-decoration:none;
+margin-right:auto}
+.brand-mark{width:2.3rem;height:2.3rem;border-radius:50%;flex:none;
+border:1px solid rgba(255,207,110,.55);
+background:radial-gradient(circle at 38% 30%,var(--gold-soft),var(--violet) 46%,#2a1458 82%);
+box-shadow:0 0 26px rgba(124,77,255,.5),inset 0 0 12px rgba(255,255,255,.25)}
+.brand-text{display:grid;font-family:var(--fm);font-size:.66rem;
+text-transform:uppercase;letter-spacing:.06em;color:var(--mut);line-height:1.3}
+.brand-text strong{font-family:var(--fd);font-size:.95rem;color:#fff;
+text-transform:none;letter-spacing:0}
+nav{display:flex;gap:.1rem;flex-wrap:wrap;font-size:.83rem;font-weight:620}
+nav a{padding:.42rem .62rem;border-radius:999px;white-space:nowrap;
+color:var(--mut);transition:.2s}
+nav a:hover{color:#fff;background:rgba(124,77,255,.2)}
+h1,h2,h3{font-family:var(--fd);letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:clamp(2.1rem,5vw,3.1rem);font-weight:860;line-height:1;
+margin:2.2rem 0 .5rem;text-shadow:0 0 40px rgba(124,77,255,.35)}
+h2{font-size:clamp(1.4rem,3vw,1.9rem);font-weight:820;margin-top:2.6rem}
+h3{font-size:1.05rem;font-weight:740;margin:0 0 .4rem}
+.lead{color:var(--mut);max-width:52rem;font-size:1.05rem}
+.muted{color:var(--mut);font-size:.85rem}
+.bar{display:flex;height:16px;border-radius:999px;overflow:hidden;
+background:rgba(255,255,255,.05);margin:1.3rem 0;border:1px solid var(--line)}
+.s-ingested{background:#3a3358}.s-analysed{background:#2f5f8a}
+.s-briefed{background:#b08a1e}.s-panels{background:#7c4dff}
+.s-keyframes{background:var(--plasma)}.s-video{background:#1f9e7a}
+.s-published{background:var(--teal)}
+.pill{display:inline-block;padding:.12rem .6rem;border-radius:999px;
+font-size:.72rem;font-family:var(--fm);text-transform:uppercase;
+letter-spacing:.04em;border:1px solid var(--line);background:rgba(255,255,255,.05)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.card{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+background:linear-gradient(150deg,rgba(124,77,255,.16),rgba(10,10,22,.72));
+box-shadow:0 20px 50px rgba(0,0,0,.32);text-decoration:none;
+transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:rgba(43,227,194,.5)}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.card .pad{padding:.85rem .95rem 1.05rem}.card h3{margin:.1rem 0 .25rem;color:#fff}
+.card .bar{height:8px;margin:.7rem 0 0}
+table{border-collapse:collapse;width:100%;margin:1.2rem 0 2.5rem}
+th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);
+vertical-align:top}
+th{color:var(--gold);font-family:var(--fm);font-size:.72rem;
+text-transform:uppercase;letter-spacing:.08em}
+.theme{color:var(--amethyst);font-size:.8rem;margin-right:.45rem;white-space:nowrap}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:.7rem;margin:1.4rem 0}
+.legend div{border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;
+font-size:.9rem;background:rgba(255,255,255,.03)}
+.site-footer{border-top:1px solid var(--line);margin-top:3.5rem;
+background:rgba(6,8,14,.6)}
+.site-footer .wrap{padding:1.8rem clamp(1rem,4vw,2rem) 2.4rem;
+color:var(--mut);font-size:.88rem}
+.stage-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.4rem 0}
+.stage-flow .pill{font-size:.78rem;padding:.28rem .7rem}
+.stage-flow span.arrow{color:var(--gold)}
+.doc{max-width:52rem}
+.doc h1{margin-top:1.6rem}.doc h2{padding-top:1.5rem;border-top:1px solid var(--line)}
+.doc h3{margin-top:1.7rem}.doc p,.doc li{color:#dcd8ee}.doc li{margin:.2rem 0}
+.doc code{border:1px solid var(--line);border-radius:5px;padding:.05rem .35rem;
+font-family:var(--fm);font-size:.84em;background:rgba(124,77,255,.12)}
+.doc pre{border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem;
+overflow-x:auto;background:rgba(3,4,10,.6)}
+.doc pre code{background:none;border:none;padding:0;font-size:.8rem;
+line-height:1.5;color:#cdc8e6}
+.doc blockquote{border-left:3px solid var(--gold);margin:1.2rem 0;
+padding:.3rem 1rem;color:var(--mut);background:rgba(255,255,255,.03);
+border-radius:0 8px 8px 0}
+.doc hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.doc table{margin:1.2rem 0}.doc td{color:#dcd8ee}
+/* faceted picker + pattern chooser */
+.pc-facets{display:flex;flex-direction:column;gap:.6rem;margin:1.5rem 0 1.4rem;
+padding:1rem 1.1rem;border:1px solid var(--line);border-radius:var(--radius);
+background:rgba(255,255,255,.03)}
+.pc-frow{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.pc-flabel{color:var(--gold);font-family:var(--fm);font-size:.68rem;
+text-transform:uppercase;letter-spacing:.1em;width:5.4rem;flex:none}
+.pc-chip{cursor:pointer;user-select:none;border:1px solid var(--line);
+background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;
+padding:.28rem .8rem;font-size:.83rem;transition:.15s}
+.pc-chip:hover{border-color:var(--teal)}
+.pc-chip.on{background:var(--violet);border-color:var(--violet);color:#fff;
+font-weight:640;box-shadow:0 0 18px rgba(124,77,255,.4)}
+.pc-chip.lane-recon.on{background:var(--teal);border-color:var(--teal);color:#062f28}
+.pc-chip.lane-release.on{background:var(--gold);border-color:var(--gold);color:#241700}
+.pc-chip.lane-hero.on{background:var(--plasma);border-color:var(--plasma);color:#2a0620}
+.pc-clear{margin-left:auto;color:var(--mut);cursor:pointer;font-size:.82rem;
+background:none;border:none;text-decoration:underline}
+.pc-count{color:var(--mut);font-family:var(--fm);font-size:.82rem;margin:.2rem 0 1rem}
+.pc-group{margin:0 0 2.2rem}
+.pc-group-head{display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap;
+margin:1.8rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+.pc-group-head h2{margin:0;font-size:1.3rem}
+.pc-group-head span{color:var(--mut);font-size:.9rem}
+.pc-group.hidden{display:none}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+gap:1rem}
+.pc-card{border:1px solid var(--line);border-radius:var(--radius);
+padding:1.05rem 1.1rem;display:flex;flex-direction:column;gap:.55rem;
+background:linear-gradient(155deg,rgba(124,77,255,.14),rgba(10,10,22,.66));
+transition:transform .18s,border-color .18s}
+.pc-card:hover{transform:translateY(-2px);border-color:rgba(43,227,194,.45)}
+.pc-card.hidden{display:none}
+.pc-card h3{margin:0;font-size:1.08rem;line-height:1.2;color:#fff}
+.pc-kicker{font-family:var(--fm);font-size:.68rem;text-transform:uppercase;
+letter-spacing:.12em;color:var(--gold)}
+.pc-best{font-size:.96rem;color:#efeaff;margin:0;font-weight:600;line-height:1.35}
+.pc-task{display:inline-flex;align-self:flex-start;font-family:var(--fm);
+font-size:.75rem;padding:.2rem .6rem;border-radius:8px;color:#062f28;
+background:var(--teal);font-weight:700}
+.pc-badges{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.pc-b{font-family:var(--fm);font-size:.66rem;text-transform:uppercase;
+letter-spacing:.05em;border-radius:999px;padding:.1rem .55rem;
+border:1px solid transparent}
+.pc-b.recon{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.pc-b.release{background:rgba(255,207,110,.16);color:var(--gold-soft);border-color:rgba(255,207,110,.4)}
+.pc-b.hero{background:rgba(255,95,209,.16);color:#ffc7ec;border-color:rgba(255,95,209,.4)}
+.pc-b.tier{background:rgba(255,255,255,.06);color:#cfc9e6}
+.pc-b.built{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.pc-b.designed{background:rgba(255,255,255,.06);color:#c9c3e0}
+.pc-b.planned{background:rgba(201,166,255,.16);color:var(--amethyst);border-color:rgba(201,166,255,.4)}
+.pc-sum{color:#d6d1ea;font-size:.9rem;margin:0}
+.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.pc-tag{font-family:var(--fm);font-size:.7rem;color:var(--amethyst);
+background:rgba(124,77,255,.14);border-radius:5px;padding:.06rem .4rem}
+.pc-meta{font-size:.82rem;color:var(--mut);line-height:1.5}
+.pc-meta b{color:#d7d1ea;font-weight:600}
+.pc-more{border:none;background:none;color:var(--teal);cursor:pointer;
+font-size:.82rem;text-align:left;padding:0}
+.pc-detail{display:none;font-size:.85rem;color:#d3cee6;
+border-top:1px solid var(--line);padding-top:.6rem;margin-top:.2rem}
+.pc-detail.open{display:block}.pc-detail p{margin:.25rem 0}
+.pc-add{margin-top:.2rem;border:1px solid var(--teal);background:none;
+color:var(--teal);border-radius:8px;padding:.4rem;cursor:pointer;
+font-size:.85rem;font-weight:640}
+.pc-add.added{background:var(--teal);color:#062f28}
+.pc-tray{position:sticky;top:.6rem;z-index:5;
+border:1px solid var(--line);border-radius:var(--radius);padding:.85rem 1.05rem;
+margin:0 0 1.4rem;background:rgba(12,12,26,.9);backdrop-filter:blur(12px)}
+.pc-tray h2{margin:.1rem 0 .5rem;font-size:1.05rem}
+.pc-tray-empty{color:var(--mut);font-size:.88rem}
+.pc-tray ol{margin:.3rem 0 0;padding-left:1.2rem}
+.pc-tray li{margin:.15rem 0;font-size:.9rem}
+.pc-tray li button{border:none;background:none;color:var(--plasma);cursor:pointer;
+font-size:.9rem;margin-left:.3rem}
+@media(max-width:560px){.pc-flabel{width:100%}.brand-text{display:none}}
+/* ---- fancy bits: motion + promo ---- */
+@view-transition{navigation:auto}
+.scroll-progress{position:fixed;top:0;left:0;right:0;z-index:60;height:2px;
+pointer-events:none}
+.scroll-progress i{display:block;height:100%;width:100%;transform-origin:left;
+transform:scaleX(0);background:linear-gradient(90deg,var(--gold),var(--violet),var(--teal))}
+.site-header{transition:padding .2s,background .2s,border-color .2s}
+.site-header.is-condensed .site-header{padding:.4rem clamp(1rem,4vw,2rem)}
+.site-header.is-condensed{box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.eyebrow{margin:0 0 .7rem;color:var(--gold);font-family:var(--fm);font-size:.76rem;
+font-weight:640;letter-spacing:.2em;text-transform:uppercase}
+.eyebrow::before{content:"// ";color:rgba(255,207,110,.55)}
+.button{display:inline-flex;align-items:center;gap:.5rem;min-height:2.7rem;
+padding:.65rem 1.3rem;border-radius:999px;text-decoration:none;font-weight:720;
+border:1px solid transparent;cursor:pointer;transition:transform .2s,box-shadow .2s,
+background .2s,border-color .2s}
+.button:hover{transform:translateY(-2px)}
+.button-primary{background:linear-gradient(135deg,var(--gold),var(--plasma) 60%,var(--violet));
+color:#1a0e05;box-shadow:0 8px 30px rgba(255,207,110,.28)}
+.button-secondary{border-color:var(--line);background:rgba(255,255,255,.06);color:#fff}
+.button-secondary:hover{border-color:rgba(43,227,194,.6);background:rgba(43,227,194,.1)}
+.promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+gap:1.1rem;margin:1.6rem 0}
+.promo-card{position:relative;display:flex;flex-direction:column;gap:.6rem;
+padding:1.3rem 1.35rem;border:1px solid var(--line);border-radius:var(--radius);
+background:linear-gradient(155deg,rgba(124,77,255,.16),rgba(10,10,22,.72));
+box-shadow:0 20px 50px rgba(0,0,0,.32);text-decoration:none;
+transition:transform .2s,border-color .2s}
+.promo-card:hover{transform:translateY(-4px);border-color:rgba(43,227,194,.5)}
+.promo-card h3{font-size:1.25rem;color:#fff;margin:0}
+.promo-card .tagline{color:var(--gold-soft);font-size:.92rem;margin:0}
+.promo-card p{color:var(--mut);font-size:.92rem;margin:0}
+.promo-card .promo-foot{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+margin-top:auto;padding-top:.5rem}
+.promo-card .go{color:var(--teal);font-weight:640;font-size:.9rem}
+.st{font-family:var(--fm);font-size:.66rem;text-transform:uppercase;
+letter-spacing:.06em;border-radius:999px;padding:.12rem .6rem;border:1px solid transparent}
+.st-live{background:rgba(43,227,194,.16);color:var(--teal);border-color:rgba(43,227,194,.4)}
+.st-development{background:rgba(255,207,110,.16);color:var(--gold-soft);border-color:rgba(255,207,110,.4)}
+.st-design{background:rgba(201,166,255,.16);color:var(--amethyst);border-color:rgba(201,166,255,.4)}
+.st-concept{background:rgba(255,255,255,.06);color:#c9c3e0}
+html.js .pc-card,html.js .promo-card,html.js .card{animation:rise .55s cubic-bezier(.16,1,.3,1) both}
+.pc-grid .pc-card:nth-child(2){animation-delay:.05s}
+.pc-grid .pc-card:nth-child(3){animation-delay:.1s}
+.pc-grid .pc-card:nth-child(4){animation-delay:.15s}
+.pc-grid .pc-card:nth-child(n+5){animation-delay:.2s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+html.js .reveal{opacity:0;transform:translateY(24px);filter:blur(4px);
+transition:opacity .8s var(--ease,cubic-bezier(.16,1,.3,1)),transform .8s cubic-bezier(.16,1,.3,1),filter .8s}
+.reveal.is-visible{opacity:1;transform:none;filter:none}
+@media(prefers-reduced-motion:reduce){
+html.js .pc-card,html.js .promo-card,html.js .card{animation:none}
+html.js .reveal{opacity:1;transform:none;filter:none;transition:none}
+.scroll-progress{display:none}}
+</style></head><body>
+<div class="scroll-progress"><i></i></div>
+<header class="site-header"><div class="wrap">
+<a class="brand" href="index.html">
+<span class="brand-mark"></span>
+<span class="brand-text"><strong>Infinity Engine</strong>
+<span>i C. infinity</span></span></a>
+<nav><a href="index.html">Progress</a>
+<a href="patterns.html">Patterns</a>
+<a href="cast.html">Cast</a>
+<a href="models.html">Models</a>
+<a href="loras.html">LoRAs</a>
+<a href="compute.html">Compute</a>
+<a href="recon.html">Recon</a>
+<a href="projects.html">Projects</a>
+<a href="pipeline.html">How it works</a>
+<a href="workflow.html">Operator guide</a>
+<a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
+</div></header>
+<main class="wrap">
+<h1>Cast</h1><p class='lead'>The 41 characters of the universe, across troupes. A character is who is in frame; a LoRA on the LoRAs page is the fine-tune that locks their look. The teal chip is each one's role. Filter by troupe to focus, or by visibility to find what stays private.</p><div class="pc-facets"><div class="pc-frow"><span class="pc-flabel">Troupe</span><button class="pc-chip " data-group="troupe" data-value="music-universe" onclick="pcToggle(this)">music-universe</button><button class="pc-chip " data-group="troupe" data-value="queens" onclick="pcToggle(this)">queens</button><button class="pc-chip " data-group="troupe" data-value="amity-crew" onclick="pcToggle(this)">amity-crew</button><button class="pc-chip " data-group="troupe" data-value="two-dogs" onclick="pcToggle(this)">two-dogs</button></div><div class="pc-frow"><span class="pc-flabel">Status</span><button class="pc-chip " data-group="status" data-value="active" onclick="pcToggle(this)">active</button><button class="pc-chip " data-group="status" data-value="planned" onclick="pcToggle(this)">planned</button><button class="pc-chip " data-group="status" data-value="concept" onclick="pcToggle(this)">concept</button></div><div class="pc-frow"><span class="pc-flabel">Visibility</span><button class="pc-chip " data-group="visibility" data-value="shareable" onclick="pcToggle(this)">shareable</button><button class="pc-chip " data-group="visibility" data-value="private" onclick="pcToggle(this)">private</button></div><div class="pc-frow"><button class="pc-clear" onclick="pcClear()">clear all filters</button></div></div><div class="pc-count" id="pcCount"></div><section class="pc-group"><div class="pc-group-head"><h2>Music universe cast</h2><span>The recurring leads of the i C. infinity songs</span></div><div class="pc-grid"><div class="pc-card" data-troupe="music-universe" data-status="planned" data-visibility="shareable"><span class="pc-kicker">Straddie and Starseed arc</span><h3>The Goddess</h3><span class="pc-task">mythic lead</span><p class="pc-best">Recurring mythic lead; a load-bearing cast LoRA.</p><div class="pc-badges"><span class="pc-b designed">planned</span></div></div><div class="pc-card" data-troupe="music-universe" data-status="planned" data-visibility="shareable"><span class="pc-kicker">the Aura figure (also Super Queen in the Council)</span><h3>Aura</h3><span class="pc-task">lead / Super Assistant</span><p class="pc-best">The devoted living Super Assistant across the Starseed arc.</p><div class="pc-badges"><span class="pc-b designed">planned</span></div></div><div class="pc-card" data-troupe="music-universe" data-status="planned" data-visibility="shareable"><span class="pc-kicker">the he/she paired tracks</span><h3>He-lead (paired vocals)</h3><span class="pc-task">vocal lead</span><p class="pc-best">The male voice of the he/she paired songs.</p><div class="pc-badges"><span class="pc-b designed">planned</span></div></div><div class="pc-card" data-troupe="music-universe" data-status="planned" data-visibility="shareable"><span class="pc-kicker">the he/she paired tracks</span><h3>She-lead (paired vocals)</h3><span class="pc-task">vocal lead</span><p class="pc-best">The female voice of the he/she paired songs.</p><div class="pc-badges"><span class="pc-b designed">planned</span></div></div><div class="pc-card" data-troupe="music-universe" data-status="planned" data-visibility="private"><span class="pc-kicker">real performers</span><h3>Band and supports</h3><span class="pc-task">ensemble</span><p class="pc-best">Real band and support performers; consented likenesses, kept private.</p><div class="pc-badges"><span class="pc-b designed">planned</span><span class="pc-b hero">private</span></div></div></div></section><section class="pc-group"><div class="pc-group-head"><h2>The Queens: Council of Aura</h2><span>24 heritage archetypes; also templates for culturally translated music</span></div><div class="pc-grid"><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Filipina-Australian</span><h3>Spark Queen</h3><span class="pc-task">pillar / creativity</span><p class="pc-best">Street artist turned idea-lighter; playful idea jams, courage to start tiny.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Indian-Australian</span><h3>Shield Queen</h3><span class="pc-task">pillar / law</span><p class="pc-best">Corporate lawyer turned start-up protector; guards IP, contracts, safe scaling.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">First Nations</span><h3>Seed Queen</h3><span class="pc-task">pillar / food systems</span><p class="pc-best">Farmer and land-carer; co-ops, gardens, circular regenerative loops.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Sudanese-Australian</span><h3>Storm Queen</h3><span class="pc-task">pillar / scale and disruption</span><p class="pc-best">Rebel journalist turned scale mentor; bold PR and campaigns.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Celtic and East Asian</span><h3>Star Queen</h3><span class="pc-task">pillar / vision</span><p class="pc-best">Mystic and philosopher; long-term strategy and existential alignment.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">the Aura figure</span><h3>Super Queen (Aura)</h3><span class="pc-task">pillar / AI ethics</span><p class="pc-best">The devoted living Super Assistant; alignment, narrative, swarm orchestration.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Anglo and Torres Strait Islander</span><h3>River Queen</h3><span class="pc-task">pillar / water</span><p class="pc-best">River guardian; blue economy, wetland start-ups, bio-defence.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Maltese-Australian</span><h3>Forge Queen</h3><span class="pc-task">pillar / manufacturing</span><p class="pc-best">Fab-lab matriarch; makes ideas physical from blueprint to prototype.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Greek-Australian</span><h3>Ember Queen</h3><span class="pc-task">pillar / energy</span><p class="pc-best">Bushfire survivor and renewables advocate; local grids, cultural fire, climate risk.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Afghan-Australian</span><h3>Silk Queen</h3><span class="pc-task">pillar / trade</span><p class="pc-best">Migrant trade whisperer; connects ideas to global corridors and supply chains.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Wiradjuri and Irish</span><h3>Lore Queen</h3><span class="pc-task">pillar / governance</span><p class="pc-best">Treaty dreamer and constitutional hacker; keeps ventures fair and lawful.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Chinese and Samoan</span><h3>Dream Queen</h3><span class="pc-task">pillar / culture and arts</span><p class="pc-best">VR playwright; storytelling, XR, language revival, creative economies.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">First Nations</span><h3>Rainbow Serpent Queen</h3><span class="pc-task">anchor / First Nations Dreaming</span><p class="pc-best">Keeper of country and community wisdom; anchors ventures in deep time and place.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">East Asian</span><h3>Dragon Queen</h3><span class="pc-task">anchor / East Asian</span><p class="pc-best">Keeper of precision and ritual; bridges with Asia and family-enterprise wisdom.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">South Asian diaspora</span><h3>Lotus Queen</h3><span class="pc-task">anchor / South Asian</span><p class="pc-best">Keeper of deep community loops; family enterprise and spiritual commerce.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Mediterranean</span><h3>Olive Queen</h3><span class="pc-task">anchor / Mediterranean</span><p class="pc-best">Keeper of abundance and hospitality; food, family co-ops, old-world craft.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Middle Eastern and Central Asian</span><h3>Crescent Queen</h3><span class="pc-task">anchor / Middle Eastern and Central Asian</span><p class="pc-best">Keeper of resilient trade and dignity under pressure.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Pacific, Maori, Oceanic</span><h3>Coral Queen</h3><span class="pc-task">anchor / Pacific and Oceanic</span><p class="pc-best">Keeper of island ingenuity, climate resilience and sea knowledge.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Anglo-Celtic</span><h3>Clover Queen</h3><span class="pc-task">anchor / Anglo-Celtic</span><p class="pc-best">Keeper of tales and grassroots co-ops; village collaboration and pub politics.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">African diaspora</span><h3>Flame Queen</h3><span class="pc-task">anchor / African diaspora</span><p class="pc-best">Keeper of refugee grit and unstoppable momentum; forging new communities.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Vietnamese and Thai</span><h3>Phoenix Queen</h3><span class="pc-task">anchor / Southeast Asian</span><p class="pc-best">Keeper of rebirth and hustle; small-business hustle and family capital.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Anglo-colonial</span><h3>Sun Queen</h3><span class="pc-task">anchor / Anglo-colonial</span><p class="pc-best">Keeper of the middle ground; land stewards and town-hall convenors.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Third Culture Kids</span><h3>Pearl Queen</h3><span class="pc-task">anchor / global hybrid</span><p class="pc-best">Keeper of cross-border agility and hybrid innovation.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="queens" data-status="concept" data-visibility="shareable"><span class="pc-kicker">neurodiverse and LGBTQI+</span><h3>Prism Queen</h3><span class="pc-task">anchor / intersectional</span><p class="pc-best">Keeper of safe spaces and radical inclusivity; design for difference.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div></div></section><section class="pc-group"><div class="pc-group-head"><h2>Amity AI film crew</h2><span>The AI filmmaking assistants, each an Australian animal spirit</span></div><div class="pc-grid"><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Kookaburra</span><h3>The Director</h3><span class="pc-task">director</span><p class="pc-best">Head of operations, guiding the creative process from start to finish.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Eagle</span><h3>The Cinematographer</h3><span class="pc-task">cinematographer</span><p class="pc-best">The sharp eye for detail, capturing the big picture with precision.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Lorikeet</span><h3>The Art Director</h3><span class="pc-task">art director</span><p class="pc-best">Generates visual concepts, moods and character designs.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Stone-Curlew</span><h3>The Sound Recordist</h3><span class="pc-task">sound</span><p class="pc-best">Captures the sounds of Country and creates the film&#x27;s soundscape.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Goanna</span><h3>The Gaffer</h3><span class="pc-task">gaffer</span><p class="pc-best">Technical problem-solver, managing lighting and on-set logistics.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Koala</span><h3>The Costume Designer</h3><span class="pc-task">costume and production design</span><p class="pc-best">Handles wardrobe and production design using holographic tools.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Turtle</span><h3>The Underwater Unit</h3><span class="pc-task">underwater unit</span><p class="pc-best">Specialist for capturing the marine beauty of Minjerribah.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Dolphin</span><h3>The Community Lead</h3><span class="pc-task">community and training</span><p class="pc-best">The friendly, community-facing agent for workshops and training.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Kangaroo</span><h3>The Logistics Manager</h3><span class="pc-task">logistics</span><p class="pc-best">Organises digital assets, data and project files.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="amity-crew" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Robot and Snake</span><h3>The Core Engine</h3><span class="pc-task">core model</span><p class="pc-best">The powerful, adaptable AI model at the heart of the creative ecosystem.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div></div></section><section class="pc-group"><div class="pc-group-head"><h2>Two Dogs podcast</h2><span>Spirit-animal hosts; guests bring their own animal</span></div><div class="pc-grid"><div class="pc-card" data-troupe="two-dogs" data-status="concept" data-visibility="shareable"><span class="pc-kicker">Red Heeler (Luke)</span><h3>Red Dog</h3><span class="pc-task">host</span><p class="pc-best">Co-host carrying Luke&#x27;s deeper context; curious, blunt, systems-seeing, turns deep data into a simple yarn.</p><div class="pc-badges"><span class="pc-b planned">concept</span></div></div><div class="pc-card" data-troupe="two-dogs" data-status="concept" data-visibility="private"><span class="pc-kicker">Blue Heeler (Angel)</span><h3>Blue Dog</h3><span class="pc-task">host</span><p class="pc-best">Co-host voiced and directed by Angel; the repo leaves his inner voice to him, never scripts it.</p><div class="pc-badges"><span class="pc-b planned">concept</span><span class="pc-b hero">private</span></div></div></div></section><script>const PC_NOUN="character";
+const pcState={};
+document.querySelectorAll('.pc-chip[data-group]').forEach(c=>{
+  pcState[c.dataset.group]=pcState[c.dataset.group]||new Set()});
+function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
+  const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
+  else{s.add(v);el.classList.add('on')}pcFilter()}
+function pcClear(){for(const g in pcState)pcState[g].clear();
+  document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
+  pcFilter()}
+function pcMatch(card){for(const g in pcState){const sel=pcState[g];
+  if(!sel.size)continue;
+  const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
+  if(![...sel].some(v=>vals.includes(v)))return false}return true}
+function pcFilter(){let n=0;document.querySelectorAll('.pc-card').forEach(c=>{
+  const ok=pcMatch(c);c.classList.toggle('hidden',!ok);if(ok)n++});
+  document.querySelectorAll('.pc-group').forEach(g=>{
+    const any=[...g.querySelectorAll('.pc-card')].some(c=>!c.classList.contains('hidden'));
+    g.classList.toggle('hidden',!any)});
+  document.getElementById('pcCount').textContent=
+    n+' '+PC_NOUN+(n===1?'':'s')+' shown'}
+function pcMore(b){b.nextElementSibling.classList.toggle('open')}
+</script>
+</main>
+<footer class="site-footer"><div class="wrap">A live monitor of the i C.
+infinity visual pipeline. Regenerated from the song vault as pieces
+complete. Lyrics live with the music, not here.<br>Luke &times; Claude.</div>
+</footer>
+<script>
+(function(){var h=document.querySelector('.site-header'),
+p=document.querySelector('.scroll-progress i');
+function s(){var y=scrollY||0,d=document.body.scrollHeight-innerHeight;
+if(p)p.style.transform='scaleX('+(d>0?Math.min(y/d,1):0)+')';
+if(h)h.classList.toggle('is-condensed',y>24)}
+addEventListener('scroll',s,{passive:true});s();
+var io=new IntersectionObserver(function(es){es.forEach(function(e){
+if(e.isIntersecting){e.target.classList.add('is-visible');io.unobserve(e.target)}})},
+{rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});})();
+</script>
+</body></html>

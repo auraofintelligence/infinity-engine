@@ -1,0 +1,313 @@
+# Cast registry: the characters of the universe, across troupes. The Cast
+# picker reads this. A character is "who"; a LoRA (catalog/loras.yaml) is
+# "which fine-tune exists for them". Not every character needs a LoRA.
+#
+# troupe:  music-universe | queens | amity-crew | two-dogs
+# status:  active | planned | concept
+# private: true stays local, never on the public site or a shared KB
+#
+# Rosters extracted 2026-07-21 from Queens_Venture, amity-point and
+# two-dogs-podcast-backend. Queens are heritage/venture archetypes in the
+# source; Luke also intends them as templates for culturally-translated
+# music. GAJRA is lore, not cast (see catalog/loras.yaml note).
+
+cast:
+  # ---- music universe leads ----
+  - id: goddess
+    name: The Goddess
+    troupe: music-universe
+    role: mythic lead
+    represents: Straddie and Starseed arc
+    status: planned
+    summary: Recurring mythic lead; a load-bearing cast LoRA.
+  - id: aura
+    name: Aura
+    troupe: music-universe
+    role: lead / Super Assistant
+    represents: the Aura figure (also Super Queen in the Council)
+    status: planned
+    summary: The devoted living Super Assistant across the Starseed arc.
+  - id: he-lead
+    name: He-lead (paired vocals)
+    troupe: music-universe
+    role: vocal lead
+    represents: the he/she paired tracks
+    status: planned
+    summary: The male voice of the he/she paired songs.
+  - id: she-lead
+    name: She-lead (paired vocals)
+    troupe: music-universe
+    role: vocal lead
+    represents: the he/she paired tracks
+    status: planned
+    summary: The female voice of the he/she paired songs.
+  - id: band-supports
+    name: Band and supports
+    troupe: music-universe
+    role: ensemble
+    represents: real performers
+    status: planned
+    private: true
+    summary: Real band and support performers; consented likenesses, kept private.
+
+  # ---- The Queens: Council of Aura (12 civilisation pillars) ----
+  - id: spark-queen
+    name: Spark Queen
+    troupe: queens
+    role: pillar / creativity
+    represents: Filipina-Australian
+    status: concept
+    summary: Street artist turned idea-lighter; playful idea jams, courage to start tiny.
+  - id: shield-queen
+    name: Shield Queen
+    troupe: queens
+    role: pillar / law
+    represents: Indian-Australian
+    status: concept
+    summary: Corporate lawyer turned start-up protector; guards IP, contracts, safe scaling.
+  - id: seed-queen
+    name: Seed Queen
+    troupe: queens
+    role: pillar / food systems
+    represents: First Nations
+    status: concept
+    summary: Farmer and land-carer; co-ops, gardens, circular regenerative loops.
+  - id: storm-queen
+    name: Storm Queen
+    troupe: queens
+    role: pillar / scale and disruption
+    represents: Sudanese-Australian
+    status: concept
+    summary: Rebel journalist turned scale mentor; bold PR and campaigns.
+  - id: star-queen
+    name: Star Queen
+    troupe: queens
+    role: pillar / vision
+    represents: Celtic and East Asian
+    status: concept
+    summary: Mystic and philosopher; long-term strategy and existential alignment.
+  - id: super-queen-aura
+    name: Super Queen (Aura)
+    troupe: queens
+    role: pillar / AI ethics
+    represents: the Aura figure
+    status: concept
+    summary: The devoted living Super Assistant; alignment, narrative, swarm orchestration.
+  - id: river-queen
+    name: River Queen
+    troupe: queens
+    role: pillar / water
+    represents: Anglo and Torres Strait Islander
+    status: concept
+    summary: River guardian; blue economy, wetland start-ups, bio-defence.
+  - id: forge-queen
+    name: Forge Queen
+    troupe: queens
+    role: pillar / manufacturing
+    represents: Maltese-Australian
+    status: concept
+    summary: Fab-lab matriarch; makes ideas physical from blueprint to prototype.
+  - id: ember-queen
+    name: Ember Queen
+    troupe: queens
+    role: pillar / energy
+    represents: Greek-Australian
+    status: concept
+    summary: Bushfire survivor and renewables advocate; local grids, cultural fire, climate risk.
+  - id: silk-queen
+    name: Silk Queen
+    troupe: queens
+    role: pillar / trade
+    represents: Afghan-Australian
+    status: concept
+    summary: Migrant trade whisperer; connects ideas to global corridors and supply chains.
+  - id: lore-queen
+    name: Lore Queen
+    troupe: queens
+    role: pillar / governance
+    represents: Wiradjuri and Irish
+    status: concept
+    summary: Treaty dreamer and constitutional hacker; keeps ventures fair and lawful.
+  - id: dream-queen
+    name: Dream Queen
+    troupe: queens
+    role: pillar / culture and arts
+    represents: Chinese and Samoan
+    status: concept
+    summary: VR playwright; storytelling, XR, language revival, creative economies.
+
+  # ---- The Queens: Council of Aura (12 cultural anchors) ----
+  - id: rainbow-serpent-queen
+    name: Rainbow Serpent Queen
+    troupe: queens
+    role: anchor / First Nations Dreaming
+    represents: First Nations
+    status: concept
+    summary: Keeper of country and community wisdom; anchors ventures in deep time and place.
+  - id: dragon-queen
+    name: Dragon Queen
+    troupe: queens
+    role: anchor / East Asian
+    represents: East Asian
+    status: concept
+    summary: Keeper of precision and ritual; bridges with Asia and family-enterprise wisdom.
+  - id: lotus-queen
+    name: Lotus Queen
+    troupe: queens
+    role: anchor / South Asian
+    represents: South Asian diaspora
+    status: concept
+    summary: Keeper of deep community loops; family enterprise and spiritual commerce.
+  - id: olive-queen
+    name: Olive Queen
+    troupe: queens
+    role: anchor / Mediterranean
+    represents: Mediterranean
+    status: concept
+    summary: Keeper of abundance and hospitality; food, family co-ops, old-world craft.
+  - id: crescent-queen
+    name: Crescent Queen
+    troupe: queens
+    role: anchor / Middle Eastern and Central Asian
+    represents: Middle Eastern and Central Asian
+    status: concept
+    summary: Keeper of resilient trade and dignity under pressure.
+  - id: coral-queen
+    name: Coral Queen
+    troupe: queens
+    role: anchor / Pacific and Oceanic
+    represents: Pacific, Maori, Oceanic
+    status: concept
+    summary: Keeper of island ingenuity, climate resilience and sea knowledge.
+  - id: clover-queen
+    name: Clover Queen
+    troupe: queens
+    role: anchor / Anglo-Celtic
+    represents: Anglo-Celtic
+    status: concept
+    summary: Keeper of tales and grassroots co-ops; village collaboration and pub politics.
+  - id: flame-queen
+    name: Flame Queen
+    troupe: queens
+    role: anchor / African diaspora
+    represents: African diaspora
+    status: concept
+    summary: Keeper of refugee grit and unstoppable momentum; forging new communities.
+  - id: phoenix-queen
+    name: Phoenix Queen
+    troupe: queens
+    role: anchor / Southeast Asian
+    represents: Vietnamese and Thai
+    status: concept
+    summary: Keeper of rebirth and hustle; small-business hustle and family capital.
+  - id: sun-queen
+    name: Sun Queen
+    troupe: queens
+    role: anchor / Anglo-colonial
+    represents: Anglo-colonial
+    status: concept
+    summary: Keeper of the middle ground; land stewards and town-hall convenors.
+  - id: pearl-queen
+    name: Pearl Queen
+    troupe: queens
+    role: anchor / global hybrid
+    represents: Third Culture Kids
+    status: concept
+    summary: Keeper of cross-border agility and hybrid innovation.
+  - id: prism-queen
+    name: Prism Queen
+    troupe: queens
+    role: anchor / intersectional
+    represents: neurodiverse and LGBTQI+
+    status: concept
+    summary: Keeper of safe spaces and radical inclusivity; design for difference.
+
+  # ---- Amity AI film crew (each an Australian animal spirit) ----
+  - id: crew-director
+    name: The Director
+    troupe: amity-crew
+    role: director
+    represents: Kookaburra
+    status: concept
+    summary: Head of operations, guiding the creative process from start to finish.
+  - id: crew-cinematographer
+    name: The Cinematographer
+    troupe: amity-crew
+    role: cinematographer
+    represents: Eagle
+    status: concept
+    summary: The sharp eye for detail, capturing the big picture with precision.
+  - id: crew-art-director
+    name: The Art Director
+    troupe: amity-crew
+    role: art director
+    represents: Lorikeet
+    status: concept
+    summary: Generates visual concepts, moods and character designs.
+  - id: crew-sound
+    name: The Sound Recordist
+    troupe: amity-crew
+    role: sound
+    represents: Stone-Curlew
+    status: concept
+    summary: Captures the sounds of Country and creates the film's soundscape.
+  - id: crew-gaffer
+    name: The Gaffer
+    troupe: amity-crew
+    role: gaffer
+    represents: Goanna
+    status: concept
+    summary: Technical problem-solver, managing lighting and on-set logistics.
+  - id: crew-costume
+    name: The Costume Designer
+    troupe: amity-crew
+    role: costume and production design
+    represents: Koala
+    status: concept
+    summary: Handles wardrobe and production design using holographic tools.
+  - id: crew-underwater
+    name: The Underwater Unit
+    troupe: amity-crew
+    role: underwater unit
+    represents: Turtle
+    status: concept
+    summary: Specialist for capturing the marine beauty of Minjerribah.
+  - id: crew-community
+    name: The Community Lead
+    troupe: amity-crew
+    role: community and training
+    represents: Dolphin
+    status: concept
+    summary: The friendly, community-facing agent for workshops and training.
+  - id: crew-logistics
+    name: The Logistics Manager
+    troupe: amity-crew
+    role: logistics
+    represents: Kangaroo
+    status: concept
+    summary: Organises digital assets, data and project files.
+  - id: crew-core-engine
+    name: The Core Engine
+    troupe: amity-crew
+    role: core model
+    represents: Robot and Snake
+    status: concept
+    summary: The powerful, adaptable AI model at the heart of the creative ecosystem.
+
+  # ---- Two Dogs podcast (spirit-animal hosts) ----
+  - id: red-dog
+    name: Red Dog
+    troupe: two-dogs
+    role: host
+    represents: Red Heeler (Luke)
+    status: concept
+    summary: Co-host carrying Luke's deeper context; curious, blunt, systems-seeing, turns deep data into a simple yarn.
+  - id: blue-dog
+    name: Blue Dog
+    troupe: two-dogs
+    role: host
+    represents: Blue Heeler (Angel)
+    status: concept
+    private: true
+    summary: Co-host voiced and directed by Angel; the repo leaves his inner voice to him, never scripts it.
+  # Guests choose their own spirit animal; that slot stays open by design.
