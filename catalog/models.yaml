@@ -29,7 +29,7 @@ models:
     category: video
     task: text/image-to-video
     hf: tencent/HunyuanVideo-1.5
-    licence: Apache 2.0
+    licence: Tencent Community (>100M-MAU clause; NOT Apache, verified)
     vram_gb: "14-24"
     comfy: yes
     status: active
@@ -81,17 +81,17 @@ models:
     status: active
     likes: 400
     why: Capture pose from any footage; runs local, no GPU spend.
-  - id: sam-2
-    name: SAM 2
+  - id: sam-3-1
+    name: SAM 3.1
     category: control
     task: segmentation (image/video)
-    hf: facebook/sam2-hiera-large
-    licence: Apache 2.0
+    hf: facebook/sam3
+    licence: Meta SAM Licence (permissive, not OSI; check terms)
     vram_gb: "low / local"
     comfy: yes
     status: active
-    likes: 3200
-    why: Detect, lift and lock objects/backgrounds across shots.
+    likes: 3600
+    why: Promotes SAM 2. Promptable concept segmentation (text/exemplar picks all matching instances at once) plus faster video tracking; detect, lift and lock objects across shots.
   - id: depth-anything-v2
     name: Depth Anything v2
     category: control
@@ -106,7 +106,7 @@ models:
 
   # ---- image ----
   - id: qwen-image-edit
-    name: Qwen-Image + Edit 2511
+    name: Qwen-Image + Edit 2512
     category: image
     task: text-to-image + edit
     hf: Qwen/Qwen-Image
@@ -115,7 +115,18 @@ models:
     comfy: yes
     status: active
     likes: 2100
-    why: 2026 standard for character consistency; best open text/lettering.
+    why: Character consistency and best open text/lettering; 2512 edit build tops the 2511 you had.
+  - id: z-image-turbo
+    name: Z-Image Turbo
+    category: image
+    task: text-to-image
+    hf: Tongyi-MAI/Z-Image-Turbo
+    licence: Apache 2.0
+    vram_gb: "5-16"
+    comfy: yes
+    status: active
+    likes: 5000
+    why: Near-flagship quality at tiny VRAM (~2.3s/image on a 4090, 8 steps); the best efficiency-per-licence play. Verified on ComfyUI Wiki + HF.
   - id: flux-2-klein
     name: FLUX.2 Klein 4B
     category: image
@@ -175,17 +186,39 @@ models:
     why: Fastest narration voice; cannot clone.
 
   # ---- stt ----
+  - id: canary-qwen
+    name: NVIDIA Canary-Qwen 2.5B
+    category: stt
+    task: speech-to-text (English)
+    hf: nvidia/canary-qwen-2.5b
+    licence: NVIDIA open (verify exact terms)
+    vram_gb: "low"
+    comfy: no
+    status: active
+    likes: 800
+    why: #1 on the HF Open ASR Leaderboard (~5.6% avg WER); the English accuracy leader, past Whisper.
+  - id: parakeet-tdt
+    name: NVIDIA Parakeet TDT 1.1B
+    category: stt
+    task: speech-to-text (English)
+    hf: nvidia/parakeet-tdt-1.1b
+    licence: NVIDIA open (verify)
+    vram_gb: "low"
+    comfy: no
+    status: recon
+    likes: 600
+    why: Fastest high-quality open ASR; best throughput for bulk autocaptioning.
   - id: whisper-large-v3
     name: Whisper large v3
     category: stt
-    task: speech-to-text
+    task: speech-to-text (multilingual)
     hf: openai/whisper-large-v3
     licence: Apache 2.0
     vram_gb: "6-10"
     comfy: partial
     status: active
     likes: 4600
-    why: The transcription and autocaption backbone; strong multilingual.
+    why: Now the multilingual fallback (99+ languages), not the English accuracy leader. Widely deployed.
   - id: faster-whisper
     name: faster-whisper (distil)
     category: stt
@@ -244,7 +277,18 @@ models:
     comfy: no
     status: active
     likes: 2200
-    why: Strongest single-24GB-card ideation model for local scripting.
+    why: Strongest single-24GB-card ideation model for local scripting. Verify the exact 27B dense build exists (mainline Qwen3.6 reads as MoE).
+  - id: glm-5-2
+    name: GLM-5.2
+    category: llm
+    task: agentic scripting
+    hf: zai-org/GLM-5.2
+    licence: MIT/Apache
+    vram_gb: "rented multi-GPU"
+    comfy: no
+    status: recon
+    likes: 900
+    why: Highest-ranked open-weight model on Artificial Analysis (Intelligence Index 51); for rented big GPUs, not a desktop card. Verified.
   - id: qwen3-embedding
     name: Qwen3-Embedding-0.6B
     category: embeddings

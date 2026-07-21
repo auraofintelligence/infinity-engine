@@ -28,3 +28,43 @@ queue:
   link: https://huggingface.co/k2-fsa/OmniVoice
   status: new
   notes: 600+ language zero-shot cloning; the multilingual wildcard for the dub lane.
+- id: wan-s2v
+  name: Wan-S2V
+  category: lipsync
+  flagged_reason: hyped
+  flagged_date: 2026-07-21
+  link: https://arxiv.org/abs/2508.18621
+  status: new
+  notes: Audio-driven cinematic avatar on the Wan stack; paper reports it beats HunyuanVideo-Avatar and OmniHuman. Slots into the existing Wan setup, test next.
+- id: fish-audio-s2
+  name: Fish Audio S2 / S2-Pro
+  category: tts
+  flagged_reason: hyped
+  flagged_date: 2026-07-21
+  link: https://huggingface.co/fishaudio/s2-pro
+  status: new
+  notes: Tops independent TTS benchmarks (paralinguistics), sub-100ms, 80+ langs. LICENCE non-commercial (research); commercial needs paid licence. Quality ceiling only.
+- id: kimi-k2-6
+  name: Kimi K2.6
+  category: llm
+  flagged_reason: hyped
+  flagged_date: 2026-07-21
+  link: https://artificialanalysis.ai/models/kimi-k2-6
+  status: new
+  notes: Top open coding model (~1T MoE, modified MIT); needs serious rented hardware. For big-GPU scripting runs.
+- id: wan-2-7
+  name: Wan 2.7
+  category: video
+  flagged_reason: hyped
+  flagged_date: 2026-07-21
+  link: https://www.wan-video.com/
+  status: new
+  notes: "UNVERIFIED: reported April 2026 with first/last-frame control and 9-grid input, but open-weight release NOT confirmed (Wan 2.5 was API-only). Confirm weights are actually open before adopting."
+- id: cosmos3-t2i
+  name: Cosmos3-Super-Text2Image
+  category: image
+  flagged_reason: hyped
+  flagged_date: 2026-07-21
+  link: https://llm-stats.com/leaderboards/best-ai-for-image-generation
+  status: new
+  notes: "UNVERIFIED: claimed open T2I leader (~1219 Elo, 65B) from a single low-quality source. Needs primary confirmation before trusting."
