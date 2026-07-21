@@ -752,6 +752,35 @@ def _worlds_subtype(m: dict) -> str:
     return "object"
 
 
+# Content note: is a tool censored, or NSFW-capable. Open weights can be
+# run without a provider filter (and uncensored fine-tunes exist), so they
+# read "unfiltered"; closed tools enforce a policy ("filtered"), and the
+# big labs block NSFW/celebrity/violence hard ("strict"). Geometry, capture,
+# STT and embeddings aren't content-gated ("n/a", shown as no badge).
+# An explicit `content:` field in the YAML always wins.
+CONTENT_BADGE = {"unfiltered": "planned", "filtered": "designed",
+                 "strict": "hero"}
+_STRICT_FRONTIER = {"sora", "veo-3", "midjourney", "firefly-image",
+                    "firefly-video", "gemini-image"}
+_NON_CONTENT_CATS = {"worlds", "control", "stt", "embeddings"}
+
+
+def _content(m: dict, is_open: bool) -> str:
+    if m.get("content"):
+        return str(m["content"])
+    if m.get("category") in _NON_CONTENT_CATS:
+        return "n/a"
+    if is_open:
+        return "unfiltered"
+    return "strict" if m.get("id") in _STRICT_FRONTIER else "filtered"
+
+
+def _content_badge(content: str) -> str:
+    if content not in CONTENT_BADGE:
+        return ""
+    return f'<span class="pc-b {CONTENT_BADGE[content]}">{content}</span>'
+
+
 def _sort_attrs(m: dict, sortnum) -> dict:
     a = {"sortname": [str(m.get("name", m.get("id", ""))).lower()],
          "sortnum": [str(sortnum or 0)]}
@@ -777,6 +806,7 @@ def _model_card(m: dict) -> tuple:
         + ('<span class="pc-b built">ComfyUI</span>' if comfy == "yes" else "")
         + (f'<span class="pc-b {"built" if commercial else "hero"}">'
            f'{"commercial" if commercial else "restricted"}</span>')
+        + _content_badge(_content(m, is_open=True))
         + '</div>'
         f'<div class="pc-meta"><b>Licence:</b> {_esc(m.get("licence",""))}<br>'
         f'<b>VRAM:</b> {_esc(m.get("vram_gb","?"))} GB '
@@ -787,12 +817,15 @@ def _model_card(m: dict) -> tuple:
            else (f'<a class="pc-more" href="{_esc(m.get("repo",""))}" '
                  'target="_blank" rel="noopener">Repo &rarr;</a>'
                  if m.get("repo") else "")))
+    content = _content(m, is_open=True)
     attrs = {
         "category": [str(m.get("category", ""))],
         "status": [status],
         "licence": ["commercial" if commercial else "restricted"],
         **_sort_attrs(m, m.get("likes")),
     }
+    if content in CONTENT_BADGE:
+        attrs["content"] = [content]
     return attrs, inner
 
 
@@ -819,6 +852,7 @@ def render_models(out_dir: Path) -> Path | None:
         ("3D type", "subtype", world_types),
         ("Status", "status", ["active", "recon", "watching"]),
         ("Licence", "licence", ["commercial", "restricted"]),
+        ("Content", "content", ["unfiltered", "filtered", "strict"]),
     ]
     return render_picker(
         out_dir, filename="models.html", title="Model picker", noun="model",
@@ -1159,17 +1193,21 @@ def _frontier_card(m: dict) -> tuple:
         f'<span class="pc-task">{_esc(m.get("category",""))}</span>'
         f'<p class="pc-best">{_esc(m.get("strength",""))}</p>'
         '<div class="pc-badges">'
-        f'<span class="pc-b {aff_class}">{aff_label}</span></div>'
+        f'<span class="pc-b {aff_class}">{aff_label}</span>'
+        + _content_badge(_content(m, is_open=False)) + '</div>'
         f'<div class="pc-meta"><b>Access:</b> {_esc(m.get("access",""))} '
         f'&middot; <b>Price:</b> {_esc(m.get("pricing","?"))}{terms}</div>'
         f'{links}')
     aff_rank = {"yes": 3, "referral": 2, "unknown": 1, "no": 0}.get(aff, 0)
+    content = _content(m, is_open=False)
     attrs = {
         "category": [str(m.get("category", ""))],
         "access": [str(m.get("access", "")).split("/")[0].strip().lower()],
         "affiliate": [aff],
         **_sort_attrs(m, aff_rank),
     }
+    if content in CONTENT_BADGE:
+        attrs["content"] = [content]
     return attrs, inner
 
 
@@ -1191,6 +1229,7 @@ def render_frontier(out_dir: Path) -> Path | None:
                                          for m in models)]),
         ("3D type", "subtype", world_types),
         ("Affiliate", "affiliate", ["yes", "referral", "no"]),
+        ("Content", "content", ["unfiltered", "filtered", "strict"]),
     ]
     disclosure = (
         "Closed, pay-to-play frontier models: the ones with the deepest "
