@@ -734,6 +734,17 @@ MODEL_CATEGORIES = {
 
 
 WORLDS_SUBTYPES = ["object", "world", "capture", "360"]
+SUBTYPE_ORDER = ["object", "world", "capture", "360", "realtime"]
+
+
+def _subtype(m: dict) -> str | None:
+    """A card's sub-type for the Type facet: explicit `subtype:` wins;
+    worlds entries infer object/world/capture/360; others have none."""
+    if m.get("subtype"):
+        return str(m["subtype"])
+    if m.get("category") == "worlds":
+        return _worlds_subtype(m)
+    return None
 
 
 def _worlds_subtype(m: dict) -> str:

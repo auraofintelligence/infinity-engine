@@ -16,6 +16,7 @@ import json
 import re
 from pathlib import Path
 
+from .structure import parse_structure
 from .vault import INGEST_OWNED, Note, note_path, read_note, write_note
 
 LYRICS_RE = re.compile(r'<pre class="lyrics">(.*?)</pre>', re.DOTALL)
@@ -49,12 +50,16 @@ def guess_themes(lyrics: str) -> list[str]:
 def _merge(vault_dir: Path, slug: str, fresh_meta: dict, lyrics: str,
            default_lane: str = "lyric-video") -> str:
     """Create or update a note. Returns 'created' or 'updated'."""
+    struct = parse_structure(lyrics)
     path = note_path(vault_dir, slug)
     if path.exists():
         note = read_note(path)
         for key in INGEST_OWNED:
             if fresh_meta.get(key) is not None:
                 note.meta[key] = fresh_meta[key]
+        # Structure is derived from the lyrics, so always refresh it.
+        note.meta["structure"] = struct["sections"]
+        note.meta["motifs"] = struct["motifs"]
         note.body = lyrics
         write_note(vault_dir, note)
         return "updated"
@@ -65,6 +70,8 @@ def _merge(vault_dir: Path, slug: str, fresh_meta: dict, lyrics: str,
     meta.setdefault("mood", None)
     meta.setdefault("narrative_structure", None)
     meta.setdefault("visual_motifs", [])
+    meta["structure"] = struct["sections"]
+    meta["motifs"] = struct["motifs"]
     meta.setdefault("lanes", [default_lane])
     write_note(vault_dir, Note(slug=slug, meta=meta, body=lyrics))
     return "created"

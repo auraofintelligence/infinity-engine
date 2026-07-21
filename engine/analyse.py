@@ -14,21 +14,35 @@ import json
 import subprocess
 from pathlib import Path
 
+from .structure import structure_digest
 from .vault import Note, note_path, read_note, write_note
 
 PROMPT_TEMPLATE = """You are the lyrical intelligence layer of the Infinity Engine,
 analysing one song from the i C. infinity universe so visuals can be
-made from it. Respond with ONLY a JSON object, no prose, using exactly
-these keys:
+made from it. Work from the SONG STRUCTURE below, not just the words:
+verses, chorus, bridge each want their own look and energy. Ground every
+image in the actual lyrics and the album's visual world; do not invent
+imagery the song does not support. Respond with ONLY a JSON object, no
+prose, using exactly these keys:
 
 {{
   "themes": [..],              // choose only from: {themes}
   "mood": "..",                // choose one from: {moods}
   "narrative_structure": "..", // choose one from: {structures}
-  "visual_motifs": [..],       // 4-8 concrete filmable images drawn from the lyrics
+  "visual_motifs": [..],       // 4-8 concrete filmable images that recur (use the motifs below)
   "emotional_arc": "..",       // one sentence, start state to end state
   "story_seed": "..",          // 2-3 sentences: a micro-drama premise for this song
-  "panel_beats": [..]          // 8-12 one-line comic panel descriptions in order
+  "section_plan": [            // ONE entry per section below, in order:
+    {{
+      "section": "..",         // echo the section label (verse 1, chorus, ...)
+      "topic": "..",           // what this part is actually about, in a phrase
+      "set": "..",             // the location/environment this section lives in
+      "scene": "..",           // the action or image on screen through it
+      "energy": "..",          // low | building | high | falling  (the flow)
+      "transition": ".."       // how it hands off to the next section
+    }}
+  ],
+  "panel_beats": [..]          // 8-12 one-line comic panels, following the section flow
 }}
 
 Song: {title}
@@ -36,15 +50,20 @@ Album: {album}
 Album visual world: {visual_world}
 Existing meaning note: {meaning}
 
-Lyrics:
+SONG STRUCTURE (parsed; keys are salient words per section):
+{structure}
+
+Full lyrics:
 {lyrics}
 """
 
 ANALYSIS_KEYS = ("themes", "mood", "narrative_structure", "visual_motifs",
-                 "emotional_arc", "story_seed", "panel_beats")
+                 "emotional_arc", "story_seed", "section_plan", "panel_beats")
 
 
 def build_prompt(note: Note, ontology: dict) -> str:
+    structure = {"sections": note.meta.get("structure") or [],
+                 "motifs": note.meta.get("motifs") or []}
     return PROMPT_TEMPLATE.format(
         themes=", ".join(ontology["themes"]),
         moods=", ".join(ontology["moods"]),
@@ -53,6 +72,7 @@ def build_prompt(note: Note, ontology: dict) -> str:
         album=note.meta.get("album", "?"),
         visual_world=note.meta.get("album_visual_world", "not specified"),
         meaning=note.meta.get("meaning", "none"),
+        structure=structure_digest(structure),
         lyrics=note.body.strip(),
     )
 
