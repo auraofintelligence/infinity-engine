@@ -51,7 +51,7 @@ nav a:hover,nav a[aria-current="page"]{color:#fff;background:rgba(124,77,255,.2)
 border-radius:999px;color:var(--mut);white-space:nowrap;transition:.2s;
 display:inline-flex;align-items:center;gap:.3rem}
 .nav-menu>summary::-webkit-details-marker{display:none}
-.nav-menu>summary::after{content:"be";font-size:.7em;opacity:.7}
+.nav-menu>summary::after{content:"\25BE";font-size:.7em;opacity:.7}
 .nav-menu[open]>summary,.nav-menu>summary:hover{color:#fff;background:rgba(124,77,255,.2)}
 .nav-drop{position:absolute;top:calc(100% + .4rem);left:0;z-index:60;
 display:grid;gap:.1rem;min-width:12rem;padding:.4rem;
@@ -92,15 +92,18 @@ vertical-align:top}
 th{color:var(--gold);font-family:var(--fm);font-size:.72rem;
 text-transform:uppercase;letter-spacing:.08em}
 .theme{color:var(--amethyst);font-size:.8rem;margin-right:.45rem;white-space:nowrap}
-.song-struct{margin-top:.35rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
-.song-struct .shape{font-family:var(--fm);font-size:.66rem;letter-spacing:.12em;
-color:var(--gold);border:1px solid var(--line);border-radius:5px;padding:.05rem .45rem}
-.song-struct .motif{font-family:var(--fm);font-size:.68rem;color:var(--amethyst);
-background:rgba(124,77,255,.12);border-radius:5px;padding:.02rem .4rem}
+.song-struct{margin-top:.4rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.song-struct .song-seed{width:100%;color:#d6d1ea;font-size:.85rem;
+line-height:1.4;margin-bottom:.15rem}
+.song-struct .motif{font-size:.76rem;color:var(--amethyst);
+background:rgba(124,77,255,.12);border-radius:6px;padding:.06rem .45rem}
 .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
 gap:.7rem;margin:1.4rem 0}
-.legend div{border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;
-font-size:.9rem;background:rgba(255,255,255,.03)}
+.legend div,.legend a{border:1px solid var(--line);border-radius:12px;
+padding:.7rem .9rem;font-size:.9rem;background:rgba(255,255,255,.03)}
+.legend a{display:block;text-decoration:none;transition:border-color .2s,background .2s}
+.legend a:hover{border-color:rgba(43,227,194,.5);background:rgba(43,227,194,.05)}
+.card .go{margin-top:.5rem;color:var(--teal);font-weight:640;font-size:.9rem}
 .site-footer{border-top:1px solid var(--line);margin-top:3.5rem;
 background:rgba(6,8,14,.6)}
 .site-footer .wrap{padding:1.8rem clamp(1rem,4vw,2rem) 2.4rem;

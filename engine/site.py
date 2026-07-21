@@ -75,7 +75,7 @@ nav a:hover,nav a[aria-current="page"]{color:#fff;background:rgba(124,77,255,.2)
 border-radius:999px;color:var(--mut);white-space:nowrap;transition:.2s;
 display:inline-flex;align-items:center;gap:.3rem}
 .nav-menu>summary::-webkit-details-marker{display:none}
-.nav-menu>summary::after{content:"\25be";font-size:.7em;opacity:.7}
+.nav-menu>summary::after{content:"\\25BE";font-size:.7em;opacity:.7}
 .nav-menu[open]>summary,.nav-menu>summary:hover{color:#fff;background:rgba(124,77,255,.2)}
 .nav-drop{position:absolute;top:calc(100% + .4rem);left:0;z-index:60;
 display:grid;gap:.1rem;min-width:12rem;padding:.4rem;
@@ -116,15 +116,18 @@ vertical-align:top}
 th{color:var(--gold);font-family:var(--fm);font-size:.72rem;
 text-transform:uppercase;letter-spacing:.08em}
 .theme{color:var(--amethyst);font-size:.8rem;margin-right:.45rem;white-space:nowrap}
-.song-struct{margin-top:.35rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
-.song-struct .shape{font-family:var(--fm);font-size:.66rem;letter-spacing:.12em;
-color:var(--gold);border:1px solid var(--line);border-radius:5px;padding:.05rem .45rem}
-.song-struct .motif{font-family:var(--fm);font-size:.68rem;color:var(--amethyst);
-background:rgba(124,77,255,.12);border-radius:5px;padding:.02rem .4rem}
+.song-struct{margin-top:.4rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.song-struct .song-seed{width:100%;color:#d6d1ea;font-size:.85rem;
+line-height:1.4;margin-bottom:.15rem}
+.song-struct .motif{font-size:.76rem;color:var(--amethyst);
+background:rgba(124,77,255,.12);border-radius:6px;padding:.06rem .45rem}
 .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
 gap:.7rem;margin:1.4rem 0}
-.legend div{border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;
-font-size:.9rem;background:rgba(255,255,255,.03)}
+.legend div,.legend a{border:1px solid var(--line);border-radius:12px;
+padding:.7rem .9rem;font-size:.9rem;background:rgba(255,255,255,.03)}
+.legend a{display:block;text-decoration:none;transition:border-color .2s,background .2s}
+.legend a:hover{border-color:rgba(43,227,194,.5);background:rgba(43,227,194,.05)}
+.card .go{margin-top:.5rem;color:var(--teal);font-weight:640;font-size:.9rem}
 .site-footer{border-top:1px solid var(--line);margin-top:3.5rem;
 background:rgba(6,8,14,.6)}
 .site-footer .wrap{padding:1.8rem clamp(1rem,4vw,2rem) 2.4rem;
@@ -440,14 +443,18 @@ def _section_shape(structure) -> str:
     return " ".join(out)
 
 
-def _song_structure(note) -> str:
-    """The section shape + top motifs, shown under a song on album pages."""
-    shape = _section_shape(note.meta.get("structure"))
-    motifs = note.meta.get("motifs") or []
-    if not shape and not motifs:
+def _song_ideas(note) -> str:
+    """The LLM's actual reading of a song, shown once analysed: its story
+    seed and strongest images. Nothing mechanical, nothing shown until a
+    real analysis exists."""
+    seed = note.meta.get("story_seed")
+    images = note.meta.get("visual_motifs") or []
+    if not seed and not images:
         return ""
-    bits = f'<span class="shape" title="section flow">{shape}</span>' if shape else ""
-    bits += "".join(f'<span class="motif">{_esc(m)}</span>' for m in motifs[:5])
+    bits = f'<div class="song-seed">{_esc(seed)}</div>' if seed else ""
+    if images:
+        bits += ("".join(f'<span class="motif">{_esc(im)}</span>'
+                         for im in images[:6]))
     return f'<div class="song-struct">{bits}</div>'
 
 
@@ -521,6 +528,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             f'<div class="muted">{_esc(album.get("year", ""))} &middot; '
             f'{len(album_notes)} songs</div>'
             f'{_status_bar(counts, len(album_notes), small=True)}'
+            '<div class="go">View songs &rarr;</div>'
             "</div></a>")
     index_body = (
         "<h1>Where every song sits</h1>"
@@ -530,9 +538,12 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
         "stages below and updates as pieces complete.</p>"
         f"{_status_bar(total_counts, len(notes))}"
         f"<p class='muted'>{len(notes)} songs &middot; {summary}</p>"
+        "<p class='muted' style='margin-bottom:.4rem'>The stages a song "
+        "passes through. Click any stage for how it works.</p>"
         "<div class='legend'>" + "".join(
-            f"<div><span class='pill s-{s}'>{s}</span><br>"
-            f"<span class='muted'>{STATUS_BLURB[s]}</span></div>"
+            f"<a href='pipeline.html' class='legend-item'>"
+            f"<span class='pill s-{s}'>{s}</span><br>"
+            f"<span class='muted'>{STATUS_BLURB[s]}</span></a>"
             for s in STATUS_ORDER) + "</div>"
         "<h2>Albums</h2>"
         f"<div class='grid'>{''.join(cards)}</div>")
@@ -558,7 +569,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             rows.append(
                 "<tr>"
                 f"<td>{meta.get('track') or ''}</td>"
-                f"<td><strong>{title_cell}</strong>{_song_structure(note)}</td>"
+                f"<td><strong>{title_cell}</strong>{_song_ideas(note)}</td>"
                 f"<td><span class='pill s-{note.status}'>{note.status}</span></td>"
                 f"<td>{_esc(meta.get('mood') or '')}</td>"
                 f"<td>{themes}</td>"
@@ -569,10 +580,9 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             f"<p class='lead'>{_esc(album.get('summary', ''))}</p>"
             f"<p class='muted'>Visual world: {_esc(album.get('visual_world', ''))}</p>"
             f"{_status_bar(counts, len(album_notes))}"
-            "<p class='muted' style='font-size:.82rem'>Under each title: the "
-            "parsed section flow (V verse, C chorus, B bridge, R refrain, "
-            "O outro) and the song's recurring motifs, from the structure-"
-            "aware ingestion.</p>"
+            "<p class='muted' style='font-size:.82rem'>Songs show their "
+            "story seed and strongest visual images once analysed (the LLM "
+            "reads the full lyric). Un-analysed songs list only their status.</p>"
             "<table><tr><th>#</th><th>Song</th><th>Status</th><th>Mood</th>"
             "<th>Themes</th></tr>" + "".join(rows) + "</table>")
         path = out_dir / "albums" / f"{album['slug']}.html"

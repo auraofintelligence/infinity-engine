@@ -14,35 +14,41 @@ import json
 import subprocess
 from pathlib import Path
 
-from .structure import structure_digest
 from .vault import Note, note_path, read_note, write_note
 
 PROMPT_TEMPLATE = """You are the lyrical intelligence layer of the Infinity Engine,
-analysing one song from the i C. infinity universe so visuals can be
-made from it. Work from the SONG STRUCTURE below, not just the words:
-verses, chorus, bridge each want their own look and energy. Ground every
-image in the actual lyrics and the album's visual world; do not invent
-imagery the song does not support. Respond with ONLY a JSON object, no
-prose, using exactly these keys:
+reading one whole song from the i C. infinity universe like a director
+looking for images to shoot. Read the ENTIRE lyric below and respond with
+a director's read, not a word-frequency summary.
+
+Hard rules:
+- Every image and idea must trace to a SPECIFIC line or phrase in this
+  lyric. Quote or paraphrase the line it comes from.
+- Be concrete and filmable: a place, an object, a gesture, a light, a
+  camera move. No abstractions ("hope", "journey"), no generic stock
+  ("person walking"), no imagery the song does not actually support.
+- Specific to THIS song and the album's visual world. If two songs would
+  get the same idea, it is too generic; go deeper into the actual words.
+- It is fine to notice tension, contradiction, or subtext and shoot
+  against the lyric, not only with it.
+
+Respond with ONLY a JSON object, no prose, using exactly these keys:
 
 {{
-  "themes": [..],              // choose only from: {themes}
+  "themes": [..],              // 2-4, choose only from: {themes}
   "mood": "..",                // choose one from: {moods}
-  "narrative_structure": "..", // choose one from: {structures}
-  "visual_motifs": [..],       // 4-8 concrete filmable images that recur (use the motifs below)
-  "emotional_arc": "..",       // one sentence, start state to end state
-  "story_seed": "..",          // 2-3 sentences: a micro-drama premise for this song
-  "section_plan": [            // ONE entry per section below, in order:
-    {{
-      "section": "..",         // echo the section label (verse 1, chorus, ...)
-      "topic": "..",           // what this part is actually about, in a phrase
-      "set": "..",             // the location/environment this section lives in
-      "scene": "..",           // the action or image on screen through it
-      "energy": "..",          // low | building | high | falling  (the flow)
-      "transition": ".."       // how it hands off to the next section
+  "emotional_arc": "..",       // one sentence: where the song starts vs ends
+  "story_seed": "..",          // 2-3 sentences: a concrete micro-drama premise
+                               // rooted in this song's actual images
+  "visual_motifs": [..],       // 5-8 concrete images that ACTUALLY appear or
+                               // are strongly implied in the lyric
+  "line_ideas": [              // the heart of this: read line by line and
+    {{                          // give 10-16 of the strongest moments
+      "lyric": "..",           // the exact line or short phrase, verbatim
+      "idea": ".."             // a specific visual, observation or direction
+                               // for that moment (image, action, camera, colour)
     }}
-  ],
-  "panel_beats": [..]          // 8-12 one-line comic panels, following the section flow
+  ]
 }}
 
 Song: {title}
@@ -50,29 +56,22 @@ Album: {album}
 Album visual world: {visual_world}
 Existing meaning note: {meaning}
 
-SONG STRUCTURE (parsed; keys are salient words per section):
-{structure}
-
 Full lyrics:
 {lyrics}
 """
 
-ANALYSIS_KEYS = ("themes", "mood", "narrative_structure", "visual_motifs",
-                 "emotional_arc", "story_seed", "section_plan", "panel_beats")
+ANALYSIS_KEYS = ("themes", "mood", "emotional_arc", "story_seed",
+                 "visual_motifs", "line_ideas")
 
 
 def build_prompt(note: Note, ontology: dict) -> str:
-    structure = {"sections": note.meta.get("structure") or [],
-                 "motifs": note.meta.get("motifs") or []}
     return PROMPT_TEMPLATE.format(
         themes=", ".join(ontology["themes"]),
         moods=", ".join(ontology["moods"]),
-        structures=", ".join(ontology["narrative_structures"]),
         title=note.meta.get("title", note.slug),
         album=note.meta.get("album", "?"),
         visual_world=note.meta.get("album_visual_world", "not specified"),
         meaning=note.meta.get("meaning", "none"),
-        structure=structure_digest(structure),
         lyrics=note.body.strip(),
     )
 
