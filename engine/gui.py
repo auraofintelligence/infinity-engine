@@ -21,7 +21,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import flow, studio_state, vault
+from . import fleet, flow, studio_state, vault
 from .config import load_config, resolve
 from .site import STATUS_ORDER
 
@@ -119,6 +119,24 @@ border-bottom:1px solid rgba(160,150,210,.08);font-size:.86rem}
 .trail .tw{color:var(--ink);font-weight:600}
 .trail .ts{color:var(--teal);flex:1}
 .trail .tt{color:var(--mut);font-family:var(--fm);font-size:.72rem;white-space:nowrap}
+.phone{font-size:.88rem;padding:.5rem .7rem;border-radius:10px;margin-bottom:.6rem;
+background:rgba(124,77,255,.1);border:1px solid var(--line)}
+.phone b{color:var(--teal)}
+.fhead{font-family:var(--fm);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;
+color:var(--mut);margin:.7rem 0 .3rem}
+.fitem{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;
+border-bottom:1px solid rgba(160,150,210,.08);flex-wrap:wrap}
+.fdot{width:.6rem;height:.6rem;border-radius:50%;flex:none;box-shadow:0 0 6px currentColor}
+.fname{font-weight:600}
+.fkind{font-family:var(--fm);font-size:.64rem;color:var(--mut);
+border:1px solid var(--line);border-radius:999px;padding:0 .4rem}
+.froles{display:flex;gap:.25rem;flex-wrap:wrap;flex:1}
+.frole{font-family:var(--fm);font-size:.62rem;color:#cfc9e6;background:rgba(255,255,255,.05);
+border-radius:999px;padding:.05rem .4rem}
+.fact{margin-left:auto}
+.fbtn{padding:.3rem .6rem;font-size:.78rem;border-radius:8px}
+.flink{color:var(--teal);font-size:.82rem}
+.fin{color:var(--teal);font-size:.8rem;font-family:var(--fm)}
 """
 
 PAGE = """<!doctype html><html><head><meta charset="utf-8">
@@ -170,6 +188,14 @@ PAGE = """<!doctype html><html><head><meta charset="utf-8">
 </div>
 
 <div class="card">
+  <h2>Your devices &amp; accounts</h2>
+  <p class="hint">Everything you own or can hire. A green dot means it is
+  live right now. Edit the list in <code>catalog/fleet.yaml</code>.</p>
+  <div id="phoneline"></div>
+  <div id="fleet"></div>
+</div>
+
+<div class="card">
   <h2>Recently</h2>
   <p class="hint">Your last few moves, so you always know where you were.</p>
   <ul class="trail" id="trail"><li class="muted">nothing yet</li></ul>
@@ -208,6 +234,7 @@ async function boot(){
   gpu=home.gpu;
   paintGpu(home.server);
   renderTrail(home.trail);
+  renderFleet();
   renderList(songs);
   if(home.continue){
     await select(home.continue.slug);
@@ -236,6 +263,47 @@ function renderTrail(trail){
     li.querySelector('.ts').textContent=e.song?(' - '+e.song):'';
     li.querySelector('.tt').textContent=when;
     ul.appendChild(li);});
+}
+const DOT={online:'#2be3c2',connected:'#2be3c2',ready:'#7c4dff',
+  offline:'#ff5fd1',declared:'#a89fce'};
+function fleetRow(e){
+  const div=document.createElement('div'); div.className='fitem';
+  const dot='<span class="fdot" style="background:'+(DOT[e.status]||'#888')+'"></span>';
+  const roles=(e.roles||[]).map(r=>'<span class="frole">'+r+'</span>').join('');
+  let act='';
+  if(e.reach==='comfy'){
+    if(e.status==='connected') act='<span class="fin">in use</span>';
+    else if(e.address) act='<button class="fbtn" data-addr="'+e.address+'">Connect</button>';
+    else act='<span class="muted" style="font-size:.78rem">add its address in fleet.yaml</span>';
+  } else if(e.reach==='browser'){
+    act=phoneUrl?'<span class="fin">open '+phoneUrl+'</span>'
+      :'<span class="muted" style="font-size:.78rem">start with --lan to use</span>';
+  } else if(e.signin){
+    act='<a class="flink" href="'+e.signin+'" target="_blank">sign in &rarr;</a>';
+  }
+  div.innerHTML=dot+'<span class="fname"></span><span class="fkind"></span>'
+    +'<span class="froles">'+roles+'</span><span class="fact">'+act+'</span>';
+  div.querySelector('.fname').textContent=e.name;
+  div.querySelector('.fkind').textContent=e.owned==='hired'?'hired':'yours';
+  return div;
+}
+let phoneUrl=null;
+async function renderFleet(){
+  const f=await (await fetch('/api/fleet')).json();
+  phoneUrl=f.phone_url;
+  const pl=document.getElementById('phoneline');
+  pl.innerHTML=phoneUrl
+    ?'<div class="phone">On your phone (same wifi), open <b>'+phoneUrl+'</b></div>'
+    :'<div class="phone muted">To use your phone as a screen, start with '
+     +'"Infinity Engine (phone).cmd" or <code>engine gui --lan</code>.</div>';
+  const box=document.getElementById('fleet'); box.innerHTML='';
+  [['Your devices',f.devices],['Hired accounts',f.accounts]].forEach(([label,items])=>{
+    if(!items||!items.length) return;
+    const h=document.createElement('div'); h.className='fhead'; h.textContent=label;
+    box.appendChild(h);
+    items.forEach(e=>box.appendChild(fleetRow(e)));
+  });
+  box.querySelectorAll('.fbtn').forEach(b=>b.onclick=()=>connect(b.dataset.addr));
 }
 function renderList(list){
   const tb=document.querySelector('#songs tbody'); tb.innerHTML='';
@@ -294,6 +362,7 @@ async function connect(server){
     body:JSON.stringify({server})})).json();
   out2.textContent=j.message||'';
   gpu=j.alive; paintGpu(j.server);
+  renderFleet();                       // dots + "in use" refresh
   if(sel) await select(sel);           // re-plan: preview vs real render
 }
 document.getElementById('ctest').onclick=()=>connect(document.getElementById('cserver').value);
@@ -340,6 +409,7 @@ def _options(values, sel=None):
 
 class Handler(BaseHTTPRequestHandler):
     cfg = None
+    phone_url = None  # set when serving on the LAN (--lan)
 
     def log_message(self, *a):
         pass
@@ -391,6 +461,11 @@ class Handler(BaseHTTPRequestHandler):
             server = self._server((qs.get("server") or [""])[0] or None)
             return self._send(200, json.dumps(
                 {"alive": self._alive(server), "server": server}))
+        if path == "/api/fleet":
+            saved = studio_state.load(self.cfg).get("comfy_server")
+            view = fleet.fleet_view(self.cfg["_root"], saved)
+            view["phone_url"] = self.phone_url
+            return self._send(200, json.dumps(view))
         if path == "/api/home":
             state = studio_state.load(self.cfg)
             server = self._server()
@@ -517,14 +592,21 @@ class Handler(BaseHTTPRequestHandler):
         raise ValueError(f"unknown action '{cmd}'")
 
 
-def serve(host="127.0.0.1", port=8765, open_browser=True):
+def serve(host="127.0.0.1", port=8765, open_browser=True, lan=False):
     Handler.cfg = load_config()
-    httpd = ThreadingHTTPServer((host, port), Handler)
-    url = f"http://{host}:{port}/"
-    print(f"Infinity Engine studio: {url}")
+    bind = "0.0.0.0" if lan else host
+    open_url = f"http://127.0.0.1:{port}/"
+    if lan:
+        ip = fleet.lan_ip()
+        Handler.phone_url = f"http://{ip}:{port}/" if ip else None
+    httpd = ThreadingHTTPServer((bind, port), Handler)
+    print(f"Infinity Engine studio: {open_url}")
+    if lan and Handler.phone_url:
+        print(f"On your phone / other devices (same wifi): {Handler.phone_url}")
+        print("(LAN mode: anyone on your network can reach this. Home wifi only.)")
     print("Leave this window open. Close it to stop.")
     if open_browser:
-        threading.Timer(0.6, lambda: webbrowser.open(url)).start()
+        threading.Timer(0.6, lambda: webbrowser.open(open_url)).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

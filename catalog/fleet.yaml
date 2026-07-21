@@ -1,0 +1,83 @@
+# Your estate: every device and account the engine can call on.
+#
+# The Infinity Engine spans many devices, some you own (BYO), some you
+# hire. This file is the map of all of them. The studio's "Your devices"
+# view reads it and shows what each one is for and whether it is live
+# right now, so you always know what you can bring to bear.
+#
+# owned:  byo   = a device or account you own / already pay for
+#         hired = pay-per-use compute you spin up when needed
+# reach:  local   = this very machine (the brain)
+#         comfy   = runs ComfyUI; the engine renders on it (needs address)
+#         browser = a screen you open the studio on (phone, tablet, laptop)
+#         account = a service you sign in to; connect when you need it
+# roles:  brain storage render capture view approve ideate route-models
+#
+# Edit freely. Addresses are placeholders until you fill them in; delete
+# anything you do not have.
+
+devices:
+  - id: studio-pc
+    name: This machine
+    kind: machine
+    owned: byo
+    roles: [brain, storage, ideate]
+    reach: local
+
+  - id: second-pc
+    name: Second PC / laptop
+    kind: machine
+    owned: byo
+    roles: [render, storage]
+    reach: comfy
+    address: http://192.168.1.50:8188   # its LAN IP once ComfyUI runs there
+
+  - id: phone
+    name: My phone
+    kind: phone
+    owned: byo
+    roles: [view, approve, capture]
+    reach: browser                       # open the studio on it over wifi
+
+  - id: gopro-max
+    name: GoPro Max (360)
+    kind: camera
+    owned: byo
+    roles: [capture]
+    reach: account                       # footage imported, not driven live
+
+accounts:
+  - id: runpod
+    name: RunPod
+    kind: cloud-compute
+    owned: hired
+    roles: [render]
+    signin: https://runpod.io
+
+  - id: vast
+    name: Vast.ai
+    kind: cloud-compute
+    owned: hired
+    roles: [render]
+    signin: https://vast.ai
+
+  - id: fal
+    name: fal.ai
+    kind: saas-render
+    owned: hired
+    roles: [render]
+    signin: https://fal.ai
+
+  - id: openrouter
+    name: OpenRouter
+    kind: model-api
+    owned: hired
+    roles: [ideate, route-models]
+    signin: https://openrouter.ai
+
+  - id: leonardo
+    name: Leonardo (credits on hand)
+    kind: saas-render
+    owned: hired
+    roles: [render]
+    signin: https://leonardo.ai

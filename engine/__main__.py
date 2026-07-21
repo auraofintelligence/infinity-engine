@@ -256,7 +256,7 @@ def cmd_advance(cfg, args):
 
 def cmd_gui(cfg, args):
     from .gui import serve
-    serve(port=args.port, open_browser=not args.no_browser)
+    serve(port=args.port, open_browser=not args.no_browser, lan=args.lan)
 
 
 def cmd_doctor(cfg, args):
@@ -428,6 +428,8 @@ def main():
     p_gui = sub.add_parser("gui")
     p_gui.add_argument("--port", type=int, default=8765)
     p_gui.add_argument("--no-browser", action="store_true")
+    p_gui.add_argument("--lan", action="store_true",
+                       help="also serve to your phone/other devices on the wifi")
     sub.add_parser("jobs")
     sub.add_parser("dashboard")
     sub.add_parser("site")
