@@ -155,6 +155,16 @@ frontier:
     url: https://www.recraft.ai
     affiliate_status: referral
     affiliate_terms: "Referral: 200 credits per referral (cap 4,000); invitee gets 200 bonus."
+  - id: leonardo
+    name: Leonardo AI
+    vendor: Leonardo
+    category: image
+    access: web / api
+    pricing: subscription / credits
+    strength: Game-asset and fine-tuned-model ecosystem; strong control and consistency tools.
+    url: https://leonardo.ai
+    affiliate_status: "no"
+    affiliate_terms: "Affiliate program closed 7 Apr 2026 (was 25% via Impact). Non-affiliate Creator Program remains."
 
   # ---- voice ----
   - id: elevenlabs
