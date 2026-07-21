@@ -387,6 +387,16 @@ def _esc(value) -> str:
     return html.escape(str(value)) if value is not None else ""
 
 
+def _prose(value) -> str:
+    """Escape LLM prose, enforcing Luke's no-em-dash rule (his own lyrics
+    and verbatim quotes keep their dashes; only generated prose is cleaned)."""
+    if value is None:
+        return ""
+    s = str(value).replace(" — ", ", ").replace("—", ", ")
+    s = s.replace("–", "-")
+    return html.escape(s)
+
+
 def _page(title: str, body: str, depth: int = 0) -> str:
     up = "../" * depth
     fonts = _FONT_FACES.format(up=up)
@@ -511,9 +521,9 @@ def _song_ideas(note) -> str:
     images = note.meta.get("visual_motifs") or []
     if not seed and not images:
         return ""
-    bits = f'<div class="song-seed">{_esc(seed)}</div>' if seed else ""
+    bits = f'<div class="song-seed">{_prose(seed)}</div>' if seed else ""
     if images:
-        bits += ("".join(f'<span class="motif">{_esc(im)}</span>'
+        bits += ("".join(f'<span class="motif">{_prose(im)}</span>'
                          for im in images[:6]))
     return f'<div class="song-struct">{bits}</div>'
 
@@ -587,18 +597,18 @@ def _song_page(note, album_slug: str | None) -> str:
             + (f'<p class="muted">Section flow (for timing): '
                f'<span class="shape">{shape}</span></p>' if shape else ""))
     else:
-        chips = "".join(f'<span class="motif">{_esc(x)}</span>' for x in motifs)
+        chips = "".join(f'<span class="motif">{_prose(x)}</span>' for x in motifs)
         arc = m.get("emotional_arc")
         posters = m.get("poster_lines") or []
         pl = "".join(f'<blockquote class="poster-line">{_esc(x)}</blockquote>'
                      for x in posters)
         li = "".join(
             f'<div class="li"><div class="li-lyric">&ldquo;{_esc(x.get("lyric",""))}'
-            f'&rdquo;</div><div class="li-idea">{_esc(x.get("idea",""))}</div></div>'
+            f'&rdquo;</div><div class="li-idea">{_prose(x.get("idea",""))}</div></div>'
             for x in ideas)
         body = (
-            (f'<p class="lead">{_esc(seed)}</p>' if seed else "")
-            + (f'<p class="muted"><b>Arc:</b> {_esc(arc)}</p>' if arc else "")
+            (f'<p class="lead">{_prose(seed)}</p>' if seed else "")
+            + (f'<p class="muted"><b>Arc:</b> {_prose(arc)}</p>' if arc else "")
             + _seam()
             + ("<h2>Images to shoot</h2>"
                f'<div class="song-struct" style="margin:.4rem 0 1rem">{chips}</div>'
