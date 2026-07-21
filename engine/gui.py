@@ -21,9 +21,13 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import flow, vault
+from . import flow, studio_state, vault
 from .config import load_config, resolve
 from .site import STATUS_ORDER
+
+# Friendly breadcrumb label per action, for the "Recently" trail.
+TRAIL_LABEL = {"brief": "Read the song", "make": "Planned the panels",
+               "advance": "Advanced a stage", "site": "Updated the site"}
 
 KINDS = ["panels", "keyframes", "video", "tts", "lipsync", "avatar"]
 TIERS = ["draft", "standard", "premium"]
@@ -101,6 +105,20 @@ padding:.5rem 0}
 .exgrid .card{margin:0}
 .exgrid button{width:100%;margin-top:.6rem}
 .done-all{text-align:center;color:var(--teal);font-size:1.05rem;padding:.6rem}
+.hint{color:var(--mut);font-size:.85rem;margin:.1rem 0 .7rem}
+.muted{color:var(--mut)}
+#cstatus{font-family:var(--fm);font-size:.66rem;vertical-align:middle}
+details#connect summary{cursor:pointer;color:var(--teal);font-size:.9rem;padding:.3rem 0}
+.steps-sm{margin:.5rem 0;padding-left:1.2rem;font-size:.86rem;color:var(--mut)}
+.steps-sm li{margin:.3rem 0}.steps-sm a{color:var(--teal)}
+.steps-sm code{font-family:var(--fm);font-size:.85em;background:rgba(255,255,255,.06);
+padding:.05rem .3rem;border-radius:5px}
+.trail{list-style:none;padding:0;margin:.3rem 0 0}
+.trail li{display:flex;gap:.5rem;align-items:baseline;padding:.3rem 0;
+border-bottom:1px solid rgba(160,150,210,.08);font-size:.86rem}
+.trail .tw{color:var(--ink);font-weight:600}
+.trail .ts{color:var(--teal);flex:1}
+.trail .tt{color:var(--mut);font-family:var(--fm);font-size:.72rem;white-space:nowrap}
 """
 
 PAGE = """<!doctype html><html><head><meta charset="utf-8">
@@ -128,6 +146,34 @@ PAGE = """<!doctype html><html><head><meta charset="utf-8">
 </div>
 
 <pre id="out">Press "Pick a song to work on" and follow the glowing button.</pre>
+
+<div class="card">
+  <h2>Rendering box <span id="cstatus" class="pill">checking...</span></h2>
+  <p class="hint">This is where real pictures get made. With no box, every
+  step still works in preview. Hire one only when you want images.</p>
+  <details id="connect"><summary>Connect a rendering box</summary>
+    <ol class="steps-sm">
+      <li>Rent an hourly GPU box (Vast.ai or RunPod) and start ComfyUI on it,
+      or run <code>pod_bootstrap.sh</code>. Full walkthrough:
+      <a href="https://auraofintelligence.github.io/infinity-engine/gpu-setup.html"
+      target="_blank">Set up a GPU &rarr;</a></li>
+      <li>Open the tunnel from your machine, then paste the address below and
+      press Test &amp; connect. It is remembered until you disconnect.</li>
+    </ol>
+    <label>box address</label>
+    <input id="cserver" placeholder="http://127.0.0.1:8188 (via tunnel) or http://POD_IP:8188">
+    <div class="row">
+      <button id="ctest">Test &amp; connect</button>
+      <button class="ghost" id="cdrop">Disconnect</button>
+    </div>
+  </details>
+</div>
+
+<div class="card">
+  <h2>Recently</h2>
+  <p class="hint">Your last few moves, so you always know where you were.</p>
+  <ul class="trail" id="trail"><li class="muted">nothing yet</li></ul>
+</div>
 
 <details class="expert">
   <summary>Expert mode (all the individual controls)</summary>
@@ -157,17 +203,39 @@ const out=document.getElementById('out');
 const working=document.getElementById('working');
 
 async function boot(){
-  const s=await (await fetch('/api/songs')).json(); songs=s;
-  const rr=await (await fetch('/api/reach')).json(); gpu=rr.alive;
+  songs=await (await fetch('/api/songs')).json();
+  const home=await (await fetch('/api/home')).json();
+  gpu=home.gpu;
+  paintGpu(home.server);
+  renderTrail(home.trail);
+  renderList(songs);
+  if(home.continue){
+    await select(home.continue.slug);
+    working.innerHTML='Welcome back. You were on <b>'+home.continue.title
+      +'</b>. Press the glowing button to keep going, or pick another song.';
+  }
+}
+function paintGpu(server){
   const b=document.getElementById('reach');
   b.textContent=gpu?'GPU connected':'no GPU (preview mode)';
   b.className='badge '+(gpu?'on':'off');
+  const cs=document.getElementById('cstatus');
+  cs.textContent = gpu ? ('connected'+(server?' · '+server:'')) : 'not connected';
   document.getElementById('banner').innerHTML = gpu ? '' :
-    '<div class="banner">You have no GPU connected yet, so you can do '
-    +'everything except make real pictures. That is fine to start. When you '
-    +'want real images, <a href="https://auraofintelligence.github.io/'
-    +'infinity-engine/gpu-setup.html" target="_blank">connect a GPU (2 min) &rarr;</a></div>';
-  renderList(songs);
+    '<div class="banner">No rendering box connected, so you can do everything '
+    +'except make real pictures. That is fine to start. When you want real '
+    +'images, open <b>Rendering box</b> below and connect one.</div>';
+}
+function renderTrail(trail){
+  const ul=document.getElementById('trail'); ul.innerHTML='';
+  if(!trail||!trail.length){ul.innerHTML='<li class="muted">nothing yet</li>';return;}
+  trail.forEach(e=>{const li=document.createElement('li');
+    const when=(e.t||'').replace('T',' ');
+    li.innerHTML='<span class="tw"></span><span class="ts"></span><span class="tt"></span>';
+    li.querySelector('.tw').textContent=e.what;
+    li.querySelector('.ts').textContent=e.song?(' - '+e.song):'';
+    li.querySelector('.tt').textContent=when;
+    ul.appendChild(li);});
 }
 function renderList(list){
   const tb=document.querySelector('#songs tbody'); tb.innerHTML='';
@@ -213,9 +281,23 @@ async function runStep(step){
     out.textContent=j.output||'(done)';}
   catch(e){out.textContent='error: '+e;}
   btns.forEach(b=>b.disabled=false);
-  const s=await (await fetch('/api/songs')).json(); songs=s;
+  songs=await (await fetch('/api/songs')).json();
+  const home=await (await fetch('/api/home')).json();
+  renderTrail(home.trail);
   await select(sel);
 }
+async function connect(server){
+  const out2=document.getElementById('out');
+  out2.innerHTML='<span class="spin">testing the box...</span>';
+  const j=await (await fetch('/api/connect',{method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({server})})).json();
+  out2.textContent=j.message||'';
+  gpu=j.alive; paintGpu(j.server);
+  if(sel) await select(sel);           // re-plan: preview vs real render
+}
+document.getElementById('ctest').onclick=()=>connect(document.getElementById('cserver').value);
+document.getElementById('cdrop').onclick=()=>connect('');
 document.getElementById('pick').onclick=async()=>{
   const j=await (await fetch('/api/next?gpu='+gpu)).json();
   if(j.slug){await select(j.slug);
@@ -276,6 +358,22 @@ class Handler(BaseHTTPRequestHandler):
                                   n.meta.get("track") or 0))
         return notes
 
+    def _server(self, override: str | None = None) -> str:
+        """The ComfyUI URL in effect: an explicit override, else the box you
+        connected (saved), else the recipe default."""
+        if override:
+            return override
+        saved = studio_state.load(self.cfg).get("comfy_server")
+        if saved:
+            return saved
+        from . import worker
+        return worker.load_comfy_config(self.cfg["_root"]).get(
+            "server", "http://127.0.0.1:8188")
+
+    def _alive(self, server: str) -> bool:
+        from . import comfy
+        return comfy.ComfyClient(server).alive()
+
     def do_GET(self):
         parsed = urlparse(self.path)
         path, qs = parsed.path, parse_qs(parsed.query)
@@ -290,10 +388,21 @@ class Handler(BaseHTTPRequestHandler):
                      "status": n.status} for n in self._notes()]
             return self._send(200, json.dumps(data))
         if path == "/api/reach":
-            from . import comfy, worker
-            ccfg = worker.load_comfy_config(self.cfg["_root"])
-            alive = comfy.ComfyClient(ccfg.get("server", "")).alive()
-            return self._send(200, json.dumps({"alive": alive}))
+            server = self._server((qs.get("server") or [""])[0] or None)
+            return self._send(200, json.dumps(
+                {"alive": self._alive(server), "server": server}))
+        if path == "/api/home":
+            state = studio_state.load(self.cfg)
+            server = self._server()
+            alive = self._alive(server)
+            cont = None
+            last = state.get("last_song")
+            if last and any(n.slug == last for n in self._notes()):
+                note = next(n for n in self._notes() if n.slug == last)
+                cont = {"slug": last, "title": note.meta.get("title", last)}
+            return self._send(200, json.dumps(
+                {"continue": cont, "trail": state.get("trail", [])[:8],
+                 "server": state.get("comfy_server"), "gpu": alive}))
         if path == "/api/plan":
             slug = (qs.get("slug") or [""])[0]
             gpu = (qs.get("gpu") or ["false"])[0] == "true"
@@ -309,10 +418,13 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(404, json.dumps({"error": "not found"}))
 
     def do_POST(self):
-        if urlparse(self.path).path != "/api/run":
-            return self._send(404, json.dumps({"error": "not found"}))
+        path = urlparse(self.path).path
         length = int(self.headers.get("Content-Length", 0))
         req = json.loads(self.rfile.read(length) or "{}")
+        if path == "/api/connect":
+            return self._connect(req)
+        if path != "/api/run":
+            return self._send(404, json.dumps({"error": "not found"}))
         try:
             args = self._build_args(req)
         except ValueError as exc:
@@ -321,7 +433,48 @@ class Handler(BaseHTTPRequestHandler):
                               cwd=self.cfg["_root"], capture_output=True,
                               text=True, encoding="utf-8", errors="replace")
         output = (proc.stdout or "") + (proc.stderr or "")
+        self._record(req)
         self._send(200, json.dumps({"output": output.strip() or "(done)"}))
+
+    def _connect(self, req: dict):
+        """Test a GPU box and, if it answers, remember it so every render
+        uses it until you disconnect."""
+        server = (req.get("server") or "").strip()
+        if not server:  # disconnect
+            studio_state.set_server(self.cfg, None)
+            studio_state.record(self.cfg, what="Disconnected compute")
+            return self._send(200, json.dumps({"alive": False, "server": None,
+                              "message": "Disconnected. Renders will preview only."}))
+        if not server.startswith("http"):
+            return self._send(200, json.dumps(
+                {"alive": False, "message": "Address must start with http."}))
+        alive = self._alive(server)
+        if alive:
+            studio_state.set_server(self.cfg, server)
+            studio_state.record(self.cfg, what="Connected compute")
+            msg = "Connected. The engine will render on this box."
+        else:
+            msg = ("No answer from that address. Is ComfyUI running on the "
+                   "box, and the tunnel open?")
+        self._send(200, json.dumps({"alive": alive, "server": server,
+                                    "message": msg}))
+
+    def _record(self, req: dict):
+        """Drop a breadcrumb for the action just run."""
+        cmd = req.get("cmd")
+        if cmd == "work":
+            what = ("Previewed the plan" if req.get("flag") == "--offline"
+                    else "Made the pictures")
+        else:
+            what = TRAIL_LABEL.get(cmd)
+        if not what:
+            return  # read-only (doctor/jobs), no breadcrumb
+        slug = req.get("slug")
+        title = ""
+        if slug:
+            note = next((n for n in self._notes() if n.slug == slug), None)
+            title = note.meta.get("title", slug) if note else slug
+        studio_state.record(self.cfg, song=slug, song_title=title, what=what)
 
     def _build_args(self, req: dict) -> list:
         cmd, slug = req.get("cmd"), req.get("slug")
@@ -351,13 +504,15 @@ class Handler(BaseHTTPRequestHandler):
         if cmd == "work":
             args = ["work"]
             if req.get("flag") == "--offline":
-                args.append("--offline")
-            elif req.get("extra") == "server":
-                server = (req.get("server") or "").strip()
-                if server:
-                    if not server.startswith("http"):
-                        raise ValueError("server must be an http URL")
-                    args += ["--server", server]
+                return args
+            # An explicit URL wins; otherwise use the box you connected.
+            server = (req.get("server") or "").strip()
+            if not server and req.get("extra") != "server":
+                server = studio_state.load(self.cfg).get("comfy_server") or ""
+            if server:
+                if not server.startswith("http"):
+                    raise ValueError("server must be an http URL")
+                args += ["--server", server]
             return args
         raise ValueError(f"unknown action '{cmd}'")
 
