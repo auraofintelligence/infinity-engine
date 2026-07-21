@@ -592,12 +592,22 @@ _FILTER_CORE_JS = r"""
 const pcState={};
 document.querySelectorAll('.pc-chip[data-group]').forEach(c=>{
   pcState[c.dataset.group]=pcState[c.dataset.group]||new Set()});
+document.querySelectorAll('.pc-grid').forEach(g=>{
+  Array.prototype.slice.call(g.children).forEach((c,i)=>{c.dataset.idx=i})});
 function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
   const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
   else{s.add(v);el.classList.add('on')}pcFilter()}
 function pcClear(){for(const g in pcState)pcState[g].clear();
-  document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('.pc-chip[data-group].on').forEach(c=>c.classList.remove('on'));
   pcFilter()}
+function pcSort(el){document.querySelectorAll('.pc-sort').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');const k=el.dataset.sort,num=el.dataset.num==='1';
+  document.querySelectorAll('.pc-grid').forEach(g=>{
+    const cs=Array.prototype.slice.call(g.children);
+    cs.sort((a,b)=>k==='idx'?(+a.dataset.idx)-(+b.dataset.idx)
+      :num?(parseFloat(b.dataset[k]||0))-(parseFloat(a.dataset[k]||0))
+      :(a.dataset[k]||'').localeCompare(b.dataset[k]||''));
+    cs.forEach(c=>g.appendChild(c))})}
 function pcMatch(card){for(const g in pcState){const sel=pcState[g];
   if(!sel.size)continue;
   const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
@@ -649,13 +659,24 @@ def _card_div(attrs: dict, inner: str) -> str:
 
 def render_picker(out_dir: Path, *, filename: str, title: str, noun: str,
                   lead: str, facet_defs: list, cards: list | None = None,
-                  groups: list | None = None, extra: str = "") -> Path:
+                  groups: list | None = None, extra: str = "",
+                  sorts: list | None = None) -> Path:
     """Generic faceted card picker. facet_defs is (label, group, [values]);
     each card is (attrs_dict, html). Pass `groups` as a list of
     (label, blurb, [cards]) to render labelled sections instead of a flat
-    grid; empty sections hide themselves as filters narrow."""
+    grid; empty sections hide themselves as filters narrow. `sorts` is a
+    list of (label, key, numeric_bool) that adds a sort toggle row."""
     facet_html = "".join(_facet_row(lbl, grp, vals)
                          for lbl, grp, vals in facet_defs if vals)
+    if sorts:
+        chips = ('<button class="pc-chip pc-sort on" data-sort="idx" '
+                 'data-num="0" onclick="pcSort(this)">Default</button>')
+        for label, key, numeric in sorts:
+            chips += (f'<button class="pc-chip pc-sort" data-sort="{key}" '
+                      f'data-num="{1 if numeric else 0}" '
+                      f'onclick="pcSort(this)">{_esc(label)}</button>')
+        facet_html += (f'<div class="pc-frow"><span class="pc-flabel">Sort</span>'
+                       f'{chips}</div>')
     facet_html += ('<div class="pc-frow"><button class="pc-clear" '
                    'onclick="pcClear()">clear all filters</button></div>')
     if groups is not None:
@@ -712,6 +733,33 @@ MODEL_CATEGORIES = {
 }
 
 
+WORLDS_SUBTYPES = ["object", "world", "capture", "360"]
+
+
+def _worlds_subtype(m: dict) -> str:
+    """Differentiate 3D entries: single asset vs whole world vs capture
+    tool vs 360/equirectangular. Explicit `subtype:` wins; else inferred."""
+    if m.get("subtype"):
+        return str(m["subtype"])
+    t = " ".join(str(m.get(k, "")) for k in ("task", "strength", "name")).lower()
+    if any(w in t for w in ("360", "panorama", "equirect", "skybox")):
+        return "360"
+    if any(w in t for w in ("splat", "photogramm", "camera solve", "capture",
+                            "realityscan", "polycam", "postshot", "luma")):
+        return "capture"
+    if any(w in t for w in ("world", "scene", "environment")):
+        return "world"
+    return "object"
+
+
+def _sort_attrs(m: dict, sortnum) -> dict:
+    a = {"sortname": [str(m.get("name", m.get("id", ""))).lower()],
+         "sortnum": [str(sortnum or 0)]}
+    if m.get("category") == "worlds":
+        a["subtype"] = [_worlds_subtype(m)]
+    return a
+
+
 def _model_card(m: dict) -> tuple:
     status = m.get("status", "watching")
     st_class = {"active": "built", "recon": "planned",
@@ -743,6 +791,7 @@ def _model_card(m: dict) -> tuple:
         "category": [str(m.get("category", ""))],
         "status": [status],
         "licence": ["commercial" if commercial else "restricted"],
+        **_sort_attrs(m, m.get("likes")),
     }
     return attrs, inner
 
@@ -762,13 +811,18 @@ def render_models(out_dir: Path) -> Path | None:
             gcards = [_model_card(m) for m in models
                       if m.get("category") == cat]
             groups.append((cat.title(), "", gcards))
+    world_types = [s for s in WORLDS_SUBTYPES
+                   if any(m.get("category") == "worlds"
+                          and _worlds_subtype(m) == s for m in models)]
     facet_defs = [
         ("Category", "category", _sorted_uniq(models, "category")),
+        ("3D type", "subtype", world_types),
         ("Status", "status", ["active", "recon", "watching"]),
         ("Licence", "licence", ["commercial", "restricted"]),
     ]
     return render_picker(
         out_dir, filename="models.html", title="Model picker", noun="model",
+        sorts=[("A-Z", "sortname", False), ("Most liked", "sortnum", True)],
         lead=("Open-weight models grouped by what they do, sourced from "
               "Hugging Face. The teal chip on each card is the task; the line "
               "under it is what it's best at. Status: active is in the working "
@@ -1109,10 +1163,12 @@ def _frontier_card(m: dict) -> tuple:
         f'<div class="pc-meta"><b>Access:</b> {_esc(m.get("access",""))} '
         f'&middot; <b>Price:</b> {_esc(m.get("pricing","?"))}{terms}</div>'
         f'{links}')
+    aff_rank = {"yes": 3, "referral": 2, "unknown": 1, "no": 0}.get(aff, 0)
     attrs = {
         "category": [str(m.get("category", ""))],
         "access": [str(m.get("access", "")).split("/")[0].strip().lower()],
         "affiliate": [aff],
+        **_sort_attrs(m, aff_rank),
     }
     return attrs, inner
 
@@ -1126,10 +1182,14 @@ def render_frontier(out_dir: Path) -> Path | None:
         gcards = [_frontier_card(m) for m in models
                   if m.get("category") == cat]
         groups.append((label, blurb, gcards))
+    world_types = [s for s in WORLDS_SUBTYPES
+                   if any(m.get("category") == "worlds"
+                          and _worlds_subtype(m) == s for m in models)]
     facet_defs = [
         ("Category", "category", [c for c in FRONTIER_CATEGORIES
                                   if any(m.get("category") == c
                                          for m in models)]),
+        ("3D type", "subtype", world_types),
         ("Affiliate", "affiliate", ["yes", "referral", "no"]),
     ]
     disclosure = (
@@ -1143,7 +1203,9 @@ def render_frontier(out_dir: Path) -> Path | None:
         "link where the card points.")
     return render_picker(
         out_dir, filename="frontier.html", title="Frontier models",
-        noun="model", lead=disclosure, facet_defs=facet_defs, groups=groups)
+        noun="model", lead=disclosure, facet_defs=facet_defs, groups=groups,
+        sorts=[("A-Z", "sortname", False),
+               ("Affiliate first", "sortnum", True)])
 
 
 PROJECT_STATUS = {"live": "st-live", "development": "st-development",

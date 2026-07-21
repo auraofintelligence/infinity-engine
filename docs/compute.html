@@ -257,12 +257,22 @@ html.js .pc-card,html.js .card,html.js .reveal{opacity:1;transform:none;transiti
 const pcState={};
 document.querySelectorAll('.pc-chip[data-group]').forEach(c=>{
   pcState[c.dataset.group]=pcState[c.dataset.group]||new Set()});
+document.querySelectorAll('.pc-grid').forEach(g=>{
+  Array.prototype.slice.call(g.children).forEach((c,i)=>{c.dataset.idx=i})});
 function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
   const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
   else{s.add(v);el.classList.add('on')}pcFilter()}
 function pcClear(){for(const g in pcState)pcState[g].clear();
-  document.querySelectorAll('.pc-chip.on').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('.pc-chip[data-group].on').forEach(c=>c.classList.remove('on'));
   pcFilter()}
+function pcSort(el){document.querySelectorAll('.pc-sort').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');const k=el.dataset.sort,num=el.dataset.num==='1';
+  document.querySelectorAll('.pc-grid').forEach(g=>{
+    const cs=Array.prototype.slice.call(g.children);
+    cs.sort((a,b)=>k==='idx'?(+a.dataset.idx)-(+b.dataset.idx)
+      :num?(parseFloat(b.dataset[k]||0))-(parseFloat(a.dataset[k]||0))
+      :(a.dataset[k]||'').localeCompare(b.dataset[k]||''));
+    cs.forEach(c=>g.appendChild(c))})}
 function pcMatch(card){for(const g in pcState){const sel=pcState[g];
   if(!sel.size)continue;
   const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
