@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en-AU"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Recon area - Infinity Engine</title>
+<title>Master plan - Infinity Engine</title>
 <script>document.documentElement.classList.add('js')</script>
 <style>@font-face{font-family:"Archivo Var";src:url("assets/fonts/archivo-var.woff2") format("woff2-variations");font-weight:100 900;font-display:swap}@font-face{font-family:"JetBrains Mono Var";src:url("assets/fonts/jetbrains-mono-var.woff2") format("woff2-variations");font-weight:100 800;font-display:swap}
 :root{--void:#05070c;--deep:#0a1420;--panel:rgba(124,77,255,.08);
@@ -254,39 +254,103 @@ html.js .pc-card,html.js .card,html.js .reveal{opacity:1;transform:none;transiti
 <a href="https://auraofintelligence.github.io/i-C-infinity-music-universe/">Music universe</a></nav>
 </div></header>
 <main class="wrap">
-<h1>Recon area</h1><p class='lead'>Candidates the watcher flagged, plus anything you drop in. This is the inbox of the Recon lane: vet each one on a fast, cheap pass, then promote the winners into the model registry or reject them. Run <code>python tools/watch_models.py</code> (or the scheduled task) to refresh it. See the <a href="https://github.com/auraofintelligence/infinity-engine/blob/main/docs/RECON-WATCHER.md">watcher spec</a>.</p><div class="pc-facets"><div class="pc-frow"><span class="pc-flabel">Category</span><button class="pc-chip " data-group="category" data-value="control" onclick="pcToggle(this)">control</button><button class="pc-chip " data-group="category" data-value="image" onclick="pcToggle(this)">image</button><button class="pc-chip " data-group="category" data-value="lipsync" onclick="pcToggle(this)">lipsync</button><button class="pc-chip " data-group="category" data-value="llm" onclick="pcToggle(this)">llm</button><button class="pc-chip " data-group="category" data-value="tts" onclick="pcToggle(this)">tts</button><button class="pc-chip " data-group="category" data-value="video" onclick="pcToggle(this)">video</button></div><div class="pc-frow"><span class="pc-flabel">Status</span><button class="pc-chip " data-group="status" data-value="new" onclick="pcToggle(this)">new</button><button class="pc-chip " data-group="status" data-value="testing" onclick="pcToggle(this)">testing</button><button class="pc-chip " data-group="status" data-value="adopted" onclick="pcToggle(this)">adopted</button><button class="pc-chip " data-group="status" data-value="rejected" onclick="pcToggle(this)">rejected</button></div><div class="pc-frow"><span class="pc-flabel">Why</span><button class="pc-chip " data-group="reason" data-value="hyped" onclick="pcToggle(this)">hyped</button><button class="pc-chip " data-group="reason" data-value="new" onclick="pcToggle(this)">new</button></div><div class="pc-frow"><button class="pc-clear" onclick="pcClear()">clear all filters</button></div></div><div class="pc-count" id="pcCount"></div><div class="pc-grid"><div class="pc-card" data-category="video" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">video</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>Kandinsky 5.0 Video Lite</h3><p class="pc-sum">Fast 2B draft-tier video. Bake off against HunyuanVideo 1.5 on a cast-rich song.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-20</div><a class="pc-more" href="https://huggingface.co/kandinskylab/Kandinsky-5.0-T2V-Lite" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="control" data-status="testing" data-reason="new"><div class="pc-badges"><span class="pc-b tier">control</span><span class="pc-b planned">testing</span><span class="pc-b release">new</span></div><h3>Wan-VACE</h3><p class="pc-sum">Core of the control rig (pose/depth/ref). Test a directed hero shot end to end.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-20</div><a class="pc-more" href="https://huggingface.co/Wan-AI/Wan2.1-VACE-14B" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="tts" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">tts</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>OmniVoice</h3><p class="pc-sum">600+ language zero-shot cloning; the multilingual wildcard for the dub lane.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-20</div><a class="pc-more" href="https://huggingface.co/k2-fsa/OmniVoice" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="lipsync" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">lipsync</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>Wan-S2V</h3><p class="pc-sum">Audio-driven cinematic avatar on the Wan stack; paper reports it beats HunyuanVideo-Avatar and OmniHuman. Slots into the existing Wan setup, test next.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-21</div><a class="pc-more" href="https://arxiv.org/abs/2508.18621" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="tts" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">tts</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>Fish Audio S2 / S2-Pro</h3><p class="pc-sum">Tops independent TTS benchmarks (paralinguistics), sub-100ms, 80+ langs. LICENCE non-commercial (research); commercial needs paid licence. Quality ceiling only.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-21</div><a class="pc-more" href="https://huggingface.co/fishaudio/s2-pro" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="llm" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">llm</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>Kimi K2.6</h3><p class="pc-sum">Top open coding model (~1T MoE, modified MIT); needs serious rented hardware. For big-GPU scripting runs.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-21</div><a class="pc-more" href="https://artificialanalysis.ai/models/kimi-k2-6" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="video" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">video</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>Wan 2.7</h3><p class="pc-sum">UNVERIFIED: reported April 2026 with first/last-frame control and 9-grid input, but open-weight release NOT confirmed (Wan 2.5 was API-only). Confirm weights are actually open before adopting.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-21</div><a class="pc-more" href="https://www.wan-video.com/" target="_blank" rel="noopener">source &rarr;</a></div><div class="pc-card" data-category="image" data-status="new" data-reason="hyped"><div class="pc-badges"><span class="pc-b tier">image</span><span class="pc-b designed">new</span><span class="pc-b release">hyped</span></div><h3>Cosmos3-Super-Text2Image</h3><p class="pc-sum">UNVERIFIED: claimed open T2I leader (~1219 Elo, 65B) from a single low-quality source. Needs primary confirmation before trusting.</p><div class="pc-meta"><b>Flagged:</b> 2026-07-21</div><a class="pc-more" href="https://llm-stats.com/leaderboards/best-ai-for-image-generation" target="_blank" rel="noopener">source &rarr;</a></div></div><h2 style="margin-top:2.8rem">Where candidates come from</h2><p class='muted' style='max-width:52rem'>Three kinds of signal, used together. The watcher automates the popularity scan; these add quality and practitioner judgement. The funnel stays: discover, rank, then vet on your own footage.</p><div class="pc-group-head"><h2>Leaderboards</h2><span>Rank quality and preference</span></div><div class="legend"><div><a href="https://lmarena.ai/" target="_blank" rel="noopener">LMArena</a> <span class="pc-tag">llm, image</span><br><span class="muted">Human-preference Elo for LLMs, with image and vision arenas.</span></div><div><a href="https://artificialanalysis.ai/" target="_blank" rel="noopener">Artificial Analysis</a> <span class="pc-tag">llm, video, tts</span><br><span class="muted">Quality vs speed vs price across LLMs, plus video and speech arenas.</span></div><div><a href="https://livebench.ai/" target="_blank" rel="noopener">LiveBench</a> <span class="pc-tag">llm</span><br><span class="muted">Contamination-resistant LLM scoring, refreshed over time.</span></div><div><a href="https://huggingface.co/spaces/Vchitect/VBench_Leaderboard" target="_blank" rel="noopener">VBench</a> <span class="pc-tag">video</span><br><span class="muted">The standard open benchmark leaderboard for video generation.</span></div><div><a href="https://imgsys.org/" target="_blank" rel="noopener">imgsys</a> <span class="pc-tag">image</span><br><span class="muted">Blind A/B image-model arena (by fal).</span></div><div><a href="https://huggingface.co/spaces/TTS-AGI/TTS-Arena" target="_blank" rel="noopener">TTS Arena</a> <span class="pc-tag">tts</span><br><span class="muted">Blind A/B voice-preference ranking for text-to-speech.</span></div><div><a href="https://huggingface.co/spaces/hf-audio/open_asr_leaderboard" target="_blank" rel="noopener">Open ASR Leaderboard</a> <span class="pc-tag">stt</span><br><span class="muted">The authoritative WER ranking for speech-to-text.</span></div><div><a href="https://huggingface.co/spaces/mteb/leaderboard" target="_blank" rel="noopener">MTEB</a> <span class="pc-tag">embeddings</span><br><span class="muted">The canonical embedding-model benchmark (where the Qwen3-Embedding pick came from).</span></div></div><div class="pc-group-head"><h2>Trusted channels</h2><span>Practitioner signal, ahead of the boards</span></div><div class="legend"><div><a href="https://www.youtube.com/@TheoreticallyMedia" target="_blank" rel="noopener">Theoretically Media</a> <span class="pc-tag">video, film</span><br><span class="muted">Tim Simmons tests AI video/image/audio tools honestly in real production; no tool-of-the-week hype.</span></div><div><a href="https://www.youtube.com/@curiousrefuge" target="_blank" rel="noopener">Curious Refuge</a> <span class="pc-tag">video, film</span><br><span class="muted">AI filmmaking school and news; workflows, shorts and the weekly AI-film roundup.</span></div><div><a href="https://www.youtube.com/@Aitrepreneur" target="_blank" rel="noopener">Aitrepreneur</a> <span class="pc-tag">image, video, tts, llm</span><br><span class="muted">Broad, hands-on open/local model coverage: Stable Diffusion, LoRA training, voice cloning, local LLMs, including uncensored and NSFW open models. Not just one category.</span></div></div><div class="pc-group-head"><h2>Community and discovery</h2><span>Raw new releases</span></div><div class="legend"><div><a href="https://huggingface.co/models?sort=trending" target="_blank" rel="noopener">Hugging Face Trending</a> <span class="pc-tag">all</span><br><span class="muted">What the recon watcher already taps; popularity, not quality.</span></div><div><a href="https://paperswithcode.com/sota" target="_blank" rel="noopener">Papers with Code</a> <span class="pc-tag">all</span><br><span class="muted">State-of-the-art tables per task, with linked code.</span></div><div><a href="https://www.reddit.com/r/LocalLLaMA/" target="_blank" rel="noopener">r/LocalLLaMA</a> <span class="pc-tag">llm</span><br><span class="muted">Fast community signal on new open models and quantised builds.</span></div><div><a href="https://www.reddit.com/r/StableDiffusion/" target="_blank" rel="noopener">r/StableDiffusion</a> <span class="pc-tag">image, video</span><br><span class="muted">Community signal on image/video models, LoRAs and ComfyUI workflows.</span></div></div><script>const PC_NOUN="candidate";
-const pcState={};
-document.querySelectorAll('.pc-chip[data-group]').forEach(c=>{
-  pcState[c.dataset.group]=pcState[c.dataset.group]||new Set()});
-document.querySelectorAll('.pc-grid').forEach(g=>{
-  Array.prototype.slice.call(g.children).forEach((c,i)=>{c.dataset.idx=i})});
-function pcToggle(el){const g=el.dataset.group,v=el.dataset.value;
-  const s=pcState[g];if(s.has(v)){s.delete(v);el.classList.remove('on')}
-  else{s.add(v);el.classList.add('on')}pcFilter()}
-function pcClear(){for(const g in pcState)pcState[g].clear();
-  document.querySelectorAll('.pc-chip[data-group].on').forEach(c=>c.classList.remove('on'));
-  pcFilter()}
-function pcSort(el){document.querySelectorAll('.pc-sort').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on');const k=el.dataset.sort,num=el.dataset.num==='1';
-  document.querySelectorAll('.pc-grid').forEach(g=>{
-    const cs=Array.prototype.slice.call(g.children);
-    cs.sort((a,b)=>k==='idx'?(+a.dataset.idx)-(+b.dataset.idx)
-      :num?(parseFloat(b.dataset[k]||0))-(parseFloat(a.dataset[k]||0))
-      :(a.dataset[k]||'').localeCompare(b.dataset[k]||''));
-    cs.forEach(c=>g.appendChild(c))})}
-function pcMatch(card){for(const g in pcState){const sel=pcState[g];
-  if(!sel.size)continue;
-  const vals=(card.dataset[g]||'').split(' ').filter(Boolean);
-  if(![...sel].some(v=>vals.includes(v)))return false}return true}
-function pcFilter(){let n=0;document.querySelectorAll('.pc-card').forEach(c=>{
-  const ok=pcMatch(c);c.classList.toggle('hidden',!ok);if(ok)n++});
-  document.querySelectorAll('.pc-group').forEach(g=>{
-    const any=[...g.querySelectorAll('.pc-card')].some(c=>!c.classList.contains('hidden'));
-    g.classList.toggle('hidden',!any)});
-  document.getElementById('pcCount').textContent=
-    n+' '+PC_NOUN+(n===1?'':'s')+' shown'}
-function pcMore(b){b.nextElementSibling.classList.toggle('open')}
-</script>
+<div class='doc'><h1>Infinity Engine master plan (v2)</h1>
+<p>Written 2026-07-21, superseding the v1 plan. v1 covered the vault and the model registries; since then the system has grown audio ingestion, treatments, a karaoke renderer design, cast/LoRA registries, a recon loop, and now the distribution layer. This plan makes all the moving parts one flow.</p>
+<p>Prices in AUD (converted at AUD/USD 0.70, 2026-07-20 unless noted). Honest tense throughout: <strong>built</strong> means running today, <strong>designed</strong> means agreed shape not yet coded, <strong>horizon</strong> means intentionally later.</p>
+<hr>
+<h2>1. North star</h2>
+<p>Turn the i C. infinity catalogue into film across three lanes: <strong>Recon</strong> (fast, rough, cheap: test models, harvest LoRA data, learn), <strong>Release</strong> (publishable, teachable, community-facing), <strong>Hero</strong> (A Protopian Gambit and festival shorts, fully directed). Earlier albums are deliberately the R&amp;D lab and community on-ramp. Everything ships from a pipeline Luke owns end to end: open-weight first, rented GPUs on demand, nothing locked to a vendor.</p>
+<h2>2. The one diagram</h2>
+<pre><code>                    SOURCES (stay on trusted machines)
+  lyrics (universe repo)   Suno stems (WAV+MIDI)   human cockpit signals
+        │                        │                        │
+        ▼                        ▼                        ▼
+  ┌────────────────────── INGESTION (built / designed) ─────────────────────┐
+  │ structure.py: verses/chorus,   ingest-audio: timed sections, beat grid, │
+  │ keywords, motifs (BUILT)       per-stem energy, lyric word timestamps,  │
+  │                                active-stem list (DESIGNED, next build)  │
+  └──────────────────────────────────┬───────────────────────────────────---┘
+                                     ▼
+             THE NOTE (vault/&lt;slug&gt;.md = the song&#x27;s single source of truth)
+      structure + motifs + audio block + analysis + section_plan + productions
+                                     ▼
+  analyse (LLM brief, per-section set/scene/energy/transition)  ── BUILT
+                                     ▼
+  ██ GATE: Luke approves direction, picks treatments ██  (status: briefed)
+                                     ▼
+  ┌───────────────────────── TREATMENTS (per song, each own status) ────────┐
+  │ karaoke lyric video   artistic film        complex film                 │
+  │ timing+style render   supports/contradicts  band/acted/CGI transpose    │
+  │ no GPU, local, fast   lyrics (mid cost)     cast+motion rig (Hero)      │
+  └──────────────────────────────────┬──────────────────────────────────────┘
+                                     ▼
+  FORMAT RENDERS (one treatment → many platform formats, from one master)
+                                     ▼
+  RELEASE PACK (agent-ready folder per song/album, asset-guide families)
+                                     ▼
+  PLATFORMS (YouTube, Shorts, IG, TikTok, Spotify Canvas, Bandcamp, site...)</code></pre>
+<p>Rule that never changes: <strong>sources and the vault stay local; only small derived data (JSON, timings) and approved renders move.</strong> Stems are ~470 MB a song; their feature block is a few KB. Same privacy rule as the lyrics.</p>
+<h2>3. Ingestion (the nuance layer)</h2>
+<p>Three inputs, one note:</p>
+<p>1. <strong>Lyric structure</strong> (BUILT): marker-aware parsing (Verse/Chorus/Bridge labels when present, hook-line detection when not), per-section keywords, song-wide motifs. 2. <strong>Audio</strong> (DESIGNED, next build): from the Suno stem export per song. Verified reality: WAV 24-bit/44.1k + optional MIDI, track-based stems with silent placeholder tracks. <code>engine ingest-audio</code> will: enumerate WAVs, map roles by track name, RMS-skip silent stems, record the <strong>active-stem list</strong> (arrangement density = a visual signal), run All-In-One (timed sections, beats, downbeats, tempo), WhisperX on the Vocals stem against the known lyrics (word timestamps; never ASR guessing, which kills the CapCut problem at the root), Essentia energy curves per stem. Output: an <code>audio</code> block + <code>timing.json</code> per song. 3. <strong>Human cockpit</strong> (DESIGNED): the 001 Human Listen page&#x27;s signals (quick notes, pads, per-timestamp feelings) finally get a home as a <code>human_signals</code> block on the note. Objective + subjective, one source of truth.</p>
+<p>Reconciliation: parsed lyric sections + timed audio sections + energy = a <strong>timestamped, energy-aware <code>section_plan</code></strong>. That is the spine every treatment reads.</p>
+<h2>4. Treatments</h2>
+<p>A song has one spine status (ingested → analysed → briefed) and then <strong>one status per treatment</strong> in a <code>productions:</code> list on the note:</p>
+<pre><code>productions:
+  - lane: karaoke          # karaoke | artistic | complex | comic | course | micro-drama
+    tier: release          # recon | release | hero
+    relationship: support  # support | counterpoint | tangent (artistic/complex)
+    status: rendered       # planned | briefed | panels | shots | assembled | rendered | released
+    formats: {yt: released, shorts: rendered, ig-feed: queued, canvas: planned}</code></pre>
+<ul>
+<li><strong>Karaoke lyric video</strong> (first rung): timing.json + a style skin → ASS subtitles (native per-syllable wipe) → ffmpeg render. Guitar-hero flow rules: fixed focal anchor, progressive fill, ~120ms anticipation lead, beat-coupled pulses, 2-line max, safe areas. Restyle = swap skin, re-render in seconds. Every song can have one with zero GPU spend. Existing CapCut-era YouTube videos get recorded as legacy releases.</li>
+<li><strong>Artistic film</strong>: generated imagery in a stated relationship to the lyrics (<code>support</code>/<code>counterpoint</code>/<code>tangent</code>, a one-word directorial decision that changes every image).</li>
+<li><strong>Complex film</strong>: performance/acted/CGI-transposed, drawing on the cast LoRAs, motion capture and control rig. Hero lane.</li>
+<li>Comic, course video, micro-drama and album aggregates remain lanes on the same spine (pattern library already covers them).</li>
+</ul>
+<h2>5. Formats and platforms (the new layer)</h2>
+<p>One treatment renders to many formats. The format matrix comes straight from the asset guide (ai-native-indie-distribution/asset-guide.html) and lives in the repo as <strong><code>formats.yaml</code></strong> so it is data, not prose:</p>
+<table><thead><tr><th>Key</th><th>Size</th><th>Platform / use</th><th>Notes</th></tr></thead><tbody>
+<tr><td><code>yt</code></td><td>1920x1080 16:9</td><td>YouTube main</td><td>H.264/AAC, thumbnail 1280x720</td></tr>
+<tr><td><code>shorts</code></td><td>1080x1920 9:16</td><td>Shorts / Reels / TikTok shared master</td><td>captions safe, hook timestamp, loop point</td></tr>
+<tr><td><code>ig-feed</code></td><td>1080x1080 1:1</td><td>Instagram feed</td><td>still or video</td></tr>
+<tr><td><code>ig-portrait</code></td><td>1080x1350 4:5</td><td>Instagram portrait</td><td></td></tr>
+<tr><td><code>canvas</code></td><td>9:16, 3-8s loop</td><td>Spotify Canvas</td><td>720-1080px tall, MP4</td></tr>
+<tr><td><code>story</code></td><td>1080x1920</td><td>story frame still</td><td></td></tr>
+<tr><td><code>cover</code></td><td>3000x3000</td><td>DSP cover master</td><td>+ 1080 square, WebP web copies</td></tr>
+<tr><td><code>site</code></td><td>responsive</td><td>release page embed</td><td>+ compressed poster frame</td></tr>
+</tbody></table>
+<p>Per-format rules a skin must respect (safe zones, caption areas, hook-first cutdown for vertical) are fields in formats.yaml. <strong>One master render per treatment, then automated crops/cutdowns per format</strong>, vertical is reframed, not squashed.</p>
+<p><strong>Status icons + priority.</strong> Each production&#x27;s <code>formats:</code> map drives the site: a compact icon strip per song/treatment (done / rendering / queued / planned per format). Priority is config, not vibes: a default platform order per lane in formats.yaml (karaoke default: <code>yt → shorts → canvas → ig-feed</code>), and the site computes <strong>&quot;next up&quot;</strong>: the highest-priority undone format across the catalogue. That answers &quot;what do I render next, for which platform&quot; at a glance.</p>
+<h2>6. Release packs and distribution</h2>
+<p>Every song (and album) accumulates an <strong>agent-ready release folder</strong> matching the asset guide&#x27;s structure: <code>/audio /artwork /video /copy /metadata /licensing /public /private + manifest.md</code>. The engine fills what it produces (video formats, captions SRT, timing-derived metadata like BPM/key/hook timestamp, lyric sheet); Luke and other tools fill the rest (cover art, credits, ISRC/UPC). <code>engine release &lt;slug&gt;</code> (designed) assembles the folder and writes the manifest with per-asset status and the asset-guide checklist. The release pack is the handoff point to distribution workflows (ai-native-indie-distribution builders) and to the paid packages on strange-but-true / right-place-right-time, including the <strong>fan-custom karaoke render</strong> perk (pick song + skin, rendered in seconds, near-zero marginal cost).</p>
+<h2>7. Progress, authority and the site</h2>
+<p>One tree, rolled up everywhere:</p>
+<pre><code>Catalogue → Album → Song → Treatment → Format
+Collections (course, short film, series) → reference treatments across albums</code></pre>
+<ul>
+<li>Progress bars per album exist today; they extend to treatment bars and format icon strips. Collections get their own rollup pages.</li>
+<li><strong>Gates carry authority</strong>: each stage is <code>auto</code>, <code>review</code> (machine proposes, Luke approves) or <code>luke</code> (only Luke: the briefed gate, hero shots). Site shows gold gates (Luke&#x27;s) vs teal (automated). The trust dial = flipping a gate in config as a pattern proves out.</li>
+<li><strong>Error correction is structural</strong>: stages write to the note, git is history, re-running a stage resets downstream statuses for that treatment; the site marks <code>stale</code> when upstream changed.</li>
+<li>Per-song page (designed): spine timeline, treatments side by side, format strip, gates coloured, artefacts as they appear.</li>
+</ul>
+<h2>8. Registries and the recon loop (built)</h2>
+<p>Patterns, Cast (41), LoRA plan, open Models (44 incl. audio + worlds), Frontier (46 with verified affiliates), Compute (AUD), Sources, and the watcher → recon queue → vet → promote loop. Content notes (unfiltered/filtered/strict) on every model. These stay current via the watcher plus dated research passes; nothing enters Hero without earning it on our own footage.</p>
+<h2>9. Build order (revised)</h2>
+<table><thead><tr><th>#</th><th>Piece</th><th>State</th><th>Exit test</th></tr></thead><tbody>
+<tr><td>1</td><td><code>ingest-audio</code> (timing.json + audio block)</td><td>next</td><td>Be The Legend&#x27;s map matches ears + Suno screenshot; word timing is karaoke-tight</td></tr>
+<tr><td>2</td><td>Karaoke renderer (ASS + skins + format renders)</td><td>designed</td><td>one song, two skins, yt+shorts out; restyle in seconds</td></tr>
+<tr><td>3</td><td><code>productions</code>/formats data model + site icons, next-up queue</td><td>designed</td><td>site shows per-treatment/per-format truth</td></tr>
+<tr><td>4</td><td><code>engine release</code> pack assembler</td><td>designed</td><td>one complete agent-ready folder from real artefacts</td></tr>
+<tr><td>5</td><td>Human cockpit → <code>human_signals</code></td><td>designed</td><td>cockpit saves into a note</td></tr>
+<tr><td>6</td><td>Comic pre-viz worker (panels from section_plan)</td><td>designed</td><td>first panel set on the production box</td></tr>
+<tr><td>7</td><td>Remote video worker (Wan 2.2 on rented GPU)</td><td>designed</td><td>first artistic-film shots, cost logged in A$</td></tr>
+<tr><td>8</td><td>Cast LoRA foundry</td><td>designed</td><td>first validated character LoRA</td></tr>
+<tr><td>9</td><td>Control rig (pose/motion, shot unit)</td><td>horizon</td><td>first directed hero shot</td></tr>
+</tbody></table>
+<p>Full karaoke catalogue sweep (96 songs) becomes possible at step 2 and costs ~nothing but render time; that is the community-facing win while the generative lanes mature.</p>
+<h2>10. Cost picture (unchanged fundamentals)</h2>
+<p>Karaoke lane: A$0 GPU, local ffmpeg. Draft generative: Vast.ai 4090 ~A$0.45/hr. Hero: RunPod A100 ~A$2.00/hr / H100 ~A$4.30/hr. LoRA training ~A$2-7 per character. Full draft-clip sweep of the catalogue ~A$18-22. Stems stay local (~45 GB catalogue-wide); only KB-scale derived data moves.</p></div>
 </main>
 <footer class="site-footer"><div class="wrap">A live monitor of the i C.
 infinity visual pipeline. Regenerated from the song vault as pieces

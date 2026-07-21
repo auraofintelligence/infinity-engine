@@ -1,0 +1,73 @@
+# Platform format matrix, derived from the asset guide
+# (ai-native-indie-distribution/asset-guide.html). Data, not prose: the
+# renderer reads sizes and safe rules; the site reads icons and priority.
+#
+# priority: per-lane default render order; the site's "next up" queue is
+# the highest-priority undone format across the catalogue.
+
+formats:
+  - key: yt
+    label: YouTube
+    icon: "YT"
+    size: 1920x1080
+    aspect: "16:9"
+    kind: video
+    notes: H.264/AAC MP4; thumbnail 1280x720; hook timestamp in metadata.
+  - key: shorts
+    label: Vertical (Shorts/Reels/TikTok)
+    icon: "9:16"
+    size: 1080x1920
+    aspect: "9:16"
+    kind: video
+    notes: One shared vertical master; captions inside safe area; hook-first cutdown; loop point; thumbnail frame.
+  - key: ig-feed
+    label: Instagram feed
+    icon: "1:1"
+    size: 1080x1080
+    aspect: "1:1"
+    kind: video/still
+    notes: Square crop from master; JPG/PNG stills, MP4 video.
+  - key: ig-portrait
+    label: Instagram portrait
+    icon: "4:5"
+    size: 1080x1350
+    aspect: "4:5"
+    kind: video/still
+    notes: Feed portrait crop.
+  - key: canvas
+    label: Spotify Canvas
+    icon: "CNV"
+    size: 1080x1920
+    aspect: "9:16"
+    kind: loop
+    notes: 3-8 second seamless loop, MP4 or JPG, 720-1080px tall.
+  - key: story
+    label: Story frame
+    icon: "STY"
+    size: 1080x1920
+    aspect: "9:16"
+    kind: still
+    notes: Still export of the vertical frame.
+  - key: cover
+    label: Cover art master
+    icon: "ART"
+    size: 3000x3000
+    aspect: "1:1"
+    kind: still
+    notes: DSP master; derive 1080 square + WebP web copies; Bandcamp 1400 minimum.
+  - key: site
+    label: Release page
+    icon: "WEB"
+    size: responsive
+    aspect: "-"
+    kind: embed
+    notes: Embed + compressed poster frame + SRT captions + lyrics + credits + provenance note.
+
+# Default render priority per lane (first undone wins "next up").
+priority:
+  karaoke: [yt, shorts, canvas, ig-feed, site]
+  artistic: [shorts, yt, ig-feed, canvas, site]
+  complex: [yt, shorts, site, canvas]
+  micro-drama: [shorts, ig-feed, yt, site]
+  comic: [site, ig-feed, ig-portrait]
+  course: [yt, site, shorts]

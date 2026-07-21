@@ -297,6 +297,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <a href="{up}projects.html">Projects</a>
 <a href="{up}pipeline.html">How it works</a>
 <a href="{up}workflow.html">Operator guide</a>
+<a href="{up}plan.html">Plan</a>
 <a href="{UNIVERSE_BASE}/">Music universe</a></nav>
 </div></header>
 <main class="wrap">
@@ -455,20 +456,28 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
     path.write_text(_page("How it works", pipeline_body), encoding="utf-8")
     written.append(path)
 
-    # Operator guide: render docs/WORKFLOW.md into a styled page so it
-    # lives on the site itself, WORKFLOW.md staying the single source.
-    guide = out_dir / "WORKFLOW.md"
-    if guide.exists():
-        from .markdown import render as render_md
-        body = render_md(guide.read_text(encoding="utf-8"))
-        # Cross-doc .md links have no on-site page; send them to the
-        # GitHub blob, which renders markdown. workflow.html self-links
-        # are not emitted by the doc, so nothing to special-case.
-        body = re.sub(r'href="([\w./-]+\.md)"',
-                      rf'href="{REPO_BASE}/blob/main/docs/\1"', body)
-        path = out_dir / "workflow.html"
-        path.write_text(_page("Operator guide",
-                              f"<div class='doc'>{body}</div>"),
+    # Docs rendered as on-site pages, the .md staying the single source.
+    # Cross-links between rendered docs resolve on-site; any other .md
+    # link falls back to the GitHub blob, which renders markdown.
+    from .markdown import render as render_md
+    rendered_docs = {"WORKFLOW.md": ("workflow.html", "Operator guide"),
+                     "PLAN.md": ("plan.html", "Master plan")}
+
+    def _doc_link(match):
+        target = match.group(1)
+        base = target.rsplit("/", 1)[-1]
+        if base in rendered_docs:
+            return f'href="{rendered_docs[base][0]}"'
+        return f'href="{REPO_BASE}/blob/main/docs/{target}"'
+
+    for md_name, (html_name, title) in rendered_docs.items():
+        src = out_dir / md_name
+        if not src.exists():
+            continue
+        body = render_md(src.read_text(encoding="utf-8"))
+        body = re.sub(r'href="([\w./-]+\.md)"', _doc_link, body)
+        path = out_dir / html_name
+        path.write_text(_page(title, f"<div class='doc'>{body}</div>"),
                         encoding="utf-8")
         written.append(path)
 
