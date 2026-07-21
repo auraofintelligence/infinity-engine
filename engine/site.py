@@ -116,6 +116,11 @@ vertical-align:top}
 th{color:var(--gold);font-family:var(--fm);font-size:.72rem;
 text-transform:uppercase;letter-spacing:.08em}
 .theme{color:var(--amethyst);font-size:.8rem;margin-right:.45rem;white-space:nowrap}
+.song-struct{margin-top:.35rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.song-struct .shape{font-family:var(--fm);font-size:.66rem;letter-spacing:.12em;
+color:var(--gold);border:1px solid var(--line);border-radius:5px;padding:.05rem .45rem}
+.song-struct .motif{font-family:var(--fm);font-size:.68rem;color:var(--amethyst);
+background:rgba(124,77,255,.12);border-radius:5px;padding:.02rem .4rem}
 .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
 gap:.7rem;margin:1.4rem 0}
 .legend div{border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;
@@ -421,6 +426,31 @@ el.classList.add('is-visible')}}}})}},1400);}})();
 </body></html>"""
 
 
+_SECTION_ABBR = {"verse": "V", "chorus": "C", "bridge": "B", "intro": "I",
+                 "outro": "O", "refrain": "R", "pre-chorus": "P",
+                 "post-chorus": "P", "hook": "H", "interlude": "-"}
+
+
+def _section_shape(structure) -> str:
+    """Compact letters for a song's section flow, e.g. V C V C B C O."""
+    out = []
+    for s in structure or []:
+        label = str(s.get("section", "")).split()[0].lower()
+        out.append(_SECTION_ABBR.get(label, (label[:1].upper() or "?")))
+    return " ".join(out)
+
+
+def _song_structure(note) -> str:
+    """The section shape + top motifs, shown under a song on album pages."""
+    shape = _section_shape(note.meta.get("structure"))
+    motifs = note.meta.get("motifs") or []
+    if not shape and not motifs:
+        return ""
+    bits = f'<span class="shape" title="section flow">{shape}</span>' if shape else ""
+    bits += "".join(f'<span class="motif">{_esc(m)}</span>' for m in motifs[:5])
+    return f'<div class="song-struct">{bits}</div>'
+
+
 def _pipeline_flow() -> str:
     """Native, theme-aware pipeline diagram (fallback for the hero image)."""
     stages = [
@@ -528,7 +558,7 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             rows.append(
                 "<tr>"
                 f"<td>{meta.get('track') or ''}</td>"
-                f"<td><strong>{title_cell}</strong></td>"
+                f"<td><strong>{title_cell}</strong>{_song_structure(note)}</td>"
                 f"<td><span class='pill s-{note.status}'>{note.status}</span></td>"
                 f"<td>{_esc(meta.get('mood') or '')}</td>"
                 f"<td>{themes}</td>"
@@ -539,6 +569,10 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
             f"<p class='lead'>{_esc(album.get('summary', ''))}</p>"
             f"<p class='muted'>Visual world: {_esc(album.get('visual_world', ''))}</p>"
             f"{_status_bar(counts, len(album_notes))}"
+            "<p class='muted' style='font-size:.82rem'>Under each title: the "
+            "parsed section flow (V verse, C chorus, B bridge, R refrain, "
+            "O outro) and the song's recurring motifs, from the structure-"
+            "aware ingestion.</p>"
             "<table><tr><th>#</th><th>Song</th><th>Status</th><th>Mood</th>"
             "<th>Themes</th></tr>" + "".join(rows) + "</table>")
         path = out_dir / "albums" / f"{album['slug']}.html"
