@@ -647,7 +647,7 @@ def _card_div(attrs: dict, inner: str) -> str:
 
 def render_picker(out_dir: Path, *, filename: str, title: str, noun: str,
                   lead: str, facet_defs: list, cards: list | None = None,
-                  groups: list | None = None) -> Path:
+                  groups: list | None = None, extra: str = "") -> Path:
     """Generic faceted card picker. facet_defs is (label, group, [values]);
     each card is (attrs_dict, html). Pass `groups` as a list of
     (label, blurb, [cards]) to render labelled sections instead of a flat
@@ -677,7 +677,7 @@ def render_picker(out_dir: Path, *, filename: str, title: str, noun: str,
         f"<p class='lead'>{lead}</p>"
         f'<div class="pc-facets">{facet_html}</div>'
         '<div class="pc-count" id="pcCount"></div>'
-        f'{grid}'
+        f'{grid}{extra}'
         f'<script>const PC_NOUN="{noun}";{_FILTER_CORE_JS}</script>')
     path = out_dir / filename
     path.write_text(_page(title, body), encoding="utf-8")
@@ -904,7 +904,42 @@ def render_recon(out_dir: Path) -> Path | None:
         intro += " Nothing in the queue right now."
     return render_picker(
         out_dir, filename="recon.html", title="Recon area", noun="candidate",
-        lead=intro, facet_defs=facet_defs, cards=cards)
+        lead=intro, facet_defs=facet_defs, cards=cards,
+        extra=_sources_section(out_dir))
+
+
+SOURCE_TYPES = {
+    "leaderboard": ("Leaderboards", "Rank quality and preference"),
+    "channel": ("Trusted channels", "Practitioner signal, ahead of the boards"),
+    "community": ("Community and discovery", "Raw new releases"),
+}
+
+
+def _sources_section(out_dir: Path) -> str:
+    sources = _load_catalog(out_dir, "catalog/sources.yaml", "sources")
+    if not sources:
+        return ""
+    blocks = []
+    for kind, (label, blurb) in SOURCE_TYPES.items():
+        rows = [s for s in sources if s.get("type") == kind]
+        if not rows:
+            continue
+        items = "".join(
+            f'<div><a href="{_esc(s.get("url","#"))}" target="_blank" '
+            f'rel="noopener">{_esc(s.get("name",""))}</a> '
+            f'<span class="pc-tag">{_esc(s.get("category",""))}</span>'
+            f'<br><span class="muted">{_esc(s.get("note",""))}</span></div>'
+            for s in rows)
+        blocks.append(
+            f'<div class="pc-group-head"><h2>{_esc(label)}</h2>'
+            f'<span>{_esc(blurb)}</span></div>'
+            f'<div class="legend">{items}</div>')
+    return ('<h2 style="margin-top:2.8rem">Where candidates come from</h2>'
+            "<p class='muted' style='max-width:52rem'>Three kinds of signal, "
+            "used together. The watcher automates the popularity scan; these "
+            "add quality and practitioner judgement. The funnel stays: "
+            "discover, rank, then vet on your own footage.</p>"
+            + "".join(blocks))
 
 
 CAST_TROUPES = {

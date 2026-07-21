@@ -43,6 +43,15 @@ schtasks /create /tn "InfinityEngine-ReconWatcher" /tr ^
 
 Weekly is plenty; the open-model world moves fast but not daily. After it runs, regenerate the site (`python -m engine site`) so the Recon page shows the new candidates, or add that as a second line in a small wrapper script.
 
+## Sources beyond the likes scan
+
+The watcher discovers by Hugging Face popularity, which is a hype signal, not a quality one. Two other signals fill the gap, listed on the Recon page and kept in `catalog/sources.yaml`:
+
+- **Leaderboards** rank quality and preference: LMArena and Artificial Analysis (LLMs, and video/image/speech arenas), LiveBench (LLMs), VBench (video), imgsys (image), TTS Arena (speech), the Open ASR Leaderboard (STT), and MTEB (embeddings).
+- **Trusted channels** are practitioner signal that runs ahead of the boards: Theoretically Media and Curious Refuge for AI film and video, Aitrepreneur for broad open/local models (Stable Diffusion, LoRA training, voice cloning, local LLMs, including uncensored and NSFW open models). When one of these features a tool that fits a category, add it to the queue by hand with `flagged_reason: manual`.
+
+The funnel is always the same: discover by hype, rank by leaderboard, then vet on your own footage in the Recon lane. Nothing reaches a Hero render on a leaderboard score alone. Add sources by editing `catalog/sources.yaml`.
+
 ## Prices and the manual scan
 
 Model discovery is automated because Hugging Face has a clean API. GPU pricing does not, and rates on the marketplace hosts drift, so `catalog/compute.yaml` is refreshed by a periodic manual pass rather than a scraper: roughly quarterly, or before any big batch, re-run the dated compute research (the same web scan that seeded the file), update the AUD figures at the current conversion rate, and note the date. The watcher's job is to surface new compute options worth a look; committing a price is a human call.
