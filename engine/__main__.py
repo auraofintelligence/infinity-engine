@@ -12,6 +12,13 @@
                                        read Suno stems (folder or zip) into
                                        an audio block; attach to a note if
                                        --slug names one in the vault
+  python -m engine make SLUG KIND [--tier T] [--dry-run]
+                                       assemble a job for a song: grab data,
+                                       pick model + compute, build the shot
+                                       direction, write the job folder.
+                                       KIND = panels|keyframes|video|tts|
+                                       lipsync|avatar
+  python -m engine advance SLUG STATUS move a song to a new pipeline stage
   python -m engine jobs                recent job log
   python -m engine dashboard           regenerate dashboard.html
 """
@@ -167,6 +174,76 @@ def cmd_review(cfg, args):
           "go into CORRECTIONS in engine/textclean.py; re-ingest to apply.")
 
 
+def cmd_make(cfg, args):
+    from . import pipeline
+    from .config import load_providers
+    vault_dir = resolve(cfg, "vault_dir")
+    by_slug = {n.slug: n for n in vault.all_notes(vault_dir)}
+    note = by_slug.get(args.slug)
+    if note is None:
+        sys.exit(f"not in vault: {args.slug}")
+    providers = load_providers()
+    try:
+        plan = pipeline.plan_job(cfg, providers, note, args.kind, args.tier)
+    except pipeline.PipelineError as exc:
+        sys.exit(str(exc))
+
+    m, r = plan["model"], plan["runner"]
+    tier_note = ("" if plan["tier_used"] == plan["tier_asked"]
+                 else f"  (asked {plan['tier_asked']}, nearest available)")
+    print(f"\n  {note.meta.get('title', note.slug)}  ->  {args.kind}\n")
+    print(f"  1 grab data      {note.slug}.md"
+          f"{' + audio' if plan['spec']['data']['has_audio'] else ''}")
+    print(f"  2 grab model     {m.get('name')}  [{plan['tier_used']}"
+          f" {plan['category']}]{tier_note}")
+    print(f"                   licence: {m.get('licence')}")
+    print(f"  3 align compute  {plan['runner_name']} ({r.get('kind', '?')})")
+    print(f"  4 give direction {plan['shot_count']} shots from the line read"
+          f" + style block")
+    if plan["shot_count"]:
+        first = plan["spec"]["direction"]["shots"][0]
+        snip = (first["direction"][:80] + "...") if len(
+            first["direction"]) > 80 else first["direction"]
+        print(f"                   shot 1: {snip}")
+
+    if args.dry_run:
+        print("\n  (dry run: nothing written)\n")
+        return
+
+    conn = jobs_mod.open_db(resolve(cfg, "db_path"))
+    job_dir = jobs_mod.create_job(
+        resolve(cfg, "jobs_dir"), conn, song_slug=note.slug, kind=args.kind,
+        tier=plan["tier_used"], provider=m.get("name"),
+        runner=plan["runner_name"], spec=plan["spec"])
+    rel = job_dir.relative_to(cfg["_root"])
+    print(f"  5 output lands   {rel}/  (spec.json queued)")
+    print(f"  6 evaluate       review results that land in {rel}/results/")
+    nxt = plan["next_status"]
+    if nxt:
+        print(f"  7 next move      engine advance {note.slug} {nxt}\n")
+    else:
+        print("  7 next move      (attach the output to the song)\n")
+
+
+def cmd_advance(cfg, args):
+    from .site import STATUS_ORDER
+    if args.status not in STATUS_ORDER:
+        sys.exit(f"status must be one of: {', '.join(allowed)}")
+    vault_dir = resolve(cfg, "vault_dir")
+    path = vault.note_path(vault_dir, args.slug)
+    if not path.exists():
+        sys.exit(f"not in vault: {args.slug}")
+    note = vault.read_note(path)
+    old = note.status
+    note.meta["status"] = args.status
+    vault.write_note(vault_dir, note)
+    from .site import STATUS_ORDER
+    if STATUS_ORDER.index(args.status) < STATUS_ORDER.index(old):
+        print(f"{args.slug}: {old} -> {args.status}  (moved back)")
+    else:
+        print(f"{args.slug}: {old} -> {args.status}")
+
+
 def cmd_jobs(cfg, args):
     conn = jobs_mod.open_db(resolve(cfg, "db_path"))
     rows = jobs_mod.list_jobs(conn)
@@ -223,6 +300,17 @@ def main():
     p_audio.add_argument("path", help="folder or .zip of Suno WAV stems")
     p_audio.add_argument("--slug", help="vault note to attach the audio block to")
     p_audio.add_argument("--bpm", type=int, help="song tempo (Suno shows it)")
+    p_make = sub.add_parser("make")
+    p_make.add_argument("slug")
+    p_make.add_argument("kind", help="panels | keyframes | video | tts | "
+                        "lipsync | avatar")
+    p_make.add_argument("--tier", default="standard",
+                        choices=["draft", "standard", "premium"])
+    p_make.add_argument("--dry-run", action="store_true",
+                        help="print the plan without writing a job")
+    p_adv = sub.add_parser("advance")
+    p_adv.add_argument("slug")
+    p_adv.add_argument("status")
     sub.add_parser("jobs")
     sub.add_parser("dashboard")
     sub.add_parser("site")
@@ -233,7 +321,8 @@ def main():
     cfg = load_config()
     {"ingest": cmd_ingest, "status": cmd_status, "validate": cmd_validate,
      "brief": cmd_brief, "merge": cmd_merge, "review": cmd_review,
-     "ingest-audio": cmd_ingest_audio, "jobs": cmd_jobs,
+     "ingest-audio": cmd_ingest_audio, "make": cmd_make,
+     "advance": cmd_advance, "jobs": cmd_jobs,
      "dashboard": cmd_dashboard, "site": cmd_site}[args.command](cfg, args)
 
 

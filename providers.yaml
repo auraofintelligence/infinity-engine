@@ -87,8 +87,8 @@ models:
       vram_gb: 6-8
       why: beat ElevenLabs in blind tests; note output watermarking
     avoid:
-      - F5-TTS (CC-BY-NC), Fish Speech (CC-BY-NC-SA), XTTS-v2 (CPML):
-        all non-commercial, excluded from this pipeline
+      - "F5-TTS (CC-BY-NC), Fish Speech (CC-BY-NC-SA), XTTS-v2 (CPML):
+        all non-commercial, excluded from this pipeline"
 
   image:
     draft:

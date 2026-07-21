@@ -168,6 +168,27 @@ color:var(--mut);font-size:.88rem}
 .stage-flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.4rem 0}
 .stage-flow .pill{font-size:.78rem;padding:.28rem .7rem}
 .stage-flow span.arrow{color:var(--gold)}
+.legend-n{font-family:var(--fm);font-size:.72rem;color:var(--teal);
+font-weight:700;vertical-align:middle}
+.stage-jump{display:flex;flex-wrap:wrap;gap:.4rem;margin:.2rem 0 1rem}
+.stage-jump .pill{font-size:.72rem;opacity:.7;transition:opacity .2s}
+.stage-jump .pill:hover{opacity:1}
+.stage-list{list-style:none;padding:0;margin:.3rem 0 1.6rem;display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.35rem .9rem}
+.stage-list li{border-left:2px solid var(--line);padding:.15rem 0 .15rem .7rem}
+.stage-list a{text-decoration:none;color:#e8e3ff}
+.stage-list a:hover{color:var(--teal)}
+code{font-family:var(--fm);font-size:.85em;background:rgba(255,255,255,.06);
+border:1px solid var(--line);border-radius:5px;padding:.05rem .35rem;color:#dfe8ff}
+.moves{counter-reset:mv;list-style:none;padding:0;margin:1.2rem 0;
+display:grid;gap:.55rem}
+.moves li{position:relative;padding:.7rem .9rem .7rem 3rem;
+border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03)}
+.moves li::before{counter-increment:mv;content:counter(mv);
+position:absolute;left:.8rem;top:.62rem;width:1.5rem;height:1.5rem;
+display:grid;place-items:center;border-radius:50%;font-family:var(--fm);
+font-size:.8rem;font-weight:700;color:var(--void);
+background:linear-gradient(135deg,var(--teal),var(--gold))}
 .doc{max-width:52rem}
 .doc h1{margin-top:1.6rem}.doc h2{padding-top:1.5rem;border-top:1px solid var(--line)}
 .doc h3{margin-top:1.7rem}.doc p,.doc li{color:#dcd8ee}.doc li{margin:.2rem 0}
@@ -578,6 +599,62 @@ def _lyrics_html(body: str) -> str:
     return f'<div class="lyrics">{"".join(lines)}</div>'
 
 
+STAGE_NEXT = {
+    "ingested": ("Analyse", "The LLM reads the full lyric for a director's "
+                 "line-by-line read. Run <code>engine brief SLUG --run-claude</code> "
+                 "or <code>brief --all --run-claude</code>."),
+    "analysed": ("Gate a direction", "Review the read, pick the treatment(s), "
+                 "set the note's status to <code>briefed</code>. This is Luke's "
+                 "call, the human gate."),
+    "briefed": ("Make it", "Assemble a job: grab the data and a model, align "
+                "compute, hand it the direction. Run <code>engine make SLUG "
+                "panels</code> (or video)."),
+    "panels": ("Promote keyframes", "Approve the strongest comic panels and "
+               "promote them to start/end video keyframes."),
+    "keyframes": ("Generate video", "Render the shots on a rented GPU from the "
+                  "approved keyframes and the section plan."),
+    "video": ("Assemble and publish", "Cut to the beat, render each platform "
+              "format, assemble the release pack."),
+    "published": ("Released", "Live on a platform. Feed audience response back "
+                  "into the catalogue."),
+}
+
+
+def _stage_page(status: str, songs: list, catalogue: dict) -> str:
+    label, blurb = STAGE_NEXT.get(status, (status, ""))
+    by_album: dict[str, list] = {}
+    for n in songs:
+        by_album.setdefault(n.meta.get("album", "Unfiled"), []).append(n)
+    sections = []
+    for album in catalogue.get("albums", []):
+        anotes = sorted(by_album.get(album["title"], []),
+                        key=lambda n: n.meta.get("track") or 0)
+        if not anotes:
+            continue
+        items = "".join(
+            f'<li><a href="../songs/{n.slug}.html">'
+            f'{_esc(n.meta.get("title", n.slug))}</a></li>' for n in anotes)
+        sections.append(
+            f'<div class="pc-group-head"><h2>{_esc(album["title"])}</h2>'
+            f'<span>{len(anotes)}</span></div><ul class="stage-list">{items}</ul>')
+    listing = ("".join(sections) if sections
+               else "<p class='muted'>No songs at this stage yet.</p>")
+    stage_nav = " ".join(
+        f'<a class="pill s-{s}" href="{s}.html" '
+        f'style="text-decoration:none;{"opacity:1;outline:1px solid var(--teal)" if s == status else ""}">'
+        f'{s}</a>'
+        for s in STATUS_ORDER)
+    return (
+        f'<p class="eyebrow">Stage</p><h1>{_esc(status)}</h1>'
+        f'<p class="lead">{_esc(STATUS_BLURB.get(status, ""))}. '
+        f"{len(songs)} song{'s' if len(songs) != 1 else ''} here.</p>"
+        f'<div class="stage-jump">{stage_nav}</div>'
+        f'<div class="legend" style="margin:1.2rem 0"><div>'
+        f'<span class="pc-b built">Next</span> <b>{label}</b><br>'
+        f'<span class="muted">{blurb}</span></div></div>'
+        + _seam() + listing)
+
+
 def _song_page(note, album_slug: str | None) -> str:
     """A per-song page: the LLM's director read (story seed, motifs and the
     line-by-line ideas) once analysed, else its status and section shape."""
@@ -713,10 +790,12 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
         f"{_status_bar(total_counts, len(notes))}"
         f"<p class='muted'>{len(notes)} songs &middot; {summary}</p>"
         "<p class='muted' style='margin-bottom:.4rem'>The stages a song "
-        "passes through. Click any stage for how it works.</p>"
+        "passes through. Click any stage to see the songs sitting there and "
+        "the next move. <a href='pipeline.html'>How it works &rarr;</a></p>"
         "<div class='legend'>" + "".join(
-            f"<a href='pipeline.html' class='legend-item'>"
-            f"<span class='pill s-{s}'>{s}</span><br>"
+            f"<a href='stage/{s}.html' class='legend-item'>"
+            f"<span class='pill s-{s}'>{s}</span> "
+            f"<span class='legend-n'>{total_counts.get(s, 0)}</span><br>"
             f"<span class='muted'>{STATUS_BLURB[s]}</span></a>"
             for s in STATUS_ORDER) + "</div>"
         + _seam() +
@@ -778,6 +857,16 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
                               depth=1), encoding="utf-8")
         written.append(path)
 
+    # One page per stage: the songs sitting there and the next move.
+    (out_dir / "stage").mkdir(exist_ok=True)
+    for status in STATUS_ORDER:
+        here = [n for n in notes if n.status == status]
+        body = _stage_page(status, here, catalogue)
+        path = out_dir / "stage" / f"{status}.html"
+        path.write_text(_page(f"{status.title()} songs", body, depth=1),
+                        encoding="utf-8")
+        written.append(path)
+
     # Merch phrase catalogue (poster_lines across the catalogue).
     phrases_page = render_phrases(out_dir, notes, catalogue)
     if phrases_page:
@@ -794,15 +883,40 @@ def render_site(notes: list, catalogue: dict, out_dir: Path) -> list[Path]:
         "already-approved ideas.</p>"
         + flow + _seam() +
         "<h2>The stages</h2><div class='legend'>" + "".join(
-            f"<div><span class='pill s-{s}'>{s}</span><br>"
-            f"<span class='muted'>{STATUS_BLURB[s]}</span></div>"
+            f"<a href='stage/{s}.html'><span class='pill s-{s}'>{s}</span><br>"
+            f"<span class='muted'>{STATUS_BLURB[s]}</span></a>"
             for s in STATUS_ORDER) + "</div>"
+        "<h2>The seven moves per piece</h2>"
+        "<p class='lead'>Every render, whether a comic panel or a video "
+        "shot, is assembled by one command (<code>engine make SLUG "
+        "KIND</code>) that makes the same seven moves. The job folder it "
+        "writes is the only thing that ever leaves this machine.</p>"
+        "<ol class='moves'>"
+        "<li><b>Grab data</b> &mdash; the song note: lyrics, the LLM's "
+        "line-by-line read, motifs, story seed, audio features if ingested.</li>"
+        "<li><b>Grab model</b> &mdash; an open-weight model chosen from the "
+        "registry by job kind and tier (draft / standard / premium).</li>"
+        "<li><b>Align compute</b> &mdash; the runner for that tier: local "
+        "box, rented pod, or hosted service.</li>"
+        "<li><b>Give direction</b> &mdash; the shot list and style block "
+        "assembled from the analysis; the actual prompt the worker renders.</li>"
+        "<li><b>Output lands</b> &mdash; a job folder (spec.json + results/) "
+        "is written and queued; the render drops results back into it.</li>"
+        "<li><b>Evaluate</b> &mdash; a human gate. Luke reviews what came "
+        "back and keeps, rerolls, or reshapes.</li>"
+        "<li><b>Next move</b> &mdash; the song advances a stage "
+        "(<code>engine advance</code>), or the job reruns.</li>"
+        "</ol>"
         "<h2>What exists today</h2>"
-        "<p>The vault, the ideation loop and this monitor are live. Comic "
-        "pre-viz, video generation, voice and lip-sync are designed and "
-        "would run on rented GPUs against open-weight models; they come "
-        "online stage by stage, and this site will show each song advance "
-        "as they do.</p>"
+        "<p>The vault, the ideation loop, this monitor, and moves 1&ndash;5 "
+        "of the job loop are live: <code>engine make</code> assembles a real "
+        "job folder (data, model, compute, direction) for any analysed song, "
+        "and <code>engine advance</code> moves it through the stages. The "
+        "render workers themselves &mdash; ComfyUI graphs for comic pre-viz "
+        "and video, voice and lip-sync &mdash; are the next thing to plug in "
+        "behind the job folder; they run on rented GPUs against open-weight "
+        "models and come online stage by stage, and this site shows each "
+        "song advance as they do.</p>"
         "<h2>Five lanes, one spine</h2>"
         "<p class='muted'>Lyric videos, comics and graphic novels, "
         "avatar-presented course videos, vertical micro-dramas, and whole-"
