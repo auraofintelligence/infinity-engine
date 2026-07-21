@@ -9,6 +9,16 @@ You never install ComfyUI on your laptop. You rent a GPU box by the hour,
 run ComfyUI on it, and point the engine at it. When the batch is done, you
 stop the box and stop paying.
 
+## Prefer buttons? Use the control panel
+
+Everything on this page can be done without the terminal. Double-click
+**`Infinity Engine.cmd`** in the repo folder (or run `python -m engine
+gui`) and a control panel opens in your browser: pick a song, analyse it,
+make a job, render offline or on a pod, advance a stage, and see the
+wiring, all as buttons. The panel is local only; it never gets published.
+The commands below are the same actions, for when you are on the GPU box
+itself or prefer typing.
+
 ## The one touchpoint
 
 Everything ComfyUI-related goes through a single URL. Check it any time:

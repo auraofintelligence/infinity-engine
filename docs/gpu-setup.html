@@ -411,6 +411,8 @@ html:not(.js) .seam .seam-light{display:none}
 <div class='doc'><h1>Set up a GPU (spinning up other devices)</h1>
 <p>The engine does all its thinking on your own machine. The only step that needs a real GPU is the render: turning a job&#x27;s shots into images or video through <strong>ComfyUI</strong>. This page is the concrete &quot;spin up another device&quot; story, from renting a box to frames landing back on your laptop.</p>
 <p>You never install ComfyUI on your laptop. You rent a GPU box by the hour, run ComfyUI on it, and point the engine at it. When the batch is done, you stop the box and stop paying.</p>
+<h2>Prefer buttons? Use the control panel</h2>
+<p>Everything on this page can be done without the terminal. Double-click <strong><code>Infinity Engine.cmd</code></strong> in the repo folder (or run `python -m engine gui`) and a control panel opens in your browser: pick a song, analyse it, make a job, render offline or on a pod, advance a stage, and see the wiring, all as buttons. The panel is local only; it never gets published. The commands below are the same actions, for when you are on the GPU box itself or prefer typing.</p>
 <h2>The one touchpoint</h2>
 <p>Everything ComfyUI-related goes through a single URL. Check it any time:</p>
 <pre><code>engine doctor</code></pre>

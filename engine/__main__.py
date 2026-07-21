@@ -24,6 +24,8 @@
                                        the GPU box. --offline emits the graphs
                                        it would submit, no GPU needed.
                                        --server points at a pod's ComfyUI.
+  python -m engine gui [--port N]      open the local control panel in a
+                                       browser (buttons, not the terminal)
   python -m engine doctor [--server URL]
                                        show the wiring: paths, whether ComfyUI
                                        is reachable, runners, queued jobs
@@ -252,6 +254,11 @@ def cmd_advance(cfg, args):
         print(f"{args.slug}: {old} -> {args.status}")
 
 
+def cmd_gui(cfg, args):
+    from .gui import serve
+    serve(port=args.port, open_browser=not args.no_browser)
+
+
 def cmd_doctor(cfg, args):
     """Show the wiring: paths, the ComfyUI touchpoint, runners, jobs. The
     one place to see whether a GPU box is actually reachable."""
@@ -418,6 +425,9 @@ def main():
                         help="ComfyUI URL override, e.g. http://POD_IP:8188")
     p_doctor = sub.add_parser("doctor")
     p_doctor.add_argument("--server", help="ComfyUI URL to test")
+    p_gui = sub.add_parser("gui")
+    p_gui.add_argument("--port", type=int, default=8765)
+    p_gui.add_argument("--no-browser", action="store_true")
     sub.add_parser("jobs")
     sub.add_parser("dashboard")
     sub.add_parser("site")
@@ -430,7 +440,7 @@ def main():
      "brief": cmd_brief, "merge": cmd_merge, "review": cmd_review,
      "ingest-audio": cmd_ingest_audio, "make": cmd_make,
      "advance": cmd_advance, "work": cmd_work, "doctor": cmd_doctor,
-     "jobs": cmd_jobs, "dashboard": cmd_dashboard,
+     "gui": cmd_gui, "jobs": cmd_jobs, "dashboard": cmd_dashboard,
      "site": cmd_site}[args.command](cfg, args)
 
 
