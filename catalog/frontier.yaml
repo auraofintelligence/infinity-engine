@@ -413,6 +413,7 @@ frontier:
     name: Marble
     vendor: World Labs
     category: worlds
+    subtype: world
     access: web
     pricing: subscription (Pro grants commercial rights)
     strength: Text/image/video to editable, downloadable 3D environments (splats + meshes). Best hosted fit for a film pipeline.
