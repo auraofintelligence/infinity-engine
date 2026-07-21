@@ -10,38 +10,9 @@ Prices in AUD (converted at AUD/USD 0.70, 2026-07-20 unless noted). Honest tense
 
 Turn the i C. infinity catalogue into film across three lanes: **Recon** (fast, rough, cheap: test models, harvest LoRA data, learn), **Release** (publishable, teachable, community-facing), **Hero** (A Protopian Gambit and festival shorts, fully directed). Earlier albums are deliberately the R&D lab and community on-ramp. Everything ships from a pipeline Luke owns end to end: open-weight first, rented GPUs on demand, nothing locked to a vendor.
 
-## 2. The one diagram
+## 2. The one flow
 
-```
-                    SOURCES (stay on trusted machines)
-  lyrics (universe repo)   Suno stems (WAV+MIDI)   human cockpit signals
-        │                        │                        │
-        ▼                        ▼                        ▼
-  ┌────────────────────── INGESTION (built / designed) ─────────────────────┐
-  │ structure.py: verses/chorus,   ingest-audio: timed sections, beat grid, │
-  │ keywords, motifs (BUILT)       per-stem energy, lyric word timestamps,  │
-  │                                active-stem list (DESIGNED, next build)  │
-  └──────────────────────────────────┬───────────────────────────────────---┘
-                                     ▼
-             THE NOTE (vault/<slug>.md = the song's single source of truth)
-      structure + motifs + audio block + analysis + section_plan + productions
-                                     ▼
-  analyse (LLM brief, per-section set/scene/energy/transition)  ── BUILT
-                                     ▼
-  ██ GATE: Luke approves direction, picks treatments ██  (status: briefed)
-                                     ▼
-  ┌───────────────────────── TREATMENTS (per song, each own status) ────────┐
-  │ karaoke lyric video   artistic film        complex film                 │
-  │ timing+style render   supports/contradicts  band/acted/CGI transpose    │
-  │ no GPU, local, fast   lyrics (mid cost)     cast+motion rig (Hero)      │
-  └──────────────────────────────────┬──────────────────────────────────────┘
-                                     ▼
-  FORMAT RENDERS (one treatment → many platform formats, from one master)
-                                     ▼
-  RELEASE PACK (agent-ready folder per song/album, asset-guide families)
-                                     ▼
-  PLATFORMS (YouTube, Shorts, IG, TikTok, Spotify Canvas, Bandcamp, site...)
-```
+The diagram at the top of this page is the whole pipeline: sources stay on trusted machines, feed ingestion, land in the note, pass Luke's gate, branch into treatments, render to every platform format, assemble into release packs, ship.
 
 Rule that never changes: **sources and the vault stay local; only small derived data (JSON, timings) and approved renders move.** Stems are ~470 MB a song; their feature block is a few KB. Same privacy rule as the lyrics.
 
