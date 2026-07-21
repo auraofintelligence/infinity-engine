@@ -269,6 +269,27 @@ border:1px solid transparent}
 background:rgba(124,77,255,.14);border-radius:5px;padding:.06rem .4rem}
 .pc-meta{font-size:.82rem;color:var(--mut);line-height:1.5}
 .pc-meta b{color:#d7d1ea;font-weight:600}
+.pc-gb{display:flex;align-items:center;justify-content:space-between;gap:.5rem;
+margin:.1rem 0 .5rem;padding:.35rem .6rem;border-radius:9px;
+border:1px solid rgba(255,207,110,.35);background:rgba(255,207,110,.08)}
+.pc-gb span{font-family:var(--fm);font-size:.62rem;text-transform:uppercase;
+letter-spacing:.06em;color:var(--gold-soft,#ffcf6e)}
+.pc-gb b{color:#ffe6b0;font-size:.92rem;text-align:right}
+.reco{border:1px solid rgba(43,227,194,.35);border-radius:16px;padding:1.1rem 1.2rem;
+margin:0 0 1.4rem;background:linear-gradient(180deg,rgba(43,227,194,.07),rgba(255,255,255,.02))}
+.reco-h{font-size:.95rem;margin-bottom:.7rem;color:#e8f7f3}
+.reco-row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:end}
+.reco-row label{display:flex;flex-direction:column;gap:.25rem;font-size:.72rem;
+text-transform:uppercase;letter-spacing:.04em;color:var(--mut);font-family:var(--fm);flex:1;min-width:180px}
+.reco-row select{padding:.5rem .6rem;border-radius:9px;border:1px solid var(--line);
+background:rgba(0,0,0,.3);color:var(--ink);font-size:.9rem;font-family:system-ui,sans-serif;
+text-transform:none;letter-spacing:0}
+.reco-go{border:none;border-radius:10px;padding:.6rem 1.1rem;font-weight:700;
+color:var(--void);background:linear-gradient(135deg,var(--teal),var(--gold));cursor:pointer}
+.reco-out{margin-top:.8rem;font-size:.95rem;line-height:1.5}
+.reco-out.muted{color:var(--mut)}
+.pc-card.reco-pick{outline:2px solid var(--teal);
+box-shadow:0 0 0 4px rgba(43,227,194,.15),0 10px 40px rgba(43,227,194,.2)}
 .cast-ref{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;
 margin:-.3rem 0 .7rem;border:1px solid var(--line);background:rgba(255,255,255,.03)}
 .pc-more{border:none;background:none;color:var(--teal);cursor:pointer;
@@ -1193,7 +1214,7 @@ def _card_div(attrs: dict, inner: str) -> str:
 def render_picker(out_dir: Path, *, filename: str, title: str, noun: str,
                   lead: str, facet_defs: list, cards: list | None = None,
                   groups: list | None = None, extra: str = "",
-                  sorts: list | None = None) -> Path:
+                  sorts: list | None = None, top: str = "") -> Path:
     """Generic faceted card picker. facet_defs is (label, group, [values]);
     each card is (attrs_dict, html). Pass `groups` as a list of
     (label, blurb, [cards]) to render labelled sections instead of a flat
@@ -1231,6 +1252,7 @@ def render_picker(out_dir: Path, *, filename: str, title: str, noun: str,
     body = (
         f"<h1>{_esc(title)}</h1>"
         f"<p class='lead'>{lead}</p>"
+        f"{top}"
         f'<div class="pc-facets">{facet_html}</div>'
         '<div class="pc-count" id="pcCount"></div>'
         f'{grid}{extra}'
@@ -1514,6 +1536,70 @@ def render_loras(out_dir: Path) -> Path | None:
         facet_defs=facet_defs, groups=groups)
 
 
+RECO_WIDGET = """
+<div class="reco">
+  <div class="reco-h"><b>Not sure which box?</b> Tell me two things and I'll
+  point at the best one and why, so you don't have to weigh all of them.</div>
+  <div class="reco-row">
+    <label>What are you making?
+      <select id="recoTask">
+        <option value="panels-draft">Comic panels, quick drafts (~10 GB)</option>
+        <option value="panels-good">Comic panels, best look (~24 GB)</option>
+        <option value="video-std">Video, standard (~24 GB)</option>
+        <option value="video-big">Video, long or premium (~48 GB+)</option>
+        <option value="voice">Voice / narration (light)</option>
+        <option value="batch">Big overnight batch</option>
+      </select></label>
+    <label>What matters most?
+      <select id="recoPri">
+        <option value="cheapest">Cheapest</option>
+        <option value="fastest">Fastest to start</option>
+        <option value="local">Most local (Australia)</option>
+      </select></label>
+    <button class="reco-go" onclick="recoRun()">Recommend</button>
+  </div>
+  <div id="recoOut" class="reco-out muted">Pick two, then press Recommend.</div>
+</div>
+<script>
+const RECO_NEED={
+ 'panels-draft':{gb:10,t:'quick draft panels'},
+ 'panels-good':{gb:24,t:'quality comic panels'},
+ 'video-std':{gb:24,t:'standard video'},
+ 'video-big':{gb:48,t:'long or premium video'},
+ 'voice':{gb:8,t:'voice / narration'},
+ 'batch':{gb:24,t:'a big overnight batch'}};
+function recoRun(){
+ const task=document.getElementById('recoTask').value;
+ const pri=document.getElementById('recoPri').value;
+ const need=RECO_NEED[task];
+ const spin={fast:3,medium:2,slow:1};
+ const cards=Array.prototype.slice.call(document.querySelectorAll('.pc-card'));
+ cards.forEach(c=>c.classList.remove('reco-pick'));
+ const isVideo=task.indexOf('video')===0;
+ let ok=cards.map(function(c){return{el:c,
+   vram:+(c.dataset.vram||0),cheap:+(c.dataset.cheap||0),dist:+(c.dataset.dist||0),
+   spin:spin[c.dataset.spinup]||0,self:c.dataset.selfserve==='yes',
+   name:(c.dataset.pname||'')+' '+c.querySelector('h3').textContent,
+   gb:c.dataset.gblabel||'',price:c.dataset.priceshort||''};})
+   .filter(function(x){return x.vram>=need.gb||(x.vram===0&&isVideo);});
+ if(!ok.length){document.getElementById('recoOut').textContent=
+   'Nothing here has enough GPU memory for that. Try a lighter task.';return;}
+ ok.sort(function(a,b){
+   if(a.self!==b.self)return a.self?-1:1;            // actionable first
+   if(pri==='cheapest')return b.cheap-a.cheap;
+   if(pri==='fastest')return b.spin-a.spin;
+   return b.dist-a.dist;});
+ const best=ok[0];
+ best.el.classList.add('reco-pick');
+ const pl={cheapest:'cheapest',fastest:'fastest to start',local:'most local'}[pri];
+ document.getElementById('recoOut').innerHTML='For <b>'+need.t+'</b>, '+pl+
+   ': <b>'+best.name+'</b> &mdash; '+best.gb+', '+best.price+
+   (best.self?'':' (contact sales)')+'. Highlighted below.';
+ best.el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>"""
+
+
 def render_compute(out_dir: Path) -> Path | None:
     rows = _load_catalog(out_dir, "catalog/compute.yaml", "compute")
     if not rows:
@@ -1524,17 +1610,29 @@ def render_compute(out_dir: Path) -> Path | None:
         "au-region": ("au-region", "AU data", "release"),
         "global": ("global", "global", "tier"),
     }
+    dist_rank = {"au-owned": 3, "au-region": 2, "global": 1}
     cards = []
     for c in rows:
         best = c.get("best_for", "")
         loc = str(c.get("location", "global"))
         lval, llabel, lclass = loc_meta.get(loc, loc_meta["global"])
-        self_serve = str(c.get("self_serve", "")).lower() == "yes"
+        # YAML parses bare yes/no as booleans; accept both forms.
+        sv = c.get("self_serve")
+        self_serve = sv is True or str(sv).lower() in ("yes", "true")
         price = c.get("price_aud_hr", "?")
+        vram = int(c.get("vram_gb") or 0)
+        vram_label = c.get("vram_label") or (f"{vram} GB" if vram else "hosted")
+        # Numeric scores so the picker's descending sort means "better first".
+        cheap = round(1000 / price) if isinstance(price, (int, float)) and price else 0
+        if isinstance(price, (int, float)):
+            price_short = f"A${price}/hr"
+        elif str(price) == "quote":
+            price_short = "by quote"
+        else:
+            price_short = "per-output"
         price_html = (f'<b>A${_esc(price)}</b>/hr'
                       if isinstance(price, (int, float))
-                      else (f'<b>{_esc(price)}</b>' if str(price) == "quote"
-                            else f'<b>{_esc(price)}</b>'))
+                      else f'<b>{_esc(price)}</b>')
         link = c.get("link", "")
         inner = (
             '<div class="pc-badges">'
@@ -1546,6 +1644,8 @@ def render_compute(out_dir: Path) -> Path | None:
                else '<span class="pc-b designed">contact sales</span>')
             + '</div>'
             f'<h3>{_esc(c.get("card", c["id"]))}</h3>'
+            f'<div class="pc-gb" title="GPU memory per card">'
+            f'<span>GPU RAM</span><b>{_esc(vram_label)}</b></div>'
             f'<div class="pc-meta" style="font-size:1.1rem;color:#cdd6df">'
             f'{price_html}</div>'
             f'<p class="pc-sum">{_esc(c.get("notes",""))}</p>'
@@ -1560,6 +1660,13 @@ def render_compute(out_dir: Path) -> Path | None:
             "provider": [str(c.get("provider", "")).lower().replace(".", "")],
             "bestfor": [str(best)] if best else [],
             "spinup": [str(c.get("spinup", ""))],
+            "vram": [str(vram)],
+            "cheap": [str(cheap)],
+            "dist": [str(dist_rank.get(loc, 1))],
+            "selfserve": ["yes" if self_serve else "no"],
+            "pname": [str(c.get("provider", ""))],
+            "gblabel": [vram_label],
+            "priceshort": [price_short],
         }
         cards.append((attrs, inner))
     facet_defs = [
@@ -1570,6 +1677,9 @@ def render_compute(out_dir: Path) -> Path | None:
             [{"p": str(c.get("provider", "")).lower().replace(".", "")}
              for c in rows], "p")),
     ]
+    sorts = [("Closest first", "dist", True),
+             ("Most GPU RAM", "vram", True),
+             ("Cheapest", "cheap", True)]
     return render_picker(
         out_dir, filename="compute.html", title="Compute comparer",
         noun="option",
@@ -1582,7 +1692,7 @@ def render_compute(out_dir: Path) -> Path | None:
               "creator's practical self-serve local path is a hyperscaler "
               "Australian region or a global marketplace filtered to Sydney. "
               "Rates drift, so re-verify before a big batch."),
-        facet_defs=facet_defs, cards=cards)
+        facet_defs=facet_defs, cards=cards, sorts=sorts, top=RECO_WIDGET)
 
 
 def render_recon(out_dir: Path) -> Path | None:

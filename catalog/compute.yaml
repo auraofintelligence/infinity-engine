@@ -8,6 +8,8 @@
 #            global     runs who-knows-where; cheapest, least sovereign
 # self_serve: yes  sign up and rent by the hour yourself
 #             no   enterprise / commitment, talk to sales first
+# vram_gb:   GPU memory PER CARD (the number that decides what models fit).
+# vram_label: how that reads on the card (per-GPU, or cluster).
 # best_for:  immediate fast spin-up | batch cheapest per hour restartable
 # spinup:    fast (seconds) | medium (minutes) | slow (image pull)
 #
@@ -23,6 +25,8 @@ compute:
     provider: Sustainable Metal Cloud (Firmus)
     offering: immersion-cooled bare metal
     card: H100 / A100 clusters
+    vram_gb: 80
+    vram_label: 80 GB/GPU (H100/A100 cluster)
     price_aud_hr: 3.00
     billing: committed
     interruptible: no
@@ -39,6 +43,8 @@ compute:
     provider: Sharon AI
     offering: sovereign neocloud
     card: H100 / H200 / B200
+    vram_gb: 80
+    vram_label: 80-192 GB/GPU (H100/H200/B200)
     price_aud_hr: quote
     billing: contract
     interruptible: no
@@ -54,6 +60,8 @@ compute:
     provider: Micron21 (mCloud)
     offering: sovereign GPU cloud
     card: A100 / H100 / H200
+    vram_gb: 80
+    vram_label: 40-141 GB (A100/H100/H200)
     price_aud_hr: quote
     billing: quote
     interruptible: no
@@ -69,6 +77,8 @@ compute:
     provider: DUG Technology
     offering: HPC-as-a-service
     card: HPC GPU nodes
+    vram_gb: 80
+    vram_label: HPC nodes (varies)
     price_aud_hr: quote
     billing: quote
     interruptible: no
@@ -86,6 +96,8 @@ compute:
     provider: AWS (ap-southeast-2)
     offering: on-demand / spot
     card: H100 (p5)
+    vram_gb: 80
+    vram_label: 80 GB (H100)
     price_aud_hr: 17.6
     billing: per-second
     interruptible: spot option
@@ -101,6 +113,8 @@ compute:
     provider: Google Cloud (australia-southeast1)
     offering: on-demand / spot
     card: H100
+    vram_gb: 80
+    vram_label: 80 GB (H100)
     price_aud_hr: 17.8
     billing: per-second
     interruptible: spot option
@@ -116,6 +130,8 @@ compute:
     provider: Azure (Australia East)
     offering: on-demand / spot
     card: ND H100 v4
+    vram_gb: 80
+    vram_label: 80 GB (H100)
     price_aud_hr: 20.0
     billing: per-second
     interruptible: spot option
@@ -133,6 +149,8 @@ compute:
     provider: Vast.ai
     offering: interruptible
     card: RTX 4090
+    vram_gb: 24
+    vram_label: 24 GB (RTX 4090)
     price_aud_hr: 0.45
     billing: per-second
     interruptible: yes
@@ -148,6 +166,8 @@ compute:
     provider: RunPod
     offering: community cloud
     card: RTX 4090
+    vram_gb: 24
+    vram_label: 24 GB (RTX 4090)
     price_aud_hr: 0.50
     billing: per-second
     interruptible: spot option
@@ -163,6 +183,8 @@ compute:
     provider: RunPod
     offering: secure cloud
     card: A100 80GB
+    vram_gb: 80
+    vram_label: 80 GB (A100)
     price_aud_hr: 2.00
     billing: per-second
     interruptible: spot option
@@ -177,6 +199,8 @@ compute:
     provider: RunPod
     offering: secure cloud
     card: H100
+    vram_gb: 80
+    vram_label: 80 GB (H100)
     price_aud_hr: 4.30
     billing: per-second
     interruptible: spot option
@@ -191,6 +215,8 @@ compute:
     provider: Salad
     offering: batch priority
     card: RTX 5090
+    vram_gb: 32
+    vram_label: 32 GB (RTX 5090)
     price_aud_hr: 0.40
     billing: per-second
     interruptible: yes
@@ -206,6 +232,8 @@ compute:
     provider: Modal
     offering: serverless
     card: H100
+    vram_gb: 80
+    vram_label: 80 GB (H100)
     price_aud_hr: 5.65
     billing: per-second
     interruptible: no
@@ -221,6 +249,8 @@ compute:
     provider: Modal
     offering: serverless
     card: A100 80GB
+    vram_gb: 80
+    vram_label: 80 GB (A100)
     price_aud_hr: 3.60
     billing: per-second
     interruptible: no
@@ -235,6 +265,8 @@ compute:
     provider: fal.ai
     offering: per-output API
     card: hosted (Wan/Kling/Veo)
+    vram_gb: 0
+    vram_label: hosted (managed)
     price_aud_hr: "≈A$0.07 per second of video"
     billing: per-output
     interruptible: n/a
@@ -249,6 +281,8 @@ compute:
     provider: Lambda
     offering: on-demand
     card: A100 80GB
+    vram_gb: 80
+    vram_label: 80 GB (A100)
     price_aud_hr: 3.99
     billing: per-minute
     interruptible: no
