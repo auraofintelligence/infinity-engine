@@ -95,7 +95,8 @@ background:rgba(0,0,0,.25);color:var(--ink);font-size:.9rem;font-family:inherit;
 label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;
 color:var(--mut);margin:.6rem 0 .2rem;font-family:var(--fm)}
 select{width:100%;padding:.5rem .6rem;border-radius:9px;border:1px solid var(--line);
-background:rgba(0,0,0,.25);color:var(--ink);font-size:.9rem;font-family:inherit}
+background:#0a1420;color:var(--ink);font-size:.9rem;font-family:inherit;color-scheme:dark}
+option{background:#0a1420;color:#eae6ff}
 #out{white-space:pre-wrap;font-family:var(--fm);font-size:.8rem;color:#d7e5ff;background:#04060b;
 border:1px solid var(--line);border-radius:12px;padding:1rem;margin-top:1rem;min-height:2.5rem;
 max-height:300px;overflow:auto}
