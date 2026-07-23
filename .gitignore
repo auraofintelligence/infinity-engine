@@ -8,3 +8,6 @@ catalog/.seen.json
 __pycache__/
 *.pyc
 .venv/
+
+# local audio/video working files (large, not for the repo)
+media/
