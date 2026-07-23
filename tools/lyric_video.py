@@ -190,17 +190,24 @@ def main():
     p.add_argument("--out", required=True)
     p.add_argument("--title", default="")
     p.add_argument("--artist", default="i C. infinity")
+    p.add_argument("--timing", help="a timing.json to render instead of "
+                   "computing timing here (list of line/start/end)")
     args = p.parse_args()
 
     lines = [l.strip() for l in
              Path(args.lyrics).read_text(encoding="utf-8").splitlines()
              if l.strip()]
-    blocks, duration = voiced_blocks(Path(args.vocals))
-    sung = sum(b - a for a, b in blocks)
-    print(f"  {len(lines)} lines, {len(blocks)} sung blocks, "
-          f"{sung:.0f}s singing of {duration:.0f}s")
-
-    timed = place_lines(lines, blocks)
+    if args.timing:
+        import json
+        rows = json.loads(Path(args.timing).read_text(encoding="utf-8"))
+        timed = [(r["start"], r["end"], r["line"]) for r in rows]
+        print(f"  using supplied timing: {len(timed)} lines")
+    else:
+        blocks, duration = voiced_blocks(Path(args.vocals))
+        sung = sum(b - a for a, b in blocks)
+        print(f"  {len(lines)} lines, {len(blocks)} sung blocks, "
+              f"{sung:.0f}s singing of {duration:.0f}s")
+        timed = place_lines(lines, blocks)
     ass = Path(args.out).with_suffix(".ass")
     write_ass(ass, timed, args.title or Path(args.audio).stem, args.artist)
     print(f"  wrote {ass.name}; first line at {timed[0][0]:.1f}s, "
