@@ -10,16 +10,13 @@
 
 ## Related public projects
 
-Each link below reflects an evidenced family, lineage or direct connection. This project has 7 relevant public connections.
+Each link below reflects an evidenced family, lineage or direct connection. This project has 4 relevant public connections.
 
 ### i C. infinity music and content system
 
 - [explorer-music-video-lab](https://github.com/auraofintelligence/explorer-music-video-lab) - [public page](https://auraofintelligence.github.io/explorer-music-video-lab/) - later build; explorer-music-video-lab is earlier, explicit cross-reference, ordered build lineage, shared named build family.
 - [i-C-infinity](https://github.com/auraofintelligence/i-C-infinity) - later build; i-C-infinity is earlier, ordered build lineage, shared named build family.
 - [i-C-infinity-music-universe](https://github.com/auraofintelligence/i-C-infinity-music-universe) - [public page](https://auraofintelligence.github.io/i-C-infinity-music-universe/) - later build; i-C-infinity-music-universe is earlier, explicit cross-reference, ordered build lineage, shared named build family.
-- [i-C-infinity-one-album-pack](https://github.com/auraofintelligence/i-C-infinity-one-album-pack) - [public page](https://auraofintelligence.github.io/i-C-infinity-one-album-pack/) - later build; i-C-infinity-one-album-pack is earlier, ordered build lineage, shared named build family.
-- [i-C-infinity-three-album-pack](https://github.com/auraofintelligence/i-C-infinity-three-album-pack) - [public page](https://auraofintelligence.github.io/i-C-infinity-three-album-pack/) - later build; i-C-infinity-three-album-pack is earlier, ordered build lineage, shared named build family.
-- [i-C-infinity-two-album-pack](https://github.com/auraofintelligence/i-C-infinity-two-album-pack) - [public page](https://auraofintelligence.github.io/i-C-infinity-two-album-pack/) - later build; i-C-infinity-two-album-pack is earlier, ordered build lineage, shared named build family.
 - [infinity-content-engine](https://github.com/auraofintelligence/infinity-content-engine) - [public page](https://auraofintelligence.github.io/infinity-content-engine/) - later build; infinity-content-engine is earlier, explicit cross-reference, ordered build lineage, shared named build family.
 
 <!-- github-organisation:end -->
