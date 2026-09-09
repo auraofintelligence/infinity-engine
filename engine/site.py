@@ -517,6 +517,7 @@ def _page(title: str, body: str, depth: int = 0) -> str:
 <li><a href="{up}phrases.html">Phrases</a></li>
 <li><a href="{up}projects.html">Projects</a></li>
 <li><a href="{UNIVERSE_BASE}/">Music universe</a></li>
+<li><a href="https://auraofintelligence.github.io/davinci-resolve-automations/">DaVinci video system</a></li>
 <li><a href="{REPO_BASE}">Source (GitHub)</a></li></ul></div>
 </div>
 <p>A live monitor of the i C. infinity visual pipeline. Regenerated from

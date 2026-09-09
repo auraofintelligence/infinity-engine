@@ -10,7 +10,7 @@
 
 ## Related public projects
 
-Each link below reflects an evidenced family, lineage or direct connection. This project has 4 relevant public connections.
+Each link below reflects an evidenced family, lineage or direct connection. This project has 5 relevant public connections.
 
 ### i C. infinity music and content system
 
@@ -18,6 +18,7 @@ Each link below reflects an evidenced family, lineage or direct connection. This
 - [i-C-infinity](https://github.com/auraofintelligence/i-C-infinity) - later build; i-C-infinity is earlier, ordered build lineage, shared named build family.
 - [i-C-infinity-music-universe](https://github.com/auraofintelligence/i-C-infinity-music-universe) - [public page](https://auraofintelligence.github.io/i-C-infinity-music-universe/) - later build; i-C-infinity-music-universe is earlier, explicit cross-reference, ordered build lineage, shared named build family.
 - [infinity-content-engine](https://github.com/auraofintelligence/infinity-content-engine) - [public page](https://auraofintelligence.github.io/infinity-content-engine/) - later build; infinity-content-engine is earlier, explicit cross-reference, ordered build lineage, shared named build family.
+- [DaVinci Resolve Automations](https://github.com/auraofintelligence/davinci-resolve-automations) - [public page](https://auraofintelligence.github.io/davinci-resolve-automations/) - the beginner-friendly editing system that turns prepared song material into consistent videos.
 
 <!-- github-organisation:end -->
 
