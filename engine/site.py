@@ -10,6 +10,7 @@ import html
 import json
 import re
 from pathlib import Path
+from .network_portraits import lookup as portrait_lookup, player as portrait_player
 
 from .textclean import clean as _clean
 
@@ -717,6 +718,9 @@ def _song_page(note, album_slug: str | None, prev=None, nxt=None) -> str:
     """A per-song page: the LLM's director read (story seed, motifs and the
     line-by-line ideas) once analysed, else its status and section shape."""
     m = note.meta
+    network_media = portrait_lookup(m.get("title", note.slug), note.slug, m.get("album", ""), m.get("track"))
+    current_body = network_media["lyrics"] if network_media else note.body
+    network_player = portrait_player(network_media) if network_media else ""
     title = _esc(m.get("title", note.slug))
     crumb = (f'<a href="../albums/{album_slug}.html">&larr; {_esc(m.get("album",""))}</a>'
              if album_slug else "")
@@ -762,10 +766,10 @@ def _song_page(note, album_slug: str | None, prev=None, nxt=None) -> str:
                f'<div class="poster-lines">{pl}</div>' if pl else "")
             + ("<h2>Line by line</h2>"
                f'<div class="line-ideas">{li}</div>' if li else ""))
-    lyrics = ("<h2>Lyrics</h2>" + _lyrics_html(note.body)) if note.body.strip() else ""
+    lyrics = ("<h2>Lyrics</h2>" + _lyrics_html(current_body)) if current_body.strip() else ""
     nav = _song_nav(prev, nxt)
     back = ('<p style="margin-top:1.4rem">' + crumb + "</p>") if crumb else ""
-    return head + body + _seam() + lyrics + _seam() + nav + back
+    return head + network_player + body + _seam() + lyrics + _seam() + nav + back
 
 
 def _pipeline_flow() -> str:
